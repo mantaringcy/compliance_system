@@ -6,6 +6,7 @@ use App\Http\Controllers\ResetPasswordController;
 use Illuminate\Support\Facades\Route;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 
 Route::redirect('/', 'login');
@@ -41,7 +42,7 @@ Route::middleware('auth')->group(function() {
 
 
     // Route::view('/overview', 'components.overview');
-    Route::get('/overview', [ComplianceController::class, 'getDepartment'])->name('new-compliance');
+    Route::view('/overview', 'components.overview');
 
 
     Route::view('/monthly-projection', 'components.monthly-projection');
@@ -76,4 +77,13 @@ Route::middleware('auth')->group(function() {
 
     // Resending the Verification Email
     Route::post('/email/verification-notification', [AuthenticationController::class, 'verifyHandler'])->middleware('throttle:6,1')->name('verification.send');
+});
+
+// Fallback route
+Route::fallback(function () {
+    // Check if the user is authenticated
+    if (Auth::check()) {
+        return redirect()->route('dashboard'); // Redirect authenticated users to the dashboard
+    }
+    return redirect()->route('login'); // Redirect guests to the login page
 });
