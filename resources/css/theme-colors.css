@@ -1,0 +1,70 @@
+:root {
+    /* Main */
+    --body-color: #F8F9FA !important;
+    --border: #E7EAEE !important;
+
+    /* Sidebar */
+    --sidebar-border: #BEC8D0 !important;
+    --sidebar-text: #5B6B79 !important;
+
+    /* Profile */
+    --profile-fill: #F2F5F7 !important;
+    --profile-fill-hover: #4680FF !important;
+
+    /* Text */
+    --primary-color-text: #131920 !important;
+
+    /* Link */
+    --active-link: #E4EDFB !important;
+    --active-link-hover: #E7EBED !important;
+    --active-link-text: #4480FF !important;
+
+    /* Icon */
+    --icon-color: #5B6B79 !important;
+    --icon-hover: #F3F5F7 !important;
+
+    /* Card */
+    --card-fill: #FFFFFF !important;
+
+    /* Input */
+    --input-color: #FFFFFF !important;
+    --input-text-color: #BEC8D0 !important;
+    --input-border: #BEC8D0 !important;
+    --checkbox-label: #585C5E !important
+}
+
+body.dark {
+    /* Main */
+    --body-color: #131920 !important;
+    --border: #303F4F !important;
+
+    /* Sidebar */
+    --sidebar-border: #242D39 !important;
+    --sidebar-text: #898D90 !important;
+
+    /* Profile */
+    --profile-fill: #1B232D !important;
+    --profile-fill-hover: #4680FF !important;
+
+    /* Text */
+    --primary-color-text: #BFBFBF !important;
+
+    /* Link */
+    --active-link: #182336 !important;
+    --active-link-hover: #192129 !important;
+    --active-link-text: #4480FF !important;
+
+    /* Icon */
+    --icon-color: #5B6B79 !important;
+    --icon-hover: #19212A !important;
+
+    /* Card */
+    --card-fill: #1B232D !important;
+
+    /* Input */
+    --input-color: #253240 !important;
+    --input-text-color: #BEC8D0 !important;
+    --input-type: #BFBFBF !important;
+    --input-border: #303F4F !important;
+    --checkbox-label: #748792 !important
+}
