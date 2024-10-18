@@ -36,9 +36,24 @@
     @endforeach --}}
 
     {{-- deadlines --}}
-    @foreach ($deadlines as $deadline)
-        {{-- <p>{{ $deadline['deadline'] }}</p> --}}
-        <p>{{ $deadline['compliance_name'] }} : <span>{{ \Carbon\Carbon::parse($deadline['deadline'])->format('F j, Y') }}</span></p>
-    @endforeach
+
+    <div class="container mt-4">
+        @foreach ($groupedResults as $monthYear => $items)
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5>{{ $monthYear }}</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        @foreach ($items as $item)
+                            <li class="list-group-item">
+                                {{ \Carbon\Carbon::parse($item['deadline'])->format('F j, Y') }} : {{ $item['compliance_name'] }}
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+        @endforeach
+    </div>
 
 </x-main>

@@ -92,7 +92,7 @@ li {
     width: 100%;
     top: 0;
     height: 75px !important;
-    /* backdrop-filter: blur(10px) !important; */
+    backdrop-filter: blur(10px) !important;
     display: flex !important;
     padding: 3px 0 0 27px !important;
     z-index: 2 !important;

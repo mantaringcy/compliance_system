@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Yajra\DataTables\DataTables;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Route;
 
 class ComplianceController extends Controller
 {
@@ -230,7 +231,7 @@ class ComplianceController extends Controller
         ]);
     }
 
-    public function projections()
+    public function projections(Request $request)
     {
         // Get the current date and the start of the current month
         // $currentMonthStart = Carbon::now()->startOfMonth();
@@ -274,8 +275,38 @@ class ComplianceController extends Controller
             ];
         }
 
+        // Grouping by month and year
+        $groupedResults = [];
+
+        foreach ($result as $item) {
+            $deadlineDate = \Carbon\Carbon::parse($item['deadline']);
+            $monthYear = $deadlineDate->format('F Y'); // e.g., "October 2024"
+
+            // Initialize the month/year array if not set
+            if (!isset($groupedResults[$monthYear])) {
+                $groupedResults[$monthYear] = [];
+            }
+
+            // Add the compliance item to the corresponding month/year
+            $groupedResults[$monthYear][] = $item;
+        }
+
+        // Current URI
+        $currentRouteName = Route::currentRouteName();
+
+        // Check which view is being requested
+        if ($currentRouteName === 'overview') { // Change this to your actual route
+            // Get current month deadlines
+            $currentMonth = Carbon::now()->format('Y-m'); // Format: YYYY-MM
+            $currentMonthDeadlines = array_filter($result, function($item) use ($currentMonth) {
+                return Carbon::parse($item['deadline'])->format('Y-m') === $currentMonth;
+            });
+
+            return view('components.overview', ['currentMonthDeadlines' => $currentMonthDeadlines]);
+        }
+
         // Pass the results to the Blade view
-        return view('components.projection', ['deadlines' => $result]);
+        return view('components.projection', compact('groupedResults'));
 
     }
 
@@ -353,5 +384,19 @@ class ComplianceController extends Controller
 
         return $filteredDeadlines;
     }
+
+    // public function monthlyDeadline()
+    // {
+    //      // Get the full compliance data
+    //     $result = $this->projections(); // Assume this is your existing method that returns $result
+
+    //     // Filter for current month deadlines
+    //     $currentMonth = Carbon::now()->format('Y-m');
+    //     $currentMonthDeadlines = array_filter($result, function($item) use ($currentMonth) {
+    //         return Carbon::parse($item['deadline'])->format('Y-m') === $currentMonth;
+    //     });
+
+    //     return view('overview.blade', ['currentMonthDeadlines' => $currentMonthDeadlines]);
+    // }
 
 }

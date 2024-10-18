@@ -39,7 +39,9 @@ Route::middleware('auth')->group(function() {
 
 
     // Route::view('/overview', 'components.overview');
-    Route::view('/overview', 'components.overview');
+    // Route::view('/overview', 'components.overview');
+    Route::get('/overview', [ComplianceController::class, 'projections'])->name('overview');
+
 
 
     // Route::get('/projection', [ComplianceController::class, 'showAllCompliances']);
