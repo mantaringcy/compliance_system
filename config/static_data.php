@@ -18,11 +18,12 @@ return [
         '6' => '4 Month Before'
     ],
     'submit_on' => [
-        '1' => '1 Week Before',
-        '2' => '2 Weeks Before',
-        '3' => '1 Month Before',
-        '4' => '2 Month Before',
-        '5' => '3 Month Before',
-        '6' => '4 Month Before'
+        '1' => '3 Days Before',
+        '2' => '1 Week Before',
+        '3' => '2 Weeks Before',
+        '4' => '1 Month Before',
+        '5' => '2 Month Before',
+        '6' => '3 Month Before',
+        '7' => '4 Month Before'
     ],
 ];

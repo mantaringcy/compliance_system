@@ -1,22 +1,22 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+
+// Controllers
 use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\ComplianceController;
 use App\Http\Controllers\ResetPasswordController;
-use Illuminate\Support\Facades\Route;
-
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-
+use App\Models\Compliance;
 
 Route::redirect('/', 'login');
 
 Route::middleware('guest')->group(function() {
+    // Register
     Route::get('/register', [AuthenticationController::class, 'index'])->name('register');
     Route::post('/register', [AuthenticationController::class, 'register']);
     
-    // Route::get('/register', [AuthenticationController::class, 'item']);
-    
+    // Login
     Route::view('/login', 'authentication.login')->name('login');
     Route::post('/login', [AuthenticationController::class, 'login']);
 
@@ -31,9 +31,6 @@ Route::middleware('guest')->group(function() {
 
     // Handling the Form Submission 2
     Route::post('/reset-password', [ResetPasswordController::class, 'passwordUpdate'])->name('password.update');
-
-    // Route::view('/sample', 'authentication.reset-password');
-
 });
 
 
@@ -45,7 +42,9 @@ Route::middleware('auth')->group(function() {
     Route::view('/overview', 'components.overview');
 
 
-    Route::view('/monthly-projection', 'components.monthly-projection');
+    // Route::get('/projection', [ComplianceController::class, 'showAllCompliances']);
+    Route::get('/projection', [ComplianceController::class, 'projections']);
+
     Route::view('/records', 'components.records');
     Route::view('/accounts', 'components.accounts');
 

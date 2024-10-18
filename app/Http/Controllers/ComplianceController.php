@@ -169,55 +169,189 @@ class ComplianceController extends Controller
 
     public function showAllCompliances()
     {
+        // dd('ok');
+
         $compliances = Compliance::all();
-        $complianceProjections = [];
+        $monthlyProjections = [];
+
+        $currentMonth = Carbon::now()->startOfMonth();
 
         foreach ($compliances as $compliance) {
-            $complianceDate = Carbon::parse($compliance->compliance_date);
-            $startWorkingOn = $compliance->start_working_on; // Numeric value from 'Start Working On' table
 
-            // Adjust the compliance date based on the numeric value
-            switch ($startWorkingOn) {
-                case 1:
-                    $adjustedDate = $complianceDate->subWeeks(1); // 1 week before
-                    break;
-                case 2:
-                    $adjustedDate = $complianceDate->subWeeks(2); // 2 weeks before
-                    break;
-                case 3:
-                    $adjustedDate = $complianceDate->subMonth(1); // 1 month before
-                    break;
-                case 4:
-                    $adjustedDate = $complianceDate->subMonths(2); // 2 months before
-                    break;
-                case 5:
-                    $adjustedDate = $complianceDate->subMonths(3); // 3 months before
-                    break;
-                case 6:
-                    $adjustedDate = $complianceDate->subMonths(4); // 4 months before
-                    break;
-                default:
-                    $adjustedDate = $complianceDate; // No change if value is invalid
+            $referenceDate = Carbon::parse($compliance->reference_date);
+            $startWorkingOn = $compliance->start_on; // Numeric value from 'Start Working On' table
+
+            if ($referenceDate->lt($currentMonth)) {
+                $referenceDate = $currentMonth;
             }
 
-            // Generate future projections from the adjusted date
-            $monthlyProjection = [];
+            // Loop through 12 months
             for ($i = 0; $i < 12; $i++) {
-                $nextMonth = $adjustedDate->copy()->addMonths($i)->startOfMonth();
-                $monthlyProjection[] = $nextMonth->format('Y-m-d');
-            }
+                // Adjust the reference date for each month by adding 30 days
+                $currentReferenceDate = $referenceDate->copy()->addDays(30 * $i); // Add 30 days for each iteration
 
-            // Store the projections for each compliance
-            $complianceProjections[] = [
-                'compliance' => $compliance,
-                'monthlyProjection' => $monthlyProjection
-            ];
+                // Apply the "Start Working On" logic (subtracting based on numeric value)
+                switch ($startWorkingOn) {
+                    case 1:
+                        $adjustedDate = $currentReferenceDate->subWeeks(1); // 1 week before
+                        break;
+                    case 2:
+                        $adjustedDate = $currentReferenceDate->subWeeks(2); // 2 weeks before
+                        break;
+                    case 3:
+                        $adjustedDate = $currentReferenceDate->subMonth();  // 1 month before
+                        break;
+                    case 4:
+                        $adjustedDate = $currentReferenceDate->subMonths(2); // 2 months before
+                        break;
+                    case 5:
+                        $adjustedDate = $currentReferenceDate->subMonths(3); // 3 months before
+                        break;
+                    case 6:
+                        $adjustedDate = $currentReferenceDate->subMonths(4); // 4 months before
+                        break;
+                    default:
+                        $adjustedDate = $currentReferenceDate; // No change if value is invalid
+                }
+
+                $displayDate = $adjustedDate->copy()->startOfMonth();
+
+                $monthYear = $adjustedDate->format('F Y'); // e.g., 'October 2024'
+                $monthlyProjections[$monthYear][] = [
+                    'name' => $compliance->compliance_name,
+                    'adjusted_date' => $adjustedDate->format('Y-m-d'),
+                    'display_date' => $displayDate->format('Y-m-d'),
+                ];
+            }
         }
 
-        return view('compliance.index', [
-            'complianceProjections' => $complianceProjections
+        return view('components.projection', [
+            'monthlyProjections' => $monthlyProjections
         ]);
     }
 
+    public function projections()
+    {
+        // Get the current date and the start of the current month
+        // $currentMonthStart = Carbon::now()->startOfMonth();
+
+        // Fetch all compliances
+        $compliances = Compliance::all();
+        
+        // Process compliance deadlines
+        $complianceDeadlines = [];
+
+        foreach ($compliances as $compliance) {
+            $referenceDate = Carbon::parse($compliance->reference_date);
+            $frequency = $compliance->frequency;
+
+            // Calculate the next deadline based on the frequency
+            $deadlines = $this->calculateDeadlines($referenceDate, $frequency);
+
+
+            // Add valid deadlines to the result
+            foreach ($deadlines as $deadline) {
+
+                $complianceDeadlines[] = [
+                    'compliance' => $compliance,
+                    'reference_date' => $referenceDate->toDateString(),
+                    'deadline' => $deadline->toDateString(),
+                ];
+            }
+        }
+
+        $result = [];
+
+        usort($complianceDeadlines, function($a, $b) {
+            return $a['deadline'] <=> $b['deadline']; // Compare the deadlines
+        });
+
+        // Iterate through the data to extract compliance_name and deadlines
+        foreach ($complianceDeadlines as $item) {
+            $result[] = [
+                'compliance_name' => $item['compliance']['compliance_name'],
+                'deadline' => $item['deadline']
+            ];
+        }
+
+        // Pass the results to the Blade view
+        return view('components.projection', ['deadlines' => $result]);
+
+    }
+
+    private function calculateDeadlines($referenceDate, $frequency)
+    {
+        $currentDateStart = Carbon::now();
+        $endMonth = $currentDateStart->copy()->addDays(365);
+
+        $deadlines = [];
+        $sortedDeadlines = [];
+
+        switch ($frequency) {
+            case 1: // Monthly
+                // Start calculating from the next month of the reference date
+                $startMonth = $referenceDate->copy()->addDays(30.42);
+
+                while ($startMonth->lessThanOrEqualTo($endMonth)) {
+                    $deadlines[] = $startMonth->copy(); // Add the deadline
+                    $startMonth->addDays(30.42); // Move to the next month
+                }
+                break;
+            case 2: // Quarterly
+                $startMonth = $referenceDate->copy()->addDays(91.25);
+
+                while ($startMonth->lessThanOrEqualTo($endMonth)) {
+                    $deadlines[] = $startMonth->copy(); // Add the deadline
+                    $startMonth->addDays(91.25); // Move to the next month
+                }
+                break;
+            case 3: // Semi-Annually
+                $startMonth = $referenceDate->copy()->addDays(182.5);
+
+                while ($startMonth->lessThanOrEqualTo($endMonth)) {
+                    $deadlines[] = $startMonth->copy(); // Add the deadline
+                    $startMonth->addDays(182.5); // Move to the next month
+                }
+                break;
+            case 4: // Annually
+                $startMonth = $referenceDate->copy()->addDays(365);
+
+                while ($startMonth->lessThanOrEqualTo($endMonth)) {
+                    $deadlines[] = $startMonth->copy(); // Add the deadline
+                    $startMonth->addDays(365); // Move to the next month
+                }
+                break;
+            case 5: // Every 3 Years
+                $startMonth = $referenceDate->copy()->addDays(1095);
+
+                while ($startMonth->lessThanOrEqualTo($endMonth)) {
+                    $deadlines[] = $startMonth->copy(); // Add the deadline
+                    $startMonth->addDays(1095); // Move to the next month
+                }
+                break;
+            case 6: // Every 5 Years
+                $startMonth = $referenceDate->copy()->addDays(1825);
+
+                while ($startMonth->lessThanOrEqualTo($endMonth)) {
+                    $deadlines[] = $startMonth->copy(); // Add the deadline
+                    $startMonth->addDays(1825); // Move to the next month
+                }
+                break;
+        }
+
+        // Filtered Date
+        $currentMonthStart = Carbon::now()->startOfMonth(); // Get the start of the current month
+
+        $filteredDeadlines = array_filter($deadlines, function ($deadline) use ($currentMonthStart) {
+            return $deadline->greaterThanOrEqualTo($currentMonthStart);
+        });
+
+        // usort($filteredDeadlines, function ($a, $b) {
+        //     return strtotime($a) - strtotime($b); // Sort using Unix timestamps
+        // });
+
+
+        return $filteredDeadlines;
+    }
 
 }

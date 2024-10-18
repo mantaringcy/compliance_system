@@ -133,9 +133,9 @@
                             </a>
                         </li>
                         <li class="sidebar-item2 mb-1">
-                            <a href="monthly-projection">
+                            <a href="projection">
                                 <i class="fa-solid fa-chart-line"></i>
-                                <span>Monthly Projection</span>
+                                <span>Projection</span>
                             </a>
                         </li>
                         <li class="sidebar-item2 mb-1">

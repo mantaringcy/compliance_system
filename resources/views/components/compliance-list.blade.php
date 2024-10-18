@@ -8,7 +8,7 @@
 
 <x-main>
     
-    <h2 class="fw-bold">Compliance List</h2>
+    <h2 class="fw-bold mb-5" style="font-size: 30px !important;">Compliance List</h2>
 
     <div>
         <div class="card-lg">
@@ -159,7 +159,8 @@
                 { data: 'action', name: 'action', orderable: false, searchable: false },
             ],
             columnDefs: [
-                { orderable: false, targets: [0, 1, 2, 3, 4] }
+                { orderable: false, targets: [0, 1, 2, 3, 4] }, 
+                { width: "20%", targets: -1}
             ],
         });
     });
