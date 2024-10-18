@@ -231,85 +231,95 @@ class ComplianceController extends Controller
         ]);
     }
 
-    public function projections(Request $request)
-    {
-        // Get the current date and the start of the current month
-        // $currentMonthStart = Carbon::now()->startOfMonth();
-
-        // Fetch all compliances
-        $compliances = Compliance::all();
-        
-        // Process compliance deadlines
-        $complianceDeadlines = [];
-
-        foreach ($compliances as $compliance) {
-            $referenceDate = Carbon::parse($compliance->reference_date);
-            $frequency = $compliance->frequency;
-
-            // Calculate the next deadline based on the frequency
-            $deadlines = $this->calculateDeadlines($referenceDate, $frequency);
-
-
-            // Add valid deadlines to the result
-            foreach ($deadlines as $deadline) {
-
-                $complianceDeadlines[] = [
-                    'compliance' => $compliance,
-                    'reference_date' => $referenceDate->toDateString(),
-                    'deadline' => $deadline->toDateString(),
-                ];
-            }
-        }
-
-        $result = [];
-
-        usort($complianceDeadlines, function($a, $b) {
-            return $a['deadline'] <=> $b['deadline']; // Compare the deadlines
-        });
-
-        // Iterate through the data to extract compliance_name and deadlines
-        foreach ($complianceDeadlines as $item) {
-            $result[] = [
-                'compliance_name' => $item['compliance']['compliance_name'],
-                'deadline' => $item['deadline']
-            ];
-        }
-
-        // Grouping by month and year
-        $groupedResults = [];
-
-        foreach ($result as $item) {
-            $deadlineDate = \Carbon\Carbon::parse($item['deadline']);
-            $monthYear = $deadlineDate->format('F Y'); // e.g., "October 2024"
-
-            // Initialize the month/year array if not set
-            if (!isset($groupedResults[$monthYear])) {
-                $groupedResults[$monthYear] = [];
-            }
-
-            // Add the compliance item to the corresponding month/year
-            $groupedResults[$monthYear][] = $item;
-        }
-
-        // Current URI
-        $currentRouteName = Route::currentRouteName();
-
-        // Check which view is being requested
-        if ($currentRouteName === 'overview') { // Change this to your actual route
-            // Get current month deadlines
-            $currentMonth = Carbon::now()->format('Y-m'); // Format: YYYY-MM
-            $currentMonthDeadlines = array_filter($result, function($item) use ($currentMonth) {
-                return Carbon::parse($item['deadline'])->format('Y-m') === $currentMonth;
-            });
-
-            return view('components.overview', ['currentMonthDeadlines' => $currentMonthDeadlines]);
-        }
-
-        // Pass the results to the Blade view
-        return view('components.projection', compact('groupedResults'));
-
+    // Change Numeric to DepartmentName
+    public function getDepartmentName($departmentId, $departments) {
+        return $departments[$departmentId - 1]['department_name'] ?? 'Unknown Department';
     }
 
+    // Calculate the Date Today and the Deadline
+    private function calculateDaysLeft($deadline) {
+        // Get the current date
+        $currentDate = Carbon::now()->startOfDay(); // Use startOfDay to ignore the time part
+    
+        // Create a Carbon instance from the deadline date
+        $deadlineDate = Carbon::parse($deadline)->startOfDay(); // Ensure we consider only the date part
+    
+        // Calculate the difference in days (negative if past)
+        $daysLeft = $deadlineDate->diffInDays($currentDate, false); // 'false' returns a negative value if the deadline is in the past
+    
+        return $daysLeft; // Return the difference as is, no need to round since it's an integer
+    }
+
+    // Compute the Deadline base on start_working_on in database
+    private function computeStartWorkingOn($deadline, $startOn) {
+        // Create a Carbon instance from the deadline date
+        $deadlineDate = Carbon::parse($deadline);
+    
+        // Adjust the deadline based on the start_on value
+        switch ($startOn) {
+            case 1: // 1 week before
+                $adjustedDate = $deadlineDate->subWeeks(1);
+                break;
+            case 2: // 2 weeks before
+                $adjustedDate = $deadlineDate->subWeeks(2);
+                break;
+            case 3: // 1 month before
+                $adjustedDate = $deadlineDate->subMonths(1);
+                break;
+            case 4: // 2 months before
+                $adjustedDate = $deadlineDate->subMonths(2);
+                break;
+            case 5: // 3 months before
+                $adjustedDate = $deadlineDate->subMonths(3);
+                break;
+            case 6: // 4 months before
+                $adjustedDate = $deadlineDate->subMonths(4);
+                break;
+            default: // If no valid start_on value is found
+                $adjustedDate = $deadlineDate; // No adjustment
+                break;
+        }
+    
+        return $adjustedDate->format('Y-m-d'); // Format to desired output
+    }
+    
+    // Compute the Deadline base on submit_on in database
+    private function computeSubmitOn($deadline, $submitOn) {
+        // Create a Carbon instance from the deadline date
+        $deadlineDate = Carbon::parse($deadline);
+    
+        // Adjust the deadline based on the start_on value
+        switch ($submitOn) {
+            case 1: // 1 week before
+                $adjustedDate = $deadlineDate->subDays(3);
+                break;
+            case 2: // 1 week before
+                $adjustedDate = $deadlineDate->subWeeks(1);
+                break;
+            case 3: // 2 weeks before
+                $adjustedDate = $deadlineDate->subWeeks(2);
+                break;
+            case 4: // 1 month before
+                $adjustedDate = $deadlineDate->subMonths(1);
+                break;
+            case 5: // 2 months before
+                $adjustedDate = $deadlineDate->subMonths(2);
+                break;
+            case 6: // 3 months before
+                $adjustedDate = $deadlineDate->subMonths(3);
+                break;
+            case 7: // 4 months before
+                $adjustedDate = $deadlineDate->subMonths(4);
+                break;
+            default: // If no valid start_on value is found
+                $adjustedDate = $deadlineDate; // No adjustment
+                break;
+        }
+    
+        return $adjustedDate->format('Y-m-d'); // Format to desired output
+    }
+
+    // Compute the deadline frequency base on reference_date in database
     private function calculateDeadlines($referenceDate, $frequency)
     {
         $currentDateStart = Carbon::now();
@@ -381,22 +391,95 @@ class ComplianceController extends Controller
         //     return strtotime($a) - strtotime($b); // Sort using Unix timestamps
         // });
 
-
         return $filteredDeadlines;
     }
 
-    // public function monthlyDeadline()
-    // {
-    //      // Get the full compliance data
-    //     $result = $this->projections(); // Assume this is your existing method that returns $result
+    public function projections(Request $request)
+    {
+        // Fetch all compliances
+        $compliances = Compliance::all();
+        $departments = Department::all();
 
-    //     // Filter for current month deadlines
-    //     $currentMonth = Carbon::now()->format('Y-m');
-    //     $currentMonthDeadlines = array_filter($result, function($item) use ($currentMonth) {
-    //         return Carbon::parse($item['deadline'])->format('Y-m') === $currentMonth;
-    //     });
+        // Process compliance deadlines
+        $complianceDeadlines = [];
 
-    //     return view('overview.blade', ['currentMonthDeadlines' => $currentMonthDeadlines]);
-    // }
+        foreach ($compliances as $compliance) {
+            $referenceDate = Carbon::parse($compliance->reference_date);
+            $frequency = $compliance->frequency;
+
+            // Calculate the next deadline based on the frequency
+            $deadlines = $this->calculateDeadlines($referenceDate, $frequency);
+
+
+            // Add valid deadlines to the result
+            foreach ($deadlines as $deadline) {
+
+                $complianceDeadlines[] = [
+                    'compliance' => $compliance,
+                    'reference_date' => $referenceDate->toDateString(),
+                    'deadline' => $deadline->toDateString(),
+                ];
+            }
+        }
+
+
+        $result = [];
+
+        usort($complianceDeadlines, function($a, $b) {
+            return $a['deadline'] <=> $b['deadline']; // Compare the deadlines
+        });
+
+        // Iterate through the data to extract compliance_name and deadlines
+        foreach ($complianceDeadlines as $item) {
+            $daysLeft = $this->calculateDaysLeft($item['deadline']);
+            $startWorkingOn = $this->computeStartWorkingOn($item['deadline'], $item['compliance']['start_on']);
+            $submitOn = $this->computeSubmitOn($item['deadline'], $item['compliance']['submit_on']);
+
+
+            $result[] = [
+                'compliance' => $item['compliance'],
+                'compliance_department' =>  $this->getDepartmentName($item['compliance']['department_id'], $departments),
+                'startWorkingOn' => $startWorkingOn,
+                'submitOn' => $submitOn,
+                'deadline' => $item['deadline'],
+                'days_left' => $daysLeft, // Add days left to the result
+
+            ];
+        }
+
+        // Grouping by month and year
+        $groupedResults = [];
+
+        foreach ($result as $item) {
+            $deadlineDate = \Carbon\Carbon::parse($item['deadline']);
+            $monthYear = $deadlineDate->format('F Y'); // e.g., "October 2024"
+
+            // Initialize the month/year array if not set
+            if (!isset($groupedResults[$monthYear])) {
+                $groupedResults[$monthYear] = [];
+            }
+
+            // Add the compliance item to the corresponding month/year
+            $groupedResults[$monthYear][] = $item;
+        }
+
+        // Current URI
+        $currentRouteName = Route::currentRouteName();
+
+        // Check which view is being requested
+        if ($currentRouteName === 'overview') { // Change this to your actual route
+            // Get current month deadlines
+            $currentMonth = Carbon::now()->format('Y-m'); // Format: YYYY-MM
+            $currentMonthDeadlines = array_filter($result, function($item) use ($currentMonth) {
+                return Carbon::parse($item['deadline'])->format('Y-m') === $currentMonth;
+            });
+
+            return view('components.overview', ['currentMonthDeadlines' => $currentMonthDeadlines]);
+        }
+
+        // Pass the results to the Blade view
+        return view('components.projection', compact('groupedResults'));
+
+    }
 
 }

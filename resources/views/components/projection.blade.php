@@ -47,7 +47,7 @@
                     <ul class="list-group">
                         @foreach ($items as $item)
                             <li class="list-group-item">
-                                {{ \Carbon\Carbon::parse($item['deadline'])->format('F j, Y') }} : {{ $item['compliance_name'] }}
+                                {{ \Carbon\Carbon::parse($item['deadline'])->format('F j, Y') }} : {{ $item['compliance']['compliance_name'] }}
                             </li>
                         @endforeach
                     </ul>
