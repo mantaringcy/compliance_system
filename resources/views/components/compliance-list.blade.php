@@ -23,7 +23,7 @@
             </div>
             
             
-            <table class="table data-table w-100" id="complianceListTable">
+            <table class="table table-hover data-table w-100" id="complianceListTable">
                 
 
                 <thead>
