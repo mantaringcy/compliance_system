@@ -84,15 +84,15 @@
                                 <!-- Start Working On -->
                                 <div class="col-md-6 mb-3">
                                     <label for="comp_name" class="mb-2">Start Working On</label>
-                                    <select class="form-select @error('start_on') is-invalid @enderror" aria-label="Default select example" name="start_on" value="{{ old('start_on') }}" id="nStartOn">
+                                    <select class="form-select @error('start_working_on') is-invalid @enderror" aria-label="Default select example" name="start_working_on" value="{{ old('start_working_on') }}" id="nStartWorkingOn">
                                         <option selected disabled>Select Start</option>
-                                        @foreach (config('static_data.start_on') as $key => $startOn)
-                                            <option value="{{ $key }}">{{ $startOn }}</option>
+                                        @foreach (config('static_data.start_working_on') as $key => $startWorkingOn)
+                                            <option value="{{ $key }}">{{ $startWorkingOn }}</option>
                                         @endforeach
                                     </select>
 
-                                    <div class="invalid-feedback start_on" style="display: block;"></div>
-                                    @error('start_on')
+                                    <div class="invalid-feedback start_working_on" style="display: block;"></div>
+                                    @error('start_working_on')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>

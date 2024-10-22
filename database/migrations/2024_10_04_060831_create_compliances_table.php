@@ -17,7 +17,7 @@ return new class extends Migration
             $table->integer('department_id');
             $table->date('reference_date');
             $table->integer('frequency');
-            $table->integer('start_on');
+            $table->integer('start_working_on');
             $table->integer('submit_on');
             $table->timestamps();
         });

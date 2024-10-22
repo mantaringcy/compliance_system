@@ -60,7 +60,7 @@
                             <!-- Start Working On -->
                             <div class="col-md-6 mt-4">
                                 <p>Start Working On</p>
-                                <h6 class="fw-semibold" id="vStartOn">Start On</h6>
+                                <h6 class="fw-semibold" id="vStartWorkingOn">Start On</h6>
                             </div>
 
                             <!-- Submit On -->
@@ -84,6 +84,6 @@
 {{-- <script>
     const departmentMapping = @json($departments);
     const frequencyMapping = @json(config('static_data.frequency'));
-    const startOnMapping = @json(config('static_data.start_on'));
+    const startOnMapping = @json(config('static_data.start_working_on'));
     const submitOnMapping = @json(config('static_data.submit_on'));
 </script> --}}

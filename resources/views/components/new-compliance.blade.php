@@ -40,20 +40,6 @@
                                     <option value="{{ $department->id }}">{{ $department->department_name }}</option>
                                 @endforeach
                         
-                                {{-- @foreach ($data as $row)
-                                    <option value="{{ $row->id }}">{{ $row->department_name }}</option>
-                                @endforeach --}}
-                                {{-- <option value="1">Marketing</option>
-                                <option value="2">Sales</option>
-                                <option value="3">Testing</option>
-                                <option value="4">IH</option>
-                                <option value="5">Consulting</option>
-                                <option value="6">OSHM360</option>
-                                <option value="7">FAD</option>
-                                <option value="8">IMS</option>
-                                <option value="9">HR</option>
-                                <option value="10">IT</option>
-                                <option value="11">ESH (IMS)</option> --}}
                             </select>
 
                             @error('department_id')
@@ -97,14 +83,14 @@
                         <!-- Start Working On -->
                         <div class="col-md-6 mb-3">
                             <label for="comp_name" class="mb-2">Start Working On</label>
-                            <select class="form-select @error('start_on') is-invalid @enderror" aria-label="Default select example" name="start_on">
+                            <select class="form-select @error('start_working_on') is-invalid @enderror" aria-label="Default select example" name="start_working_on">
                                 <option selected disabled>Select Start</option>
-                                @foreach (config('static_data.start_on') as $key => $frequency)
-                                    <option value="{{ $key }}">{{ $frequency }}</option>
+                                @foreach (config('static_data.start_working_on') as $key => $startWorkingOn)
+                                    <option value="{{ $key }}">{{ $startWorkingOn }}</option>
                                 @endforeach
                             </select>
 
-                            @error('start_on')
+                            @error('start_working_on')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -114,8 +100,8 @@
                             <label for="comp_name" class="mb-2">Submit On</label>
                             <select class="form-select @error('submit_on') is-invalid @enderror" aria-label="Default select example" name="submit_on">
                                 <option selected disabled>Select Submission</option>
-                                @foreach (config('static_data.submit_on') as $key => $frequency)
-                                    <option value="{{ $key }}">{{ $frequency }}</option>
+                                @foreach (config('static_data.submit_on') as $key => $startWorkingOn)
+                                    <option value="{{ $key }}">{{ $startWorkingOn }}</option>
                                 @endforeach
                             </select>
 

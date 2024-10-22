@@ -34,7 +34,7 @@ class ComplianceController extends Controller
                             data-department-id="'.$row->department_id.'"
                             data-compliance-reference-date="'.$row->reference_date.'"
                             data-compliance-frequency="'.$row->frequency.'"
-                            data-compliance-start-on="'.$row->start_on.'"
+                            data-compliance-start-working-on="'.$row->start_working_on.'"
                             data-compliance-submit-on="'.$row->submit_on.'"
                             ><i class="fa-regular fa-eye"></i></a>';
 
@@ -46,7 +46,7 @@ class ComplianceController extends Controller
                             data-department-id="'.$row->department_id.'"
                             data-compliance-reference-date="'.$row->reference_date.'"
                             data-compliance-frequency="'.$row->frequency.'"
-                            data-compliance-start-on="'.$row->start_on.'"
+                            data-compliance-start-working-on="'.$row->start_working_on.'"
                             data-compliance-submit-on="'.$row->submit_on.'"
                             ><i class="fa-regular fa-pen-to-square"></i></a>';
 
@@ -77,9 +77,9 @@ class ComplianceController extends Controller
             $statusKey = (string) $entry->frequency;
             $entry->mapped_frequency = Config::get('static_data.frequency.' . $statusKey, 'Unknown');
             
-            // Map start_on value
-            $statusKey = (string) $entry->start_on;
-            $entry->mapped_startOn = Config::get('static_data.start_on.' . $statusKey, 'Unknown');
+            // Map start_working_on value
+            $statusKey = (string) $entry->start_working_on;
+            $entry->mapped_startWorkingOn = Config::get('static_data.start_working_on.' . $statusKey, 'Unknown');
 
             // Map submit_on value
             $statusKey = (string) $entry->submit_on;
@@ -88,25 +88,26 @@ class ComplianceController extends Controller
         }
  
         return view('components.compliance-list', compact('complianceEntries'));
-        // return view('components.main', compact('complianceEntries'));
-
     }
 
     // Create Compliance
     public function store(Request $request)
     {
-
-        // dd($request);
-        // dd('ok');
-
-
         $fields = $request->validate([
             'compliance_name' => ['required'],
             'department_id' => ['required'],
             'reference_date' => ['required'],
             'frequency' => ['required', 'not_in:0,'],
-            'start_on' => ['required', 'not_in:0,'],
+            'start_working_on' => ['required', 'not_in:0,'],
             'submit_on' => ['required', 'not_in:0,']
+        ],
+        [
+            'compliance_name.required' => 'Please provide the name of the compliance.',
+            'department_id.required' => 'Please select a department.',
+            'reference_date.required' => 'Please provide a reference date.',
+            'frequency.required' => 'Please select the frequency of the compliance.',
+            'start_working_on.required' => 'Please provide a start date for compliance.',
+            'submit_on.required' => 'Please provide a submission date.',
         ]);
 
 
@@ -115,22 +116,26 @@ class ComplianceController extends Controller
         // return redirect()->withErrors($fields)->withInput();
         return back()->with('success', 'Your post was created.');
         // return view('components.compliance-list');
-
     }
 
     // Update Compliance
     public function update(Request $request, Compliance $compliance)
     {
-        // dd('ok');
-        // Gate::authorize('modify', $compliance);
-
         $fields = $request->validate([
             'compliance_name' => ['required'],
             'department_id' => ['required'],
             'reference_date' => ['required'],
             'frequency' => ['required'],
-            'start_on' => ['required'],
+            'start_working_on' => ['required'],
             'submit_on' => ['required']
+        ],
+        [
+            'compliance_name.required' => 'Please provide the name of the compliance.',
+            'department_id.required' => 'Please select a department.',
+            'reference_date.required' => 'Please provide a reference date.',
+            'frequency.required' => 'Please select the frequency of the compliance.',
+            'start_working_on.required' => 'Please provide a start date for compliance.',
+            'submit_on.required' => 'Please provide a submission date.',
         ]);
 
         $compliance->update([
@@ -138,7 +143,7 @@ class ComplianceController extends Controller
             'department_id' => $fields['department_id'],
             'reference_date' => $fields['reference_date'],
             'frequency' => $fields['frequency'],
-            'start_on' => $fields['start_on'],
+            'start_working_on' => $fields['start_working_on'],
             'submit_on' => $fields['submit_on']
 
         ]);
@@ -180,7 +185,7 @@ class ComplianceController extends Controller
         foreach ($compliances as $compliance) {
 
             $referenceDate = Carbon::parse($compliance->reference_date);
-            $startWorkingOn = $compliance->start_on; // Numeric value from 'Start Working On' table
+            $startWorkingOn = $compliance->start_working_on; // Numeric value from 'Start Working On' table
 
             if ($referenceDate->lt($currentMonth)) {
                 $referenceDate = $currentMonth;
@@ -251,31 +256,43 @@ class ComplianceController extends Controller
     }
 
     // Compute the Deadline base on start_working_on in database
-    private function computeStartWorkingOn($deadline, $startOn) {
+    private function computeStartWorkingOn($deadline, $startWorkingOn) {
         // Create a Carbon instance from the deadline date
         $deadlineDate = Carbon::parse($deadline);
     
-        // Adjust the deadline based on the start_on value
-        switch ($startOn) {
-            case 1: // 1 week before
+        // Adjust the deadline based on the start_working_on value
+        switch ($startWorkingOn) {
+            case 1: // 3 Days Before
+                $adjustedDate = $deadlineDate->subDays(3);
+                break;
+            case 2: // 1 Week Before
                 $adjustedDate = $deadlineDate->subWeeks(1);
                 break;
-            case 2: // 2 weeks before
+            case 3: // 2 Weeks Before
                 $adjustedDate = $deadlineDate->subWeeks(2);
                 break;
-            case 3: // 1 month before
+            case 4: // 3 Weeks Before
+                $adjustedDate = $deadlineDate->subWeeks(3);
+                break;
+            case 5: // 1 Month Before
                 $adjustedDate = $deadlineDate->subMonths(1);
                 break;
-            case 4: // 2 months before
+            case 6: // 1.5 Months Before
+                $adjustedDate = $deadlineDate->subMonths(1)->subDays(15);
+                break;
+            case 7: // 2 Months Before
                 $adjustedDate = $deadlineDate->subMonths(2);
                 break;
-            case 5: // 3 months before
+            case 8: // 3 Months Before
                 $adjustedDate = $deadlineDate->subMonths(3);
                 break;
-            case 6: // 4 months before
+            case 9: // 4 Months Before
                 $adjustedDate = $deadlineDate->subMonths(4);
                 break;
-            default: // If no valid start_on value is found
+            case 10: // 5 Months Before
+                $adjustedDate = $deadlineDate->subMonths(5);
+                break;
+            default: // If no valid start_working_on value is found
                 $adjustedDate = $deadlineDate; // No adjustment
                 break;
         }
@@ -288,30 +305,30 @@ class ComplianceController extends Controller
         // Create a Carbon instance from the deadline date
         $deadlineDate = Carbon::parse($deadline);
     
-        // Adjust the deadline based on the start_on value
+        // Adjust the deadline based on the start_working_on value
         switch ($submitOn) {
-            case 1: // 1 week before
+            case 1: // 3 Days Before
                 $adjustedDate = $deadlineDate->subDays(3);
                 break;
-            case 2: // 1 week before
+            case 2: // 1 Week Before
                 $adjustedDate = $deadlineDate->subWeeks(1);
                 break;
-            case 3: // 2 weeks before
+            case 3: // 2 Weeks Before
                 $adjustedDate = $deadlineDate->subWeeks(2);
                 break;
-            case 4: // 1 month before
+            case 4: // 1 Month Before
                 $adjustedDate = $deadlineDate->subMonths(1);
                 break;
-            case 5: // 2 months before
+            case 5: // 2 Months Before
                 $adjustedDate = $deadlineDate->subMonths(2);
                 break;
-            case 6: // 3 months before
+            case 6: // 3 Months Before
                 $adjustedDate = $deadlineDate->subMonths(3);
                 break;
-            case 7: // 4 months before
+            case 7: // 4 Months Before
                 $adjustedDate = $deadlineDate->subMonths(4);
                 break;
-            default: // If no valid start_on value is found
+            default: // If no valid start_working_on value is found
                 $adjustedDate = $deadlineDate; // No adjustment
                 break;
         }
@@ -432,7 +449,7 @@ class ComplianceController extends Controller
         // Iterate through the data to extract compliance_name and deadlines
         foreach ($complianceDeadlines as $item) {
             $daysLeft = $this->calculateDaysLeft($item['deadline']);
-            $startWorkingOn = $this->computeStartWorkingOn($item['deadline'], $item['compliance']['start_on']);
+            $startWorkingOn = $this->computeStartWorkingOn($item['deadline'], $item['compliance']['start_working_on']);
             $submitOn = $this->computeSubmitOn($item['deadline'], $item['compliance']['submit_on']);
 
 

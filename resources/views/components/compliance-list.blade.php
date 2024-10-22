@@ -34,68 +34,11 @@
                         <th scope="col">DEPARTMENT NAME</th>
                         <th scope="col">REFERENCE DATE</th>
                         <th scope="col">FREQUENCY</th>
-                        {{-- <th scope="col">START ON</th>
-                        <th scope="col">SUBMIT ON</th> --}}
                         <th scope="col">ACTION</th>
                     </tr>
-                    
-                    {{-- <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Compliance Name</th>
-                        <th scope="col">Department Name</th>
-                        <th scope="col">Reference Date</th>
-                        <th scope="col">Frequency</th>
-                        <th scope="col">Start On</th>
-                        <th scope="col">Submit On</th>
-                        <th scope="col">Action</th>
-                    </tr> --}}
+             
                 </thead>
-                {{-- <tbody>
-                    @foreach($complianceEntries as $compliance)
-                    <tr>
-                        <th scope="row">{{ $compliance->id }}</th>
-                        <td>{{ $compliance->compliance_name }}</td>
-                        <td>{{ $compliance->mapped_department }}</td>
-                        <td>{{ date('M d, Y', strtotime($compliance->reference_date)) }}</td>
-                        <td>{{ $compliance->mapped_frequency }}</td>
-                        <td>{{ $compliance->mapped_startOn }}</td>
-                        <td>{{ $compliance->mapped_submitOn }}</td>
-                        <td>
-                            <a href="#" class="view-btn view-compliance" 
-                            data-bs-toggle="modal" 
-                            data-bs-target="#viewComplianceModal"
-                            data-compliance-id="{{ $compliance->id }}"
-                            data-compliance-name="{{ $compliance->compliance_name }}"
-                            data-department="{{ $compliance->department_id }}"
-                            data-compliance-reference-date="{{ $compliance->reference_date }}"
-                            data-compliance-frequency="{{ $compliance->frequency }}"
-                            data-compliance-start-on="{{ $compliance->start_on }}"
-                            data-compliance-submit-on="{{ $compliance->submit_on }}"
-                            ><i class="fa-regular fa-eye"></i></a>
-
-                            <a href="#" class="edit-btn edit-compliance" 
-                            data-bs-toggle="modal" 
-                            data-bs-target="#editComplianceModal"
-                            data-compliance-id="{{ $compliance->id }}"
-                            data-compliance-name="{{ $compliance->compliance_name }}"
-                            data-department="{{ $compliance->department_id }}"
-                            data-compliance-reference-date="{{ $compliance->reference_date }}"
-                            data-compliance-frequency="{{ $compliance->frequency }}"
-                            data-compliance-start-on="{{ $compliance->start_on }}"
-                            data-compliance-submit-on="{{ $compliance->submit_on }}"
-                            ><i class="fa-regular fa-pen-to-square"></i></a>
-
-                            <a href="#" class="delete-btn delete-compliance" 
-                            data-bs-toggle="modal" 
-                            data-bs-target="#deleteComplianceModal"
-                            data-compliance-id="{{ $compliance->id }}"
-                            data-compliance-name="{{ $compliance->compliance_name }}"
-                            ><i class="fa-regular fa-trash-can"></i></a>
-
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody> --}}
+     
               </table>
 
         </div>
@@ -105,7 +48,7 @@
 <script>
     const departmentMapping = @json($departments);
     const frequencyMapping = @json(config('static_data.frequency'));
-    const startOnMapping = @json(config('static_data.start_on'));
+    const startWorkingOnMapping = @json(config('static_data.start_working_on'));
     const submitOnMapping = @json(config('static_data.submit_on'));
 
     // Format Date
@@ -146,16 +89,6 @@
                         return frequencyMapping[data] || 'Unknown';
                     }
                  },
-                // { data: 'start_on', name: 'start_on',
-                //     render: function(data, type, row) {
-                //         return startOnMapping[data] || 'Unknown';
-                //     }
-                //  },
-                // { data: 'submit_on', name: 'submit_on',
-                //     render: function(data, type, row) {
-                //         return submitOnMapping[data] || 'Unknown';
-                //     }
-                //  },
                 { data: 'action', name: 'action', orderable: false, searchable: false },
             ],
             columnDefs: [
@@ -174,7 +107,7 @@
         const departmentId = $(this).attr('data-department-id');
         const referenceDate = $(this).attr('data-compliance-reference-date');
         const frequency = $(this).attr('data-compliance-frequency');
-        const startOn = $(this).attr('data-compliance-start-on');
+        const startWorkingOn = $(this).attr('data-compliance-start-working-on');
         const submitOn = $(this).attr('data-compliance-submit-on');
 
         // Example: You can now pass this data to a modal or form
@@ -184,7 +117,7 @@
         $('#editComplianceModal #departmentSelect').val(departmentId);
         $('#editComplianceModal #referenceDate').val(referenceDate);
         $('#editComplianceModal #frequency').val(frequency);
-        $('#editComplianceModal #startOn').val(startOn);
+        $('#editComplianceModal #startWorkingOn').val(startWorkingOn);
         $('#editComplianceModal #submitOn').val(submitOn);
 
      
@@ -200,7 +133,7 @@
         const departmentId = $(this).attr('data-department-id');
         const referenceDate = $(this).attr('data-compliance-reference-date');
         const frequency = $(this).attr('data-compliance-frequency');
-        const startOn = $(this).attr('data-compliance-start-on');
+        const startWorkingOn = $(this).attr('data-compliance-start-working-on');
         const submitOn = $(this).attr('data-compliance-submit-on');
 
         // Example: You can now pass this data to a modal or form
@@ -210,7 +143,7 @@
         $('#viewComplianceModal #vDepartmentName').text(departmentMapping[departmentId - 1].department_name);
         $('#viewComplianceModal #vreferenceDate').text(formatDate(referenceDate));
         $('#viewComplianceModal #vfrequency').text(frequencyMapping[frequency]);
-        $('#viewComplianceModal #vstartOn').text(startOnMapping[startOn]);
+        $('#viewComplianceModal #vStartWorkingOn').text(startWorkingOnMapping[startWorkingOn]);
         $('#viewComplianceModal #vsubmitOn').text(submitOnMapping[submitOn]);
     });
 

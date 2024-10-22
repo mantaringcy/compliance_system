@@ -76,8 +76,8 @@
                             <div class="profile-text w-100">
                                 <span class="username fw-semibold">{{ Str::ucfirst(auth()->user()->username) }}</span>
                                 <span class="role fw-normal">{{ Auth::user()->role->role_name }}</span>
+                                <span class="role fw-normal fst-italic">{{ Auth::user()->department->department_name }} Department</span>
                             </div>
-    
                             <button class="collapsed border-0" data-bs-toggle="collapse" data-bs-target="#profile-list">
                                 <i class="fa-solid fa-bars-staggered"></i>
                             </button>

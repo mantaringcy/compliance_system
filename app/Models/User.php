@@ -23,7 +23,8 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
         'username',
         'email',
         'password',
-        'role_id'
+        'department_id',
+        'role_id',
     ];
 
     /**
@@ -53,5 +54,11 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
     public function role()
     {
         return $this->belongsTo(Role::class);
+    }
+
+    // Define the relationship between User and Role
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
     }
 }

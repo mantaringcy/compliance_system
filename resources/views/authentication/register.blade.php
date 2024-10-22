@@ -14,7 +14,6 @@
 
         <!-- Username -->
         <div class="mb-2">
-            {{-- <label for="username">Username</label> --}}
             <input type="text" name="username" value="{{ old('username') }}" class="form-control @error('username') is-invalid @enderror" placeholder="Username">
 
             @error('username')
@@ -25,7 +24,6 @@
 
         <!-- Email -->
         <div class="mb-2">
-            {{-- <label for="email">Email</label> --}}
             <input type="text" name="email" value="{{ old('email') }}" class="form-control @error('email') is-invalid @enderror" placeholder="Email Address">
 
             @error('email')
@@ -36,7 +34,6 @@
 
         <!-- Password -->
         <div class="mb-2">
-            {{-- <label for="password">Password</label> --}}
             <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Password">
 
             @error('password')
@@ -47,20 +44,39 @@
 
         <!-- Confirm Password -->
         <div class="mb-2">
-            {{-- <label for="password_confirmation">Confirm Password</label> --}}
             <input type="password" name="password_confirmation" class="form-control @error('password') is-invalid @enderror" placeholder="Confirm Password">
         </div>
 
-        <div class="mb-4">
-            <select class="form-select" aria-label="Default select example" name="role_id">
-                <option selected disabled>Select role</option>
-                @foreach ($data as $row)
-                    <option value="{{ $row->id }}">{{ $row->role_name }}</option>
+        <!-- Department -->
+        <div class="mb-2">
+            <select class="form-select @error('department_id') is-invalid @enderror" aria-label="Default select example" name="department_id">
+                <option selected disabled>Select Department</option>
+                @foreach ($departments as $department)
+                    <option value="{{ $department->id }}">{{ $department->department_name }}</option>
                 @endforeach
             </select>
+
+            @error('department_id')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
         </div>
 
-        <!-- Password -->
+        <!-- Role -->
+        <div class="mb-4">
+            <select class="form-select @error('role_id') is-invalid @enderror" aria-label="Default select example" name="role_id">
+                <option selected disabled>Select Role</option>
+                @foreach ($data as $role)
+                    <option value="{{ $role->id }}">{{ $role->role_name }}</option>
+                @endforeach
+            </select>
+
+            @error('role_id')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+
+
+        <!-- Button -->
         <button class="btn btn-primary border-0 w-100">Register</button>
 
         <!-- Aldready Have an Account -->

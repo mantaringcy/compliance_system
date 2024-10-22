@@ -23,7 +23,15 @@ class AuthenticationController extends Controller
             'username' => ['required', 'max:255'],
             'email' => ['required', 'max:255', 'email', 'unique:users'],
             'password' => ['required', 'min:3', 'confirmed'],
+            'department_id' => ['required'],
             'role_id' => ['required']
+        ],
+        [   // Message Error
+            'username.required' => 'The username is required.',
+            'email.required' => 'The email is required.',
+            'password.required' => 'The password is required.',
+            'department_id' => 'Please select your department.',
+            'role_id.required' => 'Please select a role.'
         ]);
 
 
@@ -65,10 +73,6 @@ class AuthenticationController extends Controller
             'email' => ['required', 'max:255'],
             'password' => ['required']
         ]);
-
-        if ($request->role === 1) {
-            return 'Super Admin';
-        }
 
         // Try to login the user
         if (Auth::attempt($fields, $request->remember)) {

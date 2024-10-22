@@ -213,7 +213,7 @@ $('#editComplianceForm').on('submit', function(event) {
     const complianceDepartment = $('#departmentSelect').val();
     const complianceReferenceDate = $('#referenceDate').val();
     const complianceFrequency = $('#frequency').val();
-    const complianceStartOn = $('#startOn').val();
+    const complianceStartWorkingOn = $('#startWorkingOn').val();
     const complianceSubmitOn = $('#submitOn').val();
 
     console.log($(this).serialize()); // This shows the data being sent
@@ -250,17 +250,6 @@ $('#editComplianceForm').on('submit', function(event) {
 // Add Compliance Error
 $('#newComplianceForm').on('submit', function(event) {
     event.preventDefault();  // Prevent the default form submission
-
-    // Get the values from the form
-    const complianceId = $('#complianceId').val();
-    const complianceName = $('#complianceName').val();
-    const complianceDepartment = $('#departmentSelect').val();
-    const complianceReferenceDate = $('#referenceDate').val();
-    const complianceFrequency = $('#frequency').val();
-    const complianceStartOn = $('#startOn').val();
-    const complianceSubmitOn = $('#submitOn').val();
-
-    console.log($(this).serialize()); // This shows the data being sent
 
     $('#newComplianceForm').attr('action', '/compliances/');
 

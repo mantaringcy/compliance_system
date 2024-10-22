@@ -61,7 +61,7 @@ Route::middleware('auth')->group(function() {
 
     // New Compliance
     // Route::get('/new-compliance', [ComplianceController::class, 'getDepartment'])->name('new-compliance');
-    Route::post('/new-compliance', [ComplianceController::class, 'post']);
+    // Route::post('/new-compliance', [ComplianceController::class, 'post']);
 
     Route::view('/settings', 'components.settings');
     
