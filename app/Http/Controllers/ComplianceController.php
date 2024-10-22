@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Compliance;
 use App\Models\Department;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Yajra\DataTables\DataTables;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 class ComplianceController extends Controller
@@ -19,12 +21,22 @@ class ComplianceController extends Controller
     {
         $complianceEntries = DB::table('compliances')->get(); // Fetch all entries
 
+        // Show All Compliances by Department
+        $userDepartmentId = Auth::user()->department_id;
+
+        if ($userDepartmentId == 1) {
+            // Admin can view all compliances
+            $compliancesByDepartment = Compliance::all();
+        } else {
+            // Regular users only see compliances for their department
+            $compliancesByDepartment = Compliance::where('department_id', $userDepartmentId)->get();
+        }
+
+
         if ($request->ajax()) {
             $compliances = Compliance::select('id', 'compliance_name', 'frequency', 'created_at');
 
-            // dd($compliances);
-
-            return DataTables::of($complianceEntries)
+            return DataTables::of($compliancesByDepartment)
                 ->addColumn('action', function($row){
                     $viewAnchor = '<a href="#" class="view-btn view-compliance" 
                             data-bs-toggle="modal" 
@@ -67,7 +79,7 @@ class ComplianceController extends Controller
 
         // dd($department);
 
-        foreach ($complianceEntries as $entry) {
+        foreach ($compliancesByDepartment as $entry) {
 
             // $statusKey = (string) $entry->department_id;
             $entry->mapped_department = $department->get($entry->department_id, 'Unknown');
@@ -87,7 +99,7 @@ class ComplianceController extends Controller
 
         }
  
-        return view('components.compliance-list', compact('complianceEntries'));
+        return view('components.compliance-list', compact('compliancesByDepartment'));
     }
 
     // Create Compliance
@@ -414,13 +426,23 @@ class ComplianceController extends Controller
     public function projections(Request $request)
     {
         // Fetch all compliances
-        $compliances = Compliance::all();
+        // $compliances = Compliance::all();
         $departments = Department::all();
+
+        $userDepartmentId = Auth::user()->department_id;
+
+        if ($userDepartmentId == 1) {
+            // Admin can view all compliances
+            $compliancesByDepartment = Compliance::all();
+        } else {
+            // Regular users only see compliances for their department
+            $compliancesByDepartment = Compliance::where('department_id', $userDepartmentId)->get();
+        }
 
         // Process compliance deadlines
         $complianceDeadlines = [];
 
-        foreach ($compliances as $compliance) {
+        foreach ($compliancesByDepartment as $compliance) {
             $referenceDate = Carbon::parse($compliance->reference_date);
             $frequency = $compliance->frequency;
 
