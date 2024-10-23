@@ -16,7 +16,7 @@
 
                     {{-- Form --}}
                     <div class="card-form">
-                        <form action="" method="post" id="newComplianceForm">
+                        <form action="{{ route('compliances.store') }}" method="post" id="newComplianceForm">
                             @csrf
                             
                             <div class="row">
@@ -36,8 +36,11 @@
                                 <!-- Department Name -->
                                 <div class="col-md-6 mb-5">
                                     <label for="department_id" class="mb-2">Department Name</label>
-                                    <select class="form-select @error('department_id') is-invalid @enderror" aria-label="Default select example" name="department_id" id="nDepartmentId" value="{{ old('department_id') }}">
+                                    <select class="form-select @error('department_id') is-invalid @enderror" aria-label="Default select example" name="department_id" id="departmentSelect">
                                         <option selected disabled>Select Department</option>
+                                        @foreach ($departments as $department)
+                                            <option value="{{ $department->id }}">{{ $department->department_name }}</option>
+                                        @endforeach
                                     </select>
 
                                     <div class="invalid-feedback department_id" style="display: block;"></div>

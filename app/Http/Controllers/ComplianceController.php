@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Compliance;
+use App\Models\ComplianceRequest;
 use App\Models\Department;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -122,12 +123,22 @@ class ComplianceController extends Controller
             'submit_on.required' => 'Please provide a submission date.',
         ]);
 
+        // Check if user is a super admin
+        if (Auth::user()->role_id == 3) {
+            // Directly create compliance if super admin
+            $compliance = Compliance::create($fields);
+        } else {
+            // dd($request);
 
-        $compliance = Compliance::create($fields);
+            // Store the request for super admin review
+            ComplianceRequest::create([
+                'user_id' => Auth::id(),
+                'action' => 'add',
+                'changes' => json_encode($request->all()),
+            ]);
+        }
 
-        // return redirect()->withErrors($fields)->withInput();
         return back()->with('success', 'Your post was created.');
-        // return view('components.compliance-list');
     }
 
     // Update Compliance
@@ -150,21 +161,33 @@ class ComplianceController extends Controller
             'submit_on.required' => 'Please provide a submission date.',
         ]);
 
-        $compliance->update([
-            'compliance_name' => $fields['compliance_name'],
-            'department_id' => $fields['department_id'],
-            'reference_date' => $fields['reference_date'],
-            'frequency' => $fields['frequency'],
-            'start_working_on' => $fields['start_working_on'],
-            'submit_on' => $fields['submit_on']
 
-        ]);
-        return response()->json(['success' => 'Compliance updated successfully.']);
+        if (Auth::user()->role_id == 3) {
+            // Directly update compliance if super admin
+            $compliance->update([
+                'compliance_name' => $fields['compliance_name'],
+                'department_id' => $fields['department_id'],
+                'reference_date' => $fields['reference_date'],
+                'frequency' => $fields['frequency'],
+                'start_working_on' => $fields['start_working_on'],
+                'submit_on' => $fields['submit_on']
+    
+            ]);
+        } else {
+            // Store the edit request for super admin review
+            ComplianceRequest::create([
+                'compliance_id' => $compliance->id,
+                'user_id' => Auth::id(),
+                'action' => 'edit',
+                'changes' => json_encode($request->all()),
+            ]);
+        }
+
+       
+        // return response()->json(['success' => 'Compliance updated successfully.']);
 
 
-        // return back()->with('success', 'Your post was updated.');
-
-        // dd($compliance);
+        return back()->with('success', 'Your compliance was updated.');
     }
 
     // Delete Compliance
@@ -173,18 +196,70 @@ class ComplianceController extends Controller
         // Step 1: Find the Existing Record
         $compliance = Compliance::findOrFail($id); // This will throw a 404 if not found
 
+        if (Auth::user()->role_id == 2) {
+            // Directly delete compliance if super admin
+            // Step 3: Delete the Record
+            $compliance->delete(); // Delete the record
+        } else {
+            // Store the delete request for super admin review
+            ComplianceRequest::create([
+                'compliance_id' => $id,
+                'user_id' => Auth::id(),
+                'action' => 'delete',
+                'changes' => json_encode([]), // No changes needed for delete
+            ]);
+        }        
+
         // Step 2: Authorize the Action
         // Gate::authorize('delete', $compliance); // Check if the user is authorized
 
-        // Step 3: Delete the Record
-        $compliance->delete(); // Delete the record
+   
 
         // Step 4: Redirect or Return a Response
         return back()->with('success', 'Compliance deleted successfully.');
         // return response()->json(['message' => 'Compliance deleted successfully!'], 200);
     }
 
+    // REQUEST FOR CHANGE
+    public function reviewRequests()
+    {
+        $requests = ComplianceRequest::where('approved', false)->get();
+        return view('admin.requests', compact('requests'));
+    }
 
+    public function approveRequest($id)
+    {
+        $request = ComplianceRequest::find($id);
+
+        // dd($request);
+
+        // Handle based on action type
+        if ($request->action == 'add') {
+            Compliance::create(json_decode($request->changes, true));
+        } elseif ($request->action == 'edit') {
+            $compliance = Compliance::find($request->compliance_id);
+            $compliance->update(json_decode($request->changes, true));
+        } elseif ($request->action == 'delete') {
+            $compliance = Compliance::find($request->compliance_id);
+            $compliance->delete();
+        }
+
+        // Mark the request as approved
+        $request->approved = true;
+        $request->save();
+
+        return redirect()->back()->with('message', 'Request approved.');
+    }
+
+
+
+
+
+
+
+
+
+    // COMPLIANCE DATA MANIPULATION
     public function showAllCompliances()
     {
         // dd('ok');

@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\ComplianceController;
 use App\Http\Controllers\ResetPasswordController;
-use App\Models\Compliance;
 
 Route::redirect('/', 'login');
 
@@ -45,13 +44,19 @@ Route::middleware('auth')->group(function() {
 
 
     // Route::get('/projection', [ComplianceController::class, 'showAllCompliances']);
-    Route::get('/projection', [ComplianceController::class, 'projections']);
+    Route::get('/projection', [ComplianceController::class, 'projections'])->name('projections');
 
     Route::view('/records', 'components.records');
     Route::view('/accounts', 'components.accounts');
 
     // Compliance List
     Route::resource('/compliances', ComplianceController::class);
+
+    Route::get('/admin/compliance/requests', [ComplianceController::class, 'reviewRequests'])->name('complianceRequests');
+    Route::post('/admin/compliance/approve/{id}', [ComplianceController::class, 'approveRequest'])->name('approveRequest');
+
+
+    // Route::view('/settings', 'components.settings');
 
     // Route::get('/compliance-list', [ComplianceController::class, 'getCompliance'])->name('compliance-list');
     // Route::post('/compliance-list', [ComplianceController::class, 'post']);
@@ -63,7 +68,6 @@ Route::middleware('auth')->group(function() {
     // Route::get('/new-compliance', [ComplianceController::class, 'getDepartment'])->name('new-compliance');
     // Route::post('/new-compliance', [ComplianceController::class, 'post']);
 
-    Route::view('/settings', 'components.settings');
     
     Route::view('/my-account', 'profile.my-account');
     Route::view('/account-settings', 'profile.my-account-settings');
@@ -81,10 +85,10 @@ Route::middleware('auth')->group(function() {
 });
 
 // Fallback route
-Route::fallback(function () {
-    // Check if the user is authenticated
-    if (Auth::check()) {
-        return redirect()->route('dashboard'); // Redirect authenticated users to the dashboard
-    }
-    return redirect()->route('login'); // Redirect guests to the login page
-});
+// Route::fallback(function () {
+//     // Check if the user is authenticated
+//     if (Auth::check()) {
+//         return redirect()->route('dashboard'); // Redirect authenticated users to the dashboard
+//     }
+//     return redirect()->route('login'); // Redirect guests to the login page
+// });

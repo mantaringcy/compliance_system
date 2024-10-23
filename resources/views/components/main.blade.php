@@ -121,19 +121,19 @@
                             NAVIGATION
                         </li>
                         <li class="sidebar-item2 mb-1">
-                            <a href="dashboard">
+                            <a href="{{ route('dashboard') }}">
                                 <i class="fa-solid fa-house"></i>
                                 <span>Dashboard</span>
                             </a>
                         </li>
                         <li class="sidebar-item2 mb-1">
-                            <a href="overview">
+                            <a href="{{ route('overview') }}">
                                 <i class="fa-solid fa-square-poll-vertical"></i>
                                 <span>Overview</span>
                             </a>
                         </li>
                         <li class="sidebar-item2 mb-1">
-                            <a href="projection">
+                            <a href="{{ route('projections') }}">
                                 <i class="fa-solid fa-chart-line"></i>
                                 <span>Projection</span>
                             </a>
@@ -151,7 +151,7 @@
                             </a>
                         </li>
                         <li class="sidebar-item2 mb-1">
-                            <a href="compliances">
+                            <a href="{{ route('compliances.index') }}">
                                 <i class="fa-solid fa-file-circle-plus"></i>
                                 <span>Compliance</span>
                             </a>
@@ -163,9 +163,9 @@
                             </a>
                         </li> --}}
                         <li class="sidebar-item2">
-                            <a href="settings">
-                                <i class="fa-solid fa-gear"></i>
-                                <span>Settings</span>
+                            <a href="{{ route('complianceRequests') }}">
+                                <i class="fa-solid fa-file-import"></i>
+                                <span>Requests</span>
                                 
                             </a>
                         </li>
