@@ -92,30 +92,30 @@ function formatDate(dateString) {
 }
 
 // New Compliance Form
-document.addEventListener('DOMContentLoaded', function () {
-    const departmentModal = document.getElementById('newComplianceModal');
+// document.addEventListener('DOMContentLoaded', function () {
+//     const departmentModal = document.getElementById('newComplianceModal');
 
-    departmentModal.addEventListener('show.bs.modal', function (event) {
-        const button = event.relatedTarget;
+//     departmentModal.addEventListener('show.bs.modal', function (event) {
+//         const button = event.relatedTarget;
 
-        // Get departments from data attribute (JSON)
-        const departments = JSON.parse(button.getAttribute('data-departments'));
+//         // Get departments from data attribute (JSON)
+//         const departments = JSON.parse(button.getAttribute('data-departments'));
 
-        // Get the select input
-        const departmentSelect = departmentModal.querySelector('#nDepartmentId');
+//         // Get the select input
+//         const departmentSelect = departmentModal.querySelector('#nDepartmentId');
 
-        // Clear existing options
-        // departmentSelect.innerHTML = '';
+//         // Clear existing options
+//         // departmentSelect.innerHTML = '';
 
-        // Append options to the select element
-        departments.forEach(function (department) {
-            var option = document.createElement('option');
-            option.value = department.id; // Set the value to the department ID
-            option.textContent = department.department_name; // Display the department name
-            departmentSelect.appendChild(option);
-        });
-    });
-});
+//         // Append options to the select element
+//         departments.forEach(function (department) {
+//             var option = document.createElement('option');
+//             option.value = department.id; // Set the value to the department ID
+//             option.textContent = department.department_name; // Display the department name
+//             departmentSelect.appendChild(option);
+//         });
+//     });
+// });
 
 // View Compliance Form
 // document.addEventListener('DOMContentLoaded', function() {
@@ -206,13 +206,6 @@ document.addEventListener('DOMContentLoaded', function () {
 let originalData = {};
 
 $(document).on('click', '.edit-compliance', function () {
-    // const complianceId = $('#complianceId').val();
-    // const complianceName = $('#complianceName').val();
-    // const complianceDepartment = $('#departmentSelect').val();
-    // const complianceReferenceDate = $('#referenceDate').val();
-    // const complianceFrequency = $('#frequency').val();
-    // const complianceStartWorkingOn = $('#startWorkingOn').val();
-    // const complianceSubmitOn = $('#submitOn').val();
     const id = $(this).attr('data-compliance-id');
     const complianceName = $(this).attr('data-compliance-name');
     const departmentId = $(this).attr('data-department-id');
@@ -224,7 +217,7 @@ $(document).on('click', '.edit-compliance', function () {
     // Store original data for comparison
     originalData = { complianceName, departmentId, referenceDate, frequency, startWorkingOn, submitOn };
 
-    console.log("Original Data", originalData);
+    // console.log("Original Data", originalData);
     
     $('#editComplianceModal #complianceName').val(complianceName);
     $('#editComplianceModal #departmentSelect').val(departmentId);
@@ -256,7 +249,6 @@ $('#editComplianceForm').on('submit', function(event) {
         submitOn: $('#editComplianceModal #submitOn').val(),
     };
 
-    // console.log('Updated Data', updatedData);
 
     // Compare original data with updated data
     const hasChanges = Object.keys(updatedData).some(key => updatedData[key] !== originalData[key]);
@@ -296,34 +288,230 @@ $('#editComplianceForm').on('submit', function(event) {
 });
 
 // Add Compliance Error
-// $('#newComplianceForm').on('submit', function(event) {
-//     event.preventDefault();  // Prevent the default form submission
+$('#newComplianceForm').on('submit', function(event) {
+    event.preventDefault();  // Prevent the default form submission
 
-//     $('#newComplianceForm').attr('action', '/compliances/');
+    console.log('object');
+
+    $('#newComplianceForm').attr('action', '/compliances/');
+
+    // Perform your AJAX update here
+    $.ajax({
+        url: $(this).attr('action'),  // Use the form action URL
+        type: 'POST',  // Use POST with _method field for PUT
+        data: $(this).serialize(),  // Serialize form data
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(response) {
+            // Handle success, e.g., update the DataTable or show a success message
+            $('#newComplianceModal').modal('hide');
+            $('#complianceListTable').DataTable().ajax.reload();  // Reload DataTable data
+            location.reload()
+        },
+        error: function(xhr) {
+            $('.invalid-feedback').text(''); // Display the first message
+            
+            if (xhr.responseJSON.errors) {
+                // Loop through each error
+                $.each(xhr.responseJSON.errors, function(fieldName, messages) {
+                    // Display the first error message for each field
+                    $('.' + fieldName).text(messages[0]); // Display the first message
+                });
+            }
+        }
+    });
+});
+
+
+// REQUEST MODAL
+
+
+// $(document).ready(function() {
+//     // Handle Cancel button click
+//     $('#cancelRequest').on('click', function(e) {
+//         e.preventDefault(); // Prevent form submission
+        
+//         // Perform the action you want for cancel
+//         if(confirm("Are you sure you want to cancel this request?")) {
+//             // For example, redirect back or reset the form
+//             window.location.href = '/dashboard';  // Redirect to another page
+//         }
+//     });
+
+//     // Handle Approve button click
+//     $('#approveRequest').on('click', function(e) {
+//         e.preventDefault(); // Prevent form submission
+
+//         // Perform the action you want for approve
+//         if(confirm("Are you sure you want to approve this request?")) {
+//             // Submit the form via AJAX or trigger form submission
+//             $('#complianceForm').submit();  // This will submit the form
+//         }
+//     });
+// });
+
+// ADD REQUEST MODAL
+// Approve Button
+$('#addApproveButton').on('click', function(e) {
+    e.preventDefault();
+
+    if(confirm("Are you sure you want to approve this compliance?")) {
+        $.ajax({
+            url:'/admin/compliance/approve/' + requestId,  
+            type: 'POST',  
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                $('#addRequestComplianceModal').modal('hide');
+                location.reload()
+            }
+        });
+
+    }
+});
+
+// Cancel Button
+$('#addCancelButton').on('click', function(e) {
+    e.preventDefault();
+
+    if(confirm("Are you sure you want to cancel this request?")) {
+        $.ajax({
+            url:'/admin/compliance/cancel/' + requestId, 
+            type: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                $('#addRequestComplianceModal').modal('hide');
+                location.reload()
+            }
+        });
+
+    }
+});
+
+// DELETE REQUEST MODAL
+// Approve Button
+$('#deleteApproveButton').on('click', function(e) {
+    e.preventDefault();
+
+    if(confirm("Are you sure you want to approve the deletion of this compliance?")) {
+        $.ajax({
+            url:'/admin/compliance/approve/' + requestId,  
+            type: 'POST',  
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                $('#addRequestComplianceModal').modal('hide');
+                location.reload()
+            }
+        });
+
+    }
+});
+
+// Cancel Button
+$('#deleteCancelButton').on('click', function(e) {
+    e.preventDefault();
+
+    if(confirm("Are you sure you want to cancel this request?")) {
+        $.ajax({
+            url:'/admin/compliance/cancel/' + requestId, 
+            type: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                $('#addRequestComplianceModal').modal('hide');
+                location.reload()
+            }
+        });
+
+    }
+});
+
+// EDIT REQUEST MODAL
+// Approve Button
+$('#editApproveButton').on('click', function(e) {
+    e.preventDefault();
+
+    if(confirm("Are you sure you want to approve the editing of this compliance?")) {
+        $.ajax({
+            url:'/admin/compliance/approve/' + requestId,  
+            type: 'POST',  
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                $('#addRequestComplianceModal').modal('hide');
+                location.reload()
+            }
+        });
+
+    }
+});
+
+// Cancel Button
+$('#editCancelButton').on('click', function(e) {
+    e.preventDefault();
+
+    if(confirm("Are you sure you want to cancel this request?")) {
+        $.ajax({
+            url:'/admin/compliance/cancel/' + requestId, 
+            type: 'POST',
+            data: $(this).serialize(),  // Serialize form data
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                $('#addRequestComplianceModal').modal('hide');
+                location.reload()
+            }
+        });
+
+    }
+});
+
+// $('#aRequestComplianceForm').on('submit', function(event) {
+//     event.preventDefault();  // Prevent the default form submission
+    
+//     // Get the values from the form
+//     const complianceId = $('#complianceId').val();
+//     const complianceName = $('#aRequestComplianceName').text();
+//     const departmentName = addRequest[0];
+//     const referenceDate = addRequest[1];
+//     const frequency = addRequest[2];
+//     const startWorkingOn = addRequest[3];
+//     const submitOn = addRequest[4];
+
+//     // const approveBtn = $('#approveRequest');
+//     // const cancelBtn = $('#cancelRequest');
+
+//     // if ($('#approveRequest').attr('name') == "approveRequest") {            
+//     //     alert("First Button is pressed - Form will submit")
+//     //     $("#myform").submit();
+//     // }
+
+//     // if ($('#cancelRequest').attr('name') == "cancelRequest") {
+//     //     alert("Second button is pressed - Form did not submit")
+//     // }
+
+//     // $('#aRequestComplianceForm').attr('action', '/admin/compliance/approve/' + addRequest[5]);
 
 //     // Perform your AJAX update here
 //     $.ajax({
 //         url: $(this).attr('action'),  // Use the form action URL
 //         type: 'POST',  // Use POST with _method field for PUT
-//         data: $(this).serialize(),  // Serialize form data
+//         // data: $(this).serialize(),  // Serialize form data
 //         headers: {
 //             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 //         },
 //         success: function(response) {
-//             // Handle success, e.g., update the DataTable or show a success message
-//             $('#newComplianceModal').modal('hide');
-//             $('#complianceListTable').DataTable().ajax.reload();  // Reload DataTable data
-//         },
-//         error: function(xhr) {
-//             $('.invalid-feedback').text(''); // Display the first message
-            
-//             if (xhr.responseJSON.errors) {
-//                 // Loop through each error
-//                 $.each(xhr.responseJSON.errors, function(fieldName, messages) {
-//                     // Display the first error message for each field
-//                     $('.' + fieldName).text(messages[0]); // Display the first message
-//                 });
-//             }
+//             $('#addRequestComplianceModal').modal('hide');
+//             location.reload()
 //         }
 //     });
 // });

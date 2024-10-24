@@ -54,6 +54,7 @@ Route::middleware('auth')->group(function() {
 
     Route::get('/admin/compliance/requests', [ComplianceController::class, 'reviewRequests'])->name('complianceRequests');
     Route::post('/admin/compliance/approve/{id}', [ComplianceController::class, 'approveRequest'])->name('approveRequest');
+    Route::post('/admin/compliance/cancel/{id}', [ComplianceController::class, 'cancelRequest'])->name('cancelRequest');
 
 
     // Route::view('/settings', 'components.settings');

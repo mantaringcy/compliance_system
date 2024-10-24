@@ -119,9 +119,6 @@
         $('#editComplianceModal #frequency').val(frequency);
         $('#editComplianceModal #startWorkingOn').val(startWorkingOn);
         $('#editComplianceModal #submitOn').val(submitOn);
-
-     
-
     });
 
     // View Button

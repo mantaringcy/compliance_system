@@ -164,9 +164,19 @@
                         </li> --}}
                         <li class="sidebar-item2">
                             <a href="{{ route('complianceRequests') }}">
-                                <i class="fa-solid fa-file-import"></i>
-                                <span>Requests</span>
-                                
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <i class="fa-solid fa-file-import"></i>
+                                        <span>Requests</span>
+                                    </div>
+                                    <div>
+                                        @if (!empty($totalRequestsCount))
+                                            <span class="circle-badge">{{ $totalRequestsCount }}</span>
+                                        @else
+                                            
+                                        @endif
+                                    </div>
+                                </div>
                             </a>
                         </li>
                     </ul>

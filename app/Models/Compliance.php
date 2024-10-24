@@ -17,4 +17,10 @@ class Compliance extends Model
         'start_working_on',
         'submit_on',
     ];
+
+    // Define the relationship between Compliance and Department
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
 }

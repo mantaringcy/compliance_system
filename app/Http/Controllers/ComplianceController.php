@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Yajra\DataTables\DataTables;
 use Carbon\Carbon;
+use Hamcrest\Core\HasToString;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -191,12 +192,12 @@ class ComplianceController extends Controller
     }
 
     // Delete Compliance
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
         // Step 1: Find the Existing Record
         $compliance = Compliance::findOrFail($id); // This will throw a 404 if not found
 
-        if (Auth::user()->role_id == 2) {
+        if (Auth::user()->role_id == 3) {
             // Directly delete compliance if super admin
             // Step 3: Delete the Record
             $compliance->delete(); // Delete the record
@@ -206,7 +207,7 @@ class ComplianceController extends Controller
                 'compliance_id' => $id,
                 'user_id' => Auth::id(),
                 'action' => 'delete',
-                'changes' => json_encode([]), // No changes needed for delete
+                'changes' => json_encode($request->all()), // No changes needed for delete
             ]);
         }        
 
@@ -223,15 +224,45 @@ class ComplianceController extends Controller
     // REQUEST FOR CHANGE
     public function reviewRequests()
     {
-        $requests = ComplianceRequest::where('approved', false)->get();
-        return view('admin.requests', compact('requests'));
+        // Fetch departments
+        $departments = Department::all()->pluck('department_name', 'id')->toArray();
+
+        // Get the logged-in user's department_id (assuming it's stored in the authenticated user)
+        $userDepartmentId = Auth::user()->department_id;
+
+        // Fetch only the compliance requests for the user's department, excluding approved ones
+        $requests = ComplianceRequest::where('approved', false)
+        ->when(!in_array($userDepartmentId, [1]), function ($query) use ($userDepartmentId) {
+            return $query->whereHas('compliance', function ($complianceQuery) use ($userDepartmentId) {
+                $complianceQuery->where('department_id', $userDepartmentId);
+            });
+        })
+        ->get();
+        
+        // Fetch original compliance data to compare with the requests
+        $requestsWithCompliance = $requests->map(function ($request) use ($departments) {
+            $originalCompliance = Compliance::find($request->compliance_id);
+            
+            // Decode changes JSON if necessary
+            $changes = json_decode($request->changes, true);
+
+            return [
+                'request' => $request,
+                'originalCompliance' => $originalCompliance,
+                'changes' => $changes,
+                'departments' => $departments // Pass departments mapping
+            ];
+        });
+    
+        return view('admin.requests', [
+            'requestsWithCompliance' => $requestsWithCompliance,
+        ]);
     }
 
     public function approveRequest($id)
     {
+        
         $request = ComplianceRequest::find($id);
-
-        // dd($request);
 
         // Handle based on action type
         if ($request->action == 'add') {
@@ -251,6 +282,19 @@ class ComplianceController extends Controller
         return redirect()->back()->with('message', 'Request approved.');
     }
 
+    public function cancelRequest($id)
+    {
+        $request = ComplianceRequest::find($id);
+        
+        if($request) {
+            $request->approved = 2; // 2 means canceled
+            $request->save();
+
+            return response()->json(['message' => 'Request cancelled successfully']);
+        } else {
+            return response()->json(['error' => 'Request not found'], 404);
+        }
+    }
 
 
 

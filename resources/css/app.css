@@ -266,7 +266,7 @@ a.sidebar-link {
 }
 
 .sidebar-nav .sidebar-item-active i,
-.sidebar-nav .sidebar-item-active span {
+.sidebar-nav .sidebar-item-active  {
     color: var(--active-link-text) !important;
 }
 
@@ -383,3 +383,15 @@ body.dark card-lg a {
     background: #f4bebe !important;
     color: #dc2625 !important;
 }
+
+.circle-badge {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 11px;
+    background-color: var(--profile-fill-hover);
+    color: white;
+  }
