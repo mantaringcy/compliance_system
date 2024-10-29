@@ -30,7 +30,19 @@
     --input-color: #FFFFFF !important;
     --input-text-color: #BEC8D0 !important;
     --input-border: #BEC8D0 !important;
-    --checkbox-label: #585C5E !important
+    --checkbox-label: #585C5E !important;
+
+    /* Badge */
+    --badge-blue: #4680FF !important;
+    --badge-green: #2CA87F !important;
+    --badge-red: #DC2625 !important;
+
+    --badge-blue-light: #E4ECFF !important;
+    --badge-green-light: #E3F2EB !important;
+    --badge-red-light: #FBE1DF !important;
+
+    --badge-light: #E5F7F9 !important;
+    --badge-light-color: #3EC9D6 !important;
 }
 
 body.dark {
@@ -66,5 +78,17 @@ body.dark {
     --input-text-color: #BEC8D0 !important;
     --input-type: #BFBFBF !important;
     --input-border: #303F4F !important;
-    --checkbox-label: #748792 !important
+    --checkbox-label: #748792 !important;
+
+    /* Badge */
+    --badge-blue: #4680FF !important;
+    --badge-green: #2CA87F !important;
+    --badge-red: #DC2625 !important;
+
+    --badge-blue-light: #23314C !important;
+    --badge-green-light: #213738 !important;
+    --badge-red-light: #3A262C !important;
+
+    --badge-light: #233C46 !important;
+    --badge-light-color: #3EC9D6 !important;
 }

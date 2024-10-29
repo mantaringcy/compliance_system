@@ -1,18 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-
     <!-- Vite -->
     @vite([
         'resources/css/app.css',
+        'resources/css/auth-app.css',
         'resources/css/form.css',
         'resources/css/modal.css', 
         'resources/css/theme-switch.css',
         'resources/css/theme-colors.css',
         'resources/js/app.js'])
+        
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
     
     <!-- Title -->
     <title>@yield('title', 'Dashboard') | {{ config('app.name') }}</title>
@@ -139,17 +141,25 @@
                             </a>
                         </li>
                         <li class="sidebar-item2 mb-1">
-                            <a href="records">
-                                <i class="fa-solid fa-file-invoice"></i>
-                                <span>Records</span>
+                            <a href="{{ route('logs.data') }}">
+                                <i class="fa-solid fa-book"></i>
+                                <span>Logs</span>
                             </a>
                         </li>
                         <li class="sidebar-item2 mb-1">
+                            <a href="{{ route('logs.sample') }}">
+                                <i class="fa-solid fa-book"></i>
+                                <span>Logs Sample</span>
+                            </a>
+                        </li>
+
+                        {{-- <li class="sidebar-item2 mb-1">
                             <a href="accounts">
                                 <i class="fa-solid fa-users"></i>
                                 <span>Accounts</span>
                             </a>
-                        </li>
+                        </li> --}}
+
                         <li class="sidebar-item2 mb-1">
                             <a href="{{ route('compliances.index') }}">
                                 <i class="fa-solid fa-file-circle-plus"></i>

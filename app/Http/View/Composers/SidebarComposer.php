@@ -18,13 +18,14 @@ class SidebarComposer
         $userDepartmentId = Auth::user()->department_id;
 
         // Fetch only the compliance requests for the user's department, excluding approved ones
-        $requests = ComplianceRequest::where('approved', false)
-        ->when(!in_array($userDepartmentId, [1]), function ($query) use ($userDepartmentId) {
-            return $query->whereHas('compliance', function ($complianceQuery) use ($userDepartmentId) {
-                $complianceQuery->where('department_id', $userDepartmentId);
-            });
-        })
-        ->get();
+        if ($userDepartmentId == 1) {
+            $requests = ComplianceRequest::where('approved', false)->get();
+        } else {
+            // Filter compliances based on the user's department
+            $requests = ComplianceRequest::where('approved', false)
+                ->whereJsonContains('changes->department_id', $userDepartmentId)
+                ->get();
+        }
 
         // Count all requests
         $totalRequestsCount = $requests->count();
