@@ -140,6 +140,7 @@ class ComplianceController extends Controller
                 'user_id' => Auth::id(),
                 'action' => 'add',
                 'compliance_id' => $compliance->id,
+                'department_id' => $compliance->department_id,
                 'changes' => json_encode($request->all())
             ]);
 
@@ -151,6 +152,7 @@ class ComplianceController extends Controller
                 'user_id' => Auth::id(),
                 'action' => 'add/approval',
                 'compliance_id' => $request->id,
+                'department_id' => $request->department_id,
                 'changes' => json_encode($request->all())
             ]);
 
@@ -208,6 +210,7 @@ class ComplianceController extends Controller
                 'user_id' => Auth::id(),
                 'action' => 'edit',
                 'compliance_id' => $compliance->id,
+                'department_id' => $compliance->department_id,
                 'changes' => json_encode([
                     'old' => $oldCompliance,  // Convert old compliance to array
                     'new' => $request->all(), // Store new data excluding _token
@@ -220,6 +223,7 @@ class ComplianceController extends Controller
                 'user_id' => Auth::id(),
                 'action' => 'edit/approval',
                 'compliance_id' => $compliance->id,
+                'department_id' => $compliance->department_id,
                 'changes' => json_encode([
                     'old' => $oldCompliance,  // Convert old compliance to array
                     'new' => $request->all(), // Store new data excluding _token
@@ -250,7 +254,7 @@ class ComplianceController extends Controller
         $compliance = Compliance::findOrFail($id); // This will throw a 404 if not found
 
         $departmentId = Auth::user()->department_id;
-        $changes = array_merge($request->all(), ['department_id' => $departmentId]);
+        $changes = array_merge($request->all(), ['department_id' => $departmentId, 'compliance_name' => $compliance->compliance_name]);
 
 
         if (Auth::user()->role_id == 3) {
@@ -262,6 +266,7 @@ class ComplianceController extends Controller
                 'user_id' => Auth::id(),
                 'action' => 'delete',
                 'compliance_id' => $id,
+                'department_id' => $compliance->department_id,
                 'changes' => json_encode($request->all()),
             ]);
 
@@ -271,6 +276,7 @@ class ComplianceController extends Controller
                 'user_id' => Auth::id(),
                 'action' => 'delete/approval',
                 'compliance_id' => $id,
+                'department_id' => $compliance->department_id,
                 'changes' => json_encode([$request->all()]),
             ]);
 
@@ -279,7 +285,7 @@ class ComplianceController extends Controller
                 'compliance_id' => $id,
                 'user_id' => Auth::id(),
                 'action' => 'delete',
-                'changes' => json_encode($changes), // No changes needed for delete
+                'changes' => json_encode($changes),
             ]);
         }        
 
@@ -306,10 +312,13 @@ class ComplianceController extends Controller
 
         // Check if the user is from department 1, in which case show all compliances
         if ($userDepartmentId == 1) {
-            $requests = ComplianceRequest::where('approved', 0)->get();
+            $requests = ComplianceRequest::where('approved', 0)
+            ->orderBy('created_at', 'desc')
+            ->get();
         } else {
             // Filter compliances based on the user's department
             $requests = ComplianceRequest::where('approved', 0)
+                ->orderBy('created_at', 'desc')
                 ->whereJsonContains('changes->department_id', $userDepartmentId)
                 ->get();
         }
@@ -357,6 +366,7 @@ class ComplianceController extends Controller
                 'user_id' => Auth::id(),
                 'action' => 'add/approved',
                 // 'compliance_id' => $request->id,
+                'department_id' => $newCompliance['department_id'],
                 'changes' => json_encode($newCompliance)
             ]);
 
@@ -372,6 +382,7 @@ class ComplianceController extends Controller
                 'user_id' => Auth::id(),
                 'action' => 'edit/approved',
                 'compliance_id' => $compliance->id,
+                'department_id' => $newCompliance['department_id'],
                 'changes' => json_encode([
                     'old' => $oldCompliance,  // Convert old compliance to array
                     'new' => $newCompliance, // Store new data excluding _token
@@ -385,6 +396,7 @@ class ComplianceController extends Controller
                 'user_id' => Auth::id(),
                 'action' => 'delete/approved',
                 'compliance_id' => $compliance->id,
+                'department_id' => $compliance->department_id,
                 'changes' => json_encode($request),
             ]);
 
@@ -414,6 +426,7 @@ class ComplianceController extends Controller
                 'user_id' => Auth::id(),
                 'action' => 'cancelled',
                 // 'compliance_id' => $request->id,
+                'department_id' => $newCompliance['department_id'],
                 'changes' => json_encode($newCompliance)
             ]);
 
@@ -447,25 +460,48 @@ class ComplianceController extends Controller
 
     public function getAllLogs(Request $request)
     {
-        $logs = ComplianceLog::orderBy('created_at', 'desc')->get()->map(function ($log) {
+        // Get the current user
+        $currentUser = Auth::user();
+        $departmentId = $currentUser->department_id;
+        $roleId = $currentUser->role_id;
+        $userId = $currentUser->id;
+
+        // Initialize the base query for logs
+        $logsQuery = ComplianceLog::query();
+
+       // Check if the user can see all logs (department 1 or 2 with roles 1, 2, or 3)
+        if (in_array($departmentId, [1, 2]) && in_array($roleId, [1, 2, 3])) {
+            // Show all logs for department 1 or 2 with allowed roles
+        } else {
+            // For any other department (3 to 15), show only the logs that match the user's department_id
+            $logsQuery->where('department_id', $departmentId);
+            // dd($userId);
+        }
+
+        // Get the logs in descending order and map them
+        $logs = $logsQuery->orderBy('created_at', 'desc')->get()->map(function ($log) {
             // Get the compliance name, including soft-deleted records
             $compliance = Compliance::withTrashed()->find($log->compliance_id);
             $complianceName = $compliance ? $compliance->compliance_name : 'Unknown Compliance';
             $departments = Department::all()->pluck('department_name', 'id')->toArray();
 
-        
             // Add the compliance name to the log entry for easier access later
             $log->compliance_name = $complianceName;
-        
+
             return $log;
         });
 
         if ($request->ajax()) {
             return DataTables::of($logs)
+            ->addColumn('id', function ($log) {
+                return $log->id;
+            })
             ->addColumn('date', function ($log) {
-                return \Carbon\Carbon::parse($log->created_at)->format('d M Y');
+                return \Carbon\Carbon::parse($log->created_at)->format('d M Y h:i A');
             })
             ->addColumn('action', function ($log) {
+                $changesData = json_decode($log->changes, true);
+
                 switch($log->action) {
                     case 'add':
                         return '<span class="badge badge-blue">' . Str::upper('Add') . '</span>';
@@ -495,7 +531,13 @@ class ComplianceController extends Controller
                         return '<span class="badge badge-red-light">' . Str::upper('Deleted') . '</span>';
                         break;
                     case 'cancelled':
-                        return '<span class="badge badge-light">' . Str::upper('Cancelled') . '</span>';
+                        if (isset($changesData['_method']) && $changesData['_method'] == "DELETE")
+                            return '<span class="badge badge-light">' . Str::upper('Cancelled - Deletion') . '</span>';
+                        elseif (isset($changesData['_method']) && $changesData['_method'] == "PUT") {
+                            return '<span class="badge badge-light">' . Str::upper('Cancelled - Editing') . '</span>';
+                        } else {
+                            return '<span class="badge badge-light">' . Str::upper('Cancelled - Addition') . '</span>';
+                        }
                         break;
                     default: 
                         return '<span class="badge badge-blue">' . Str::upper($log->action) . '</span>';
@@ -515,6 +557,91 @@ class ComplianceController extends Controller
             })
             ->addColumn('changes', function ($log) {
                 $changesData = json_decode($log->changes, true);
+
+                // switch($log->action) {
+                //     case 'add':
+                //         // return 'Additon of Compliance ' . $log->compliance_name;
+                //         return 'Initiated the addition of ' . '<span class="fst-italic">' . $log->compliance_name . '</span>';
+                //         break;
+                //     case 'edit':
+                //         return 'Updated ' . '<span class="fst-italic">' . $log->compliance_name . '</span>' . ' details';
+                //         break;
+                //     case 'delete':
+                //         return 'Initiated the deletion of ' . '<span class="fst-italic">' . $log->compliance_name . '</span>';
+                //         break;
+                //     case 'add/approval':
+                //         return 'Requested the addition of ' . '<span class="fst-italic">' . $changesData['compliance_name'] . '</span>';
+                //         break;
+                //     case 'edit/approval':
+                //         return 'Requested an edit for ' . '<span class="fst-italic">' . $log->compliance_name . '</span>';
+                //         break;
+                //     case 'delete/approval':
+                //         return 'Request the deletion of ' . '<span class="fst-italic">' . $log->compliance_name . '</span>';
+                //         break;
+                //     case 'add/approved':
+                //         return 'Approved the addition of ' . '<span class="fst-italic">' . $changesData['compliance_name'] . '</span>';
+                //         return '<span class="badge badge-blue-light">' . Str::upper('Added') . '</span>';
+                //         break;
+                //     case 'edit/approved':
+                //         return 'Approved the edit of ' . '<span class="fst-italic">' . $log->compliance_name . '</span>';
+                //         break;
+                //     case 'delete/approved':
+                //         return 'Approved the deletion of ' . '<span class="fst-italic">' . $log->compliance_name . '</span>';
+                //         break;
+                //     case 'cancelled':
+                //         if (isset($changesData['_method']) && $changesData['_method'] == "DELETE")
+                //             return 'Cancelled the addition of ' . '<span class="fst-italic">' . $changesData['compliance_name'] . '</span>';
+                //         elseif (isset($changesData['_method']) && $changesData['_method'] == "PUT") {
+                //             return 'Cancelled the edit of ' . '<span class="fst-italic">' . $changesData['compliance_name'] . '</span>';
+                //         } else {
+                //             return 'Cancelled the deletion of ' . '<span class="fst-italic">' . $changesData['compliance_name'] . '</span>';
+                //         }
+                //         break;
+                //     default: 
+                //         return '<span class="badge badge-blue">' . Str::upper($log->action) . '</span>';
+                // }
+                switch($log->action) {
+                    case 'add':
+                        // return 'Additon of Compliance ' . $log->compliance_name;
+                        return 'Initiated the addition of ' . $log->compliance_name;
+                        break;
+                    case 'edit':
+                        return 'Updated ' . $log->compliance_name . ' details';
+                        break;
+                    case 'delete':
+                        return 'Initiated the deletion of ' . $log->compliance_name;
+                        break;
+                    case 'add/approval':
+                        return 'Requested the addition of ' . $changesData['compliance_name'];
+                        break;
+                    case 'edit/approval':
+                        return 'Requested an edit for ' . $log->compliance_name;
+                        break;
+                    case 'delete/approval':
+                        return 'Request the deletion of ' . $log->compliance_name;
+                        break;
+                    case 'add/approved':
+                        return 'Approved the addition of ' . $changesData['compliance_name'];
+                        return '<span class="badge badge-blue-light">' . Str::upper('Added');
+                        break;
+                    case 'edit/approved':
+                        return 'Approved the edit of ' . $log->compliance_name;
+                        break;
+                    case 'delete/approved':
+                        return 'Approved the deletion of ' . $log->compliance_name;
+                        break;
+                    case 'cancelled':
+                        if (isset($changesData['_method']) && $changesData['_method'] == "DELETE")
+                            return 'Cancelled the addition of ' . $changesData['compliance_name'];
+                        elseif (isset($changesData['_method']) && $changesData['_method'] == "PUT") {
+                            return 'Cancelled the edit of ' . $changesData['compliance_name'];
+                        } else {
+                            return 'Cancelled the deletion of ' . $changesData['compliance_name'];
+                        }
+                        break;
+                    default: 
+                        return '<span class="badge badge-blue">' . Str::upper($log->action);
+                }
                 // $oldData = $changesData['old'] ?? [];
                 // $newData = $changesData['new'] ?? [];
     
@@ -546,12 +673,14 @@ class ComplianceController extends Controller
                 // }
     
                 // echo $changesData;
-                if ($log->action == 'add/approved' || $log->action == 'add/approval' || $log->action == 'cancelled') {
-                    return $changesData['compliance_name'];
-                }
-                return $log->compliance_name;
+                // if ($log->action == 'add/approved' || $log->action == 'add/approval' || $log->action == 'cancelled') {
+                //     return $changesData['compliance_name'];
+                // }
+                // return $log->compliance_name;
             })
-            // ->rawColumn('actions')
+            
+            // ->rawColumn(['actions', 'changes'])
+            ->escapeColumns([]) // Disable HTML escaping for all columns
             ->make(true);
         }
 
@@ -568,7 +697,7 @@ class ComplianceController extends Controller
         // }
         // dd($logs);
 
-        return view('components.logs', compact('logs'));
+        return view('components.logs');
     }
 
 

@@ -21,6 +21,8 @@
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+    <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.js"></script>
+
     <!-- Bootstrap Datatable -->
     <link href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
 

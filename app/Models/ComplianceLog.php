@@ -13,7 +13,8 @@ class ComplianceLog extends Model
         'user_id',
         'action',
         'compliance_id',
-        'changes'
+        'changes',
+        'department_id'
     ];
 
     // Define the relationship with the Compliance model

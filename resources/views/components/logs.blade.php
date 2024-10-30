@@ -162,10 +162,11 @@
             <table class="table logs-table w-100" id="logsTable">
                 <thead>
                     <tr>
+                        <th>ID</th>
                         <th>AT</th>
-                        <th>TYPE</th>
                         <th>USER</th>
-                        <th>COMPLIANCE</th>
+                        <th>TYPE</th>
+                        <th>COMPLIANCE NAME</th>
                         <th>CHANGES</th>
                         <th>ACTION</th>
                     </tr>
@@ -366,18 +367,17 @@
         outline: none !important; /* Removes the default focus outline */
         box-shadow: none !important; /* Remove any focus shadow if applied */
     }
+
+    .shortened-compliance-name {
+        white-space: nowrap; /* Prevent text from wrapping to the next line */
+        overflow: hidden; /* Hide overflow */
+        text-overflow: ellipsis; /* Show ellipsis for overflowed text */
+        display: inline-block; /* Ensure it behaves like an inline element */
+        max-width: 150px; /* Set a max-width as needed */
+    }
 </style>
 
 <script>
-    // Initialize tooltips for dynamically added elements
-    // document.addEventListener("DOMContentLoaded", function() {
-    //     const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    //     const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-    //         return new bootstrap.Tooltip(tooltipTriggerEl)
-    //     })
-    // });
-
-
     // Log Table
     $(document).ready(function () {
         $('#logsTable').DataTable({
@@ -392,16 +392,83 @@
             serverSide: true,
             ajax: '{{ route('logs.data') }}',
             columns: [
-                { data: 'date', name: 'date' },
-                { data: 'action', name: 'action' },
+                { data: 'id', name: 'id', visible: false },
+                { 
+                    data: 'date', 
+                    name: 'date' ,
+                    render: function (data, type, row) {
+                        const shortenedName = data.length > 10 ? data.substring(0, 11) : data; // Limit to 50 characters
+
+
+                        return `<span class="shortened-compliance-name" data-toggle="tooltip" title="${data}">${shortenedName}</span>`;
+                        return data;
+                    }
+                },
                 { data: 'user', name: 'user' },
-                { data: 'compliance_name', name: 'compliance_name' },
-                { data: 'changes', name: 'changes' },
-                // { data: 'actions', name: 'actions' },
-                // { data: 'compliance_name', name: 'compliance_name' },
-                // { data: 'department_name', name: 'department_name' }
-            ]
+                { data: 'action', name: 'action' },
+                { 
+                    data: 'compliance_name', 
+                    name: 'compliance_name',
+                    render: function (data, type, row) {
+                        // Create a dynamic shortened name based on the full compliance name
+                        const shortenedName = data.length > 50 ? data.substring(0, 40) + '...' : data; // Limit to 50 characters
+
+                        if (data.length > 25) {
+                            return `<span class="shortened-compliance-name" data-toggle="tooltip" title="${data}">${shortenedName}</span>`;
+                        } else {
+                            return data;
+                        }
+
+                        // Add a tooltip with the full name
+
+                        // return `<span data-toggle="tooltip" title="${data}">${shortenedName}</span>`;
+                    }    
+                },
+                { 
+                    data: 'changes', 
+                    name: 'changes',
+                    render: function (data, type, row) {
+                        // Create a dynamic shortened name based on the full compliance name
+                        const shortenedName = data.length > 50 ? data.substring(0, 60) + '...' : data; // Limit to 50 characters
+
+                        if (data.length > 50) {
+                            return `<span class="" data-toggle="tooltip" title="${data}">${shortenedName}</span>`;
+                        } else {
+                            return data;
+                        }
+
+                        // return shortenedName;
+                        // Add a tooltip with the full name
+
+                        // return `<span  data-toggle="tooltip" title="${data}">${shortenedName}</span>`;
+                    } 
+                },
+            ],
+            order: [[0, 'desc']],
+            columnDefs: [
+                {
+                    targets: 1,
+                    width: '110px'
+                }
+            ],
+            // Tooltip Call
+            initComplete: function(settings, json) {
+                // Initialize tooltips after table is drawn
+                $('[data-toggle="tooltip"]').tooltip();
+            },
+            drawCallback: function(settings) {
+            // Re-initialize tooltips after each draw
+            $('[data-toggle="tooltip"]').tooltip();
+            },
         });
+    });
+
+    // Initialize Bootstrap tooltips with Popper.js
+    $('[data-toggle="tooltip"]').tooltip({
+        animation: true, // Enable animation
+        delay: { "show": 500, "hide": 100 }, // Set delay for showing/hiding
+        html: true, // Allow HTML content
+        placement: 'top', // Set position: 'top', 'bottom', 'left', 'right'
     });
 
 </script>

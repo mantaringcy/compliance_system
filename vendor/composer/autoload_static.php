@@ -204,12 +204,12 @@ class ComposerStaticInit7e8c3c14ff33b199b4a0838993eb8423
         ),
         'Yajra\\DataTables\\' => 
         array (
-            0 => __DIR__ . '/..' . '/yajra/laravel-datatables-fractal/src',
-            1 => __DIR__ . '/..' . '/yajra/laravel-datatables-oracle/src',
-            2 => __DIR__ . '/..' . '/yajra/laravel-datatables-html/src',
-            3 => __DIR__ . '/..' . '/yajra/laravel-datatables-buttons/src',
-            4 => __DIR__ . '/..' . '/yajra/laravel-datatables-export/src',
-            5 => __DIR__ . '/..' . '/yajra/laravel-datatables-editor/src',
+            0 => __DIR__ . '/..' . '/yajra/laravel-datatables-buttons/src',
+            1 => __DIR__ . '/..' . '/yajra/laravel-datatables-editor/src',
+            2 => __DIR__ . '/..' . '/yajra/laravel-datatables-export/src',
+            3 => __DIR__ . '/..' . '/yajra/laravel-datatables-fractal/src',
+            4 => __DIR__ . '/..' . '/yajra/laravel-datatables-html/src',
+            5 => __DIR__ . '/..' . '/yajra/laravel-datatables-oracle/src',
         ),
         'Whoops\\' => 
         array (
@@ -561,15 +561,19 @@ class ComposerStaticInit7e8c3c14ff33b199b4a0838993eb8423
 
     public static $classMap = array (
         'App\\Http\\Controllers\\AuthenticationController' => __DIR__ . '/../..' . '/app/Http/Controllers/AuthenticationController.php',
+        'App\\Http\\Controllers\\ComplianceController' => __DIR__ . '/../..' . '/app/Http/Controllers/ComplianceController.php',
         'App\\Http\\Controllers\\Controller' => __DIR__ . '/../..' . '/app/Http/Controllers/Controller.php',
         'App\\Http\\Controllers\\MainController' => __DIR__ . '/../..' . '/app/Http/Controllers/MainController.php',
-        'App\\Http\\Controllers\\NewComplianceController' => __DIR__ . '/../..' . '/app/Http/Controllers/NewComplianceController.php',
         'App\\Http\\Controllers\\ResetPasswordController' => __DIR__ . '/../..' . '/app/Http/Controllers/ResetPasswordController.php',
         'App\\Http\\Controllers\\RoleController' => __DIR__ . '/../..' . '/app/Http/Controllers/RoleController.php',
         'App\\Http\\Requests\\StoreRoleRequest' => __DIR__ . '/../..' . '/app/Http/Requests/StoreRoleRequest.php',
         'App\\Http\\Requests\\UpdateRoleRequest' => __DIR__ . '/../..' . '/app/Http/Requests/UpdateRoleRequest.php',
+        'App\\Http\\View\\Composers\\SidebarComposer' => __DIR__ . '/../..' . '/app/Http/View/Composers/SidebarComposer.php',
+        'App\\Jobs\\GenerateComplianceProjections' => __DIR__ . '/../..' . '/app/Jobs/GenerateComplianceProjections.php',
         'App\\Mail\\WelcomeMail' => __DIR__ . '/../..' . '/app/Mail/WelcomeMail.php',
         'App\\Models\\Compliance' => __DIR__ . '/../..' . '/app/Models/Compliance.php',
+        'App\\Models\\ComplianceLog' => __DIR__ . '/../..' . '/app/Models/ComplianceLog.php',
+        'App\\Models\\ComplianceRequest' => __DIR__ . '/../..' . '/app/Models/ComplianceRequest.php',
         'App\\Models\\Department' => __DIR__ . '/../..' . '/app/Models/Department.php',
         'App\\Models\\Role' => __DIR__ . '/../..' . '/app/Models/Role.php',
         'App\\Models\\User' => __DIR__ . '/../..' . '/app/Models/User.php',

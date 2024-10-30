@@ -30,7 +30,7 @@
 
                     <tr>
                         <th scope="col">#</th>
-                        <th scope="col">COMPLIANCE NAME</th>
+                        <th scope="col" class="compliance-name">COMPLIANCE NAME</th>
                         <th scope="col">DEPARTMENT NAME</th>
                         <th scope="col">REFERENCE DATE</th>
                         <th scope="col">FREQUENCY</th>
@@ -93,7 +93,11 @@
             ],
             columnDefs: [
                 { orderable: false, targets: [0, 1, 2, 3, 4] }, 
-                { width: "20%", targets: -1}
+                { width: "15%", targets: -1},
+                // {
+                //     target: 3,
+                //     width: '2000px'
+                // }
             ],
         });
     });
@@ -163,6 +167,10 @@
 
 
 <style>
+    .table td {
+        vertical-align: middle; /* Center align vertically */
+    }
+
     .card-top {
         /* border-radius: 100px !important; */
         font-weight: 500;
@@ -218,6 +226,10 @@
         border: 0 !important;
         border-top: 1px solid var(--border) !important;
         padding: 20px 10px !important;
+        max-width: 300px; /* Adjust this width as needed */
+        white-space: normal; /* Allow line breaks */
+        overflow: hidden; /* Hide overflow if necessary */
+        text-overflow: ellipsis; /* Show ellipsis if text overflows */
     }
 
     .dataTables_paginate .paginate_button.previous,
