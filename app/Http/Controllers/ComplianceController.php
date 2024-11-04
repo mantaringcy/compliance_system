@@ -144,6 +144,12 @@ class ComplianceController extends Controller
                 'changes' => json_encode($request->all())
             ]);
 
+            return response()->json([
+                'success' => true,
+                'action' => 'create_compliance',
+                'compliance_name' => $fields['compliance_name']
+            ]);
+
         } else {
             // $compliance = Compliance::create($fields);
 
@@ -163,10 +169,17 @@ class ComplianceController extends Controller
                 // 'compliance_id' => 1,
                 'changes' => json_encode($request->all()),
             ]);
+
             
+            return response()->json([
+                'success' => true,
+                'action' => 'request_create_compliance',
+                'compliance_name' => $fields['compliance_name']
+            ]);
         }
 
-        return back()->with('success', 'Your post was created.');
+     
+        // return back()->with('success', 'Your post was created.');
     }
 
     // Update Compliance
@@ -212,9 +225,14 @@ class ComplianceController extends Controller
                 'compliance_id' => $compliance->id,
                 'department_id' => $compliance->department_id,
                 'changes' => json_encode([
-                    'old' => $oldCompliance,  // Convert old compliance to array
-                    'new' => $request->all(), // Store new data excluding _token
+                    'old' => $oldCompliance,
+                    'new' => $request->all(),
                 ]),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'action' => 'edit_compliance'
             ]);
 
         } else {
@@ -238,13 +256,12 @@ class ComplianceController extends Controller
                 'action' => 'edit',
                 'changes' => json_encode($request->all()),
             ]);
+
+            return response()->json([
+                'success' => true,
+                'action' => 'request_edit_compliance'
+            ]);
         }
-
-       
-        // return response()->json(['success' => 'Compliance updated successfully.']);
-
-
-        return back()->with('success', 'Your compliance was updated.');
     }
 
     // Delete Compliance
@@ -270,6 +287,12 @@ class ComplianceController extends Controller
                 'changes' => json_encode($request->all()),
             ]);
 
+            return response()->json([
+                'success' => true,
+                'action' => 'delete_compliance',
+                // 'message' => 'Compliance has been deleted successfully.'
+            ]);
+
         } else {
             // Log the deletion
             ComplianceLog::create([
@@ -287,6 +310,12 @@ class ComplianceController extends Controller
                 'action' => 'delete',
                 'changes' => json_encode($changes),
             ]);
+
+            return response()->json([
+                'success' => true,
+                'action' => 'request_delete_compliance',
+                // 'message' => 'Request for compliance deletion has been submitted.'
+            ]);
         }        
 
         // Step 2: Authorize the Action
@@ -294,8 +323,9 @@ class ComplianceController extends Controller
 
    
 
+       
         // Step 4: Redirect or Return a Response
-        return back()->with('success', 'Compliance deleted successfully.');
+        // return back()->with('success', 'Compliance deleted successfully.');
         // return response()->json(['message' => 'Compliance deleted successfully!'], 200);
     }
 

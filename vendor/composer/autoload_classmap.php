@@ -12,6 +12,7 @@ return array(
     'App\\Http\\Controllers\\MainController' => $baseDir . '/app/Http/Controllers/MainController.php',
     'App\\Http\\Controllers\\ResetPasswordController' => $baseDir . '/app/Http/Controllers/ResetPasswordController.php',
     'App\\Http\\Controllers\\RoleController' => $baseDir . '/app/Http/Controllers/RoleController.php',
+    'App\\Http\\Controllers\\UserProfileController' => $baseDir . '/app/Http/Controllers/UserProfileController.php',
     'App\\Http\\Requests\\StoreRoleRequest' => $baseDir . '/app/Http/Requests/StoreRoleRequest.php',
     'App\\Http\\Requests\\UpdateRoleRequest' => $baseDir . '/app/Http/Requests/UpdateRoleRequest.php',
     'App\\Http\\View\\Composers\\SidebarComposer' => $baseDir . '/app/Http/View/Composers/SidebarComposer.php',

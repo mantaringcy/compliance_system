@@ -4,11 +4,13 @@
     <!-- Vite -->
     @vite([
         'resources/css/app.css',
+        'resources/css/alert.css',
         'resources/css/auth-app.css',
         'resources/css/form.css',
         'resources/css/modal.css', 
         'resources/css/theme-switch.css',
         'resources/css/theme-colors.css',
+        'resources/css/toast.css',
         'resources/js/app.js'])
         
     <meta charset="UTF-8">
@@ -22,6 +24,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.js"></script>
+    {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> --}}
 
     <!-- Bootstrap Datatable -->
     <link href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
@@ -91,7 +94,7 @@
                         <div id="profile-list" class="profile-list sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                             <ul>
                                 <li class="mb-3">
-                                    <a href="my-account">
+                                    <a href="{{ route('profile.update') }}">
                                         <i class="fa-solid fa-user"></i>
                                         My Account
                                     </a>

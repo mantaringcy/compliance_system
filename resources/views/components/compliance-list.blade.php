@@ -7,19 +7,53 @@
 @include('modals.new-compliance-modal')
 
 <x-main>
+
+    {{-- Toast --}}
+    <div id="customToast" class="custom-toast">
+        {{-- Compliance Create --}}
+        <div class="shadow custom-alert custom-alert-blue" style="display: none;"  id="alert-compliance-created">
+       </div>
+
+       {{-- Compliance Edit --}}
+       <div class="shadow custom-alert custom-alert-green" style="display: none;"  id="alert-compliance-edited">
+       </div>
+
+       {{-- Compliance Delete --}}
+       <div class="shadow custom-alert custom-alert-red" style="display: none;"  id="alert-compliance-deleted">
+       </div>
+    </div>
     
     <h2 class="fw-bold mb-5" style="font-size: 30px !important;">Compliance List</h2>
 
+    {{-- @if(session('success')) --}}
+    {{-- @endif --}}
+
     <div>
         <div class="card-lg">
-            <div class="card-top text-end">
-                {{-- <h5 class="fw-semibold m-0 p-0" style="font-size: 16px !important;">Compliance List</h5> --}}
-                
-                <!-- Add Compliance -->
-                <button type="button border-0" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newComplianceModal"  
-                data-departments='@json($departments)'>
-                    <i class="fa-solid fa-plus"></i> Add Compliance
-                </button>
+            <div class="card-top">
+
+                {{-- ALERTS --}}
+                {{-- Compliance Create --}}
+                <div class="custom-alert custom-alert-blue" style="display: none;"  id="alert-compliance-created">
+                </div>
+
+                {{-- Compliance Edit --}}
+                <div class="custom-alert custom-alert-green" style="display: none;"  id="alert-compliance-edited">
+                </div>
+
+                {{-- Compliance Delete --}}
+                <div class="custom-alert custom-alert-red" style="display: none;"  id="alert-compliance-deleted">
+                </div>
+
+                <div class="text-end">
+
+                    <!-- Add Compliance -->
+                    <button type="button border-0" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newComplianceModal"  
+                    data-departments='@json($departments)'>
+                        <i class="fa-solid fa-plus"></i> Add Compliance
+                    </button>
+                </div>
+
             </div>
             
             

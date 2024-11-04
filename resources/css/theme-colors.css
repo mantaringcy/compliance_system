@@ -43,6 +43,19 @@
 
     --badge-light: #E5F7F9 !important;
     --badge-light-color: #3EC9D6 !important;
+
+    /* Alert */
+    --alert-blue-text: #2E63FF !important;
+    --alert-red-text: #CE1618 !important;
+    --alert-green-text: #1A8D62 !important;
+
+    --alert-blue: #DBE5FF !important;
+    --alert-red: #F9D7D5 !important;
+    --alert-green: #ECF6F2 !important;
+    
+    --alert-blue-border: #BED0FF !important;
+    --alert-red-border: #F4B6B3 !important;
+    --alert-green-border: #DBEEE6 !important;
 }
 
 body.dark {

@@ -429,7 +429,7 @@
                     name: 'changes',
                     render: function (data, type, row) {
                         // Create a dynamic shortened name based on the full compliance name
-                        const shortenedName = data.length > 50 ? data.substring(0, 60) + '...' : data; // Limit to 50 characters
+                        const shortenedName = data.length > 50 ? data.substring(0, 50) + '...' : data; // Limit to 50 characters
 
                         if (data.length > 50) {
                             return `<span class="" data-toggle="tooltip" title="${data}">${shortenedName}</span>`;

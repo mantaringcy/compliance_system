@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\ComplianceController;
 use App\Http\Controllers\ResetPasswordController;
+use App\Http\Controllers\UserProfileController;
 use Carbon\Carbon;
 
 Route::redirect('/', 'login');
@@ -57,7 +58,9 @@ Route::middleware('auth')->group(function() {
     Route::post('/admin/compliance/approve/{id}', [ComplianceController::class, 'approveRequest'])->name('approveRequest');
     Route::post('/admin/compliance/cancel/{id}', [ComplianceController::class, 'cancelRequest'])->name('cancelRequest');
 
-    Route::view('/my-account', 'profile.my-account');
+    // User Profile
+    Route::get('/account-profile', [UserProfileController::class, 'index'])->name('profile.update');
+    Route::post('/account-profile', [UserProfileController::class, 'update'])->name('profile.update');
     Route::view('/account-settings', 'profile.my-account-settings');
 
     // Logout

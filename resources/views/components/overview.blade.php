@@ -4,6 +4,17 @@
 
     <h2 class="fw-bold mb-5">Overview</h2>
 
+    <div class="custom-alert custom-alert-blue custom-toast" id="alert-compliance-created">
+        Sample toast!
+    </div>
+
+    <!-- Custom Toast Structure -->
+    <div id="customToast" class="custom-toast">
+        <div class="custom-alert custom-alert-blue shadow-lg" id="alert-compliance-created">
+            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sint officiis animi incidunt, in officia vero iste at quaerat beatae illum.
+        </div>
+    </div>
+
     <div>
         <div class="card-lg table-card">
 
@@ -51,8 +62,54 @@
             </table>
         </div>
     </div>
+
+    <button onclick="showToast()">Show Custom Toast</button>
+
     
 </x-main>
+
+<script>
+    function showToast() {
+        // Show the toast with a fade-in effect
+        $('#customToast').addClass('show');
+
+        // Automatically hide the toast after 3 seconds
+        setTimeout(function() {
+            $('#customToast').removeClass('show');
+        }, 3000);
+    }
+
+    function closeToast() {
+        // Hide the toast when close button is clicked
+        $('#customToast').removeClass('show');
+    }
+</script>
+
+<style>
+    .custom-toast {
+        position: fixed;
+        bottom: 1px;
+        right: 20px;
+        opacity: 0;
+        transform: translateY(50px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        z-index: 1055;
+    }
+
+    .custom-toast-close {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    /* Show animation */
+    .custom-toast.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+</style>
 
 <style>
     .table-card {

@@ -31,6 +31,11 @@
     "file": "assets/fa-v4compatibility-BX8XWJtE.woff2",
     "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-v4compatibility.woff2"
   },
+  "resources/css/alert.css": {
+    "file": "assets/alert-DI6_hvRE.css",
+    "src": "resources/css/alert.css",
+    "isEntry": true
+  },
   "resources/css/app.css": {
     "file": "assets/app-1PGvnDvP.css",
     "src": "resources/css/app.css",
@@ -52,7 +57,7 @@
     "isEntry": true
   },
   "resources/css/theme-colors.css": {
-    "file": "assets/theme-colors-BLb7Ln4H.css",
+    "file": "assets/theme-colors-Pp40Epvs.css",
     "src": "resources/css/theme-colors.css",
     "isEntry": true
   },
@@ -61,8 +66,13 @@
     "src": "resources/css/theme-switch.css",
     "isEntry": true
   },
+  "resources/css/toast.css": {
+    "file": "assets/toast-D7R84HGT.css",
+    "src": "resources/css/toast.css",
+    "isEntry": true
+  },
   "resources/js/app.js": {
-    "file": "assets/app-Cp2T8WLM.js",
+    "file": "assets/app-CsJ44nNv.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
