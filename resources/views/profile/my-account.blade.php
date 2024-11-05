@@ -1,7 +1,11 @@
 @section('title', 'Account Profile')
 
+
+
 <x-main>
     <h2 class="fw-bold mb-5" style="font-size: 30px !important;">Account Profile</h2>
+
+    </div>
 
 
     <div>
@@ -16,14 +20,11 @@
 
             <div class="card-body">
 
-                @if(session('success_profile'))
-                    <div class="custom-alert custom-alert-green auto-close-alert">
-                        {{ session('success_profile') }}
-                    </div>
-                @endif
+                <div class="custom-alert custom-alert-green" id="alertProfileUpdate" style="display: none;">
+                </div>
 
                 {{-- Form --}}
-                <form action="{{ route('profile.update') }}" method="POST">
+                <form action="{{ route('profile.update') }}" method="post" id="updateProfileForm">
                     @csrf
 
                     <input type="hidden" name="update_type" value="profile">
@@ -65,7 +66,7 @@
                                 @endphp
 
                                 @foreach ($roles as $role)
-                                    <option value="{{ $role->id }}" {{ $role->id == $userRole ? 'selected' : '' }}>{{ $role->role_name }}</option>
+                                    <option value="{{ $role->id }}" {{ $role->id == $userRole ? 'selected' : '' }} id="role">{{ $role->role_name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -99,20 +100,23 @@
 
             <div class="card-body">
 
-                @if(session('success_password'))
-                    <div class="custom-alert custom-alert-green auto-close-alert">
-                        {{ session('success_password') }}
-                    </div>
-                @endif
+                <div class="custom-alert custom-alert-green" id="alertPasswordUpdate" style="display: none;">
+                </div>
 
-                @error('old_password')
+                {{-- @if(session('success_password')) --}}
+                    {{-- <div class="custom-alert custom-alert-green">
+                        {{ session('success_password') }}
+                    </div> --}}
+                {{-- @endif --}}
+
+                {{-- @error('old_password')
                     <div class="custom-alert custom-alert-red auto-close-alert">
                         {{ $message }}
                     </div>
-                @enderror
+                @enderror --}}
 
                 {{-- Form --}}
-                <form action="{{ route('profile.update') }}" method="POST">
+                <form method="POST" id="updatePasswordForm">
                     @csrf
 
                     <input type="hidden" name="update_type" value="password">
@@ -253,6 +257,173 @@
 </style>
 
 <script>
+    const departmentMapping = @json($departments);
+    const roleMapping = @json($roles);
+</script>
+
+<script>
+    function showAlert(alertId, response) {
+        let message = response.message;
+        // let action = response.action;
+        // let complianceRef = complianceId 
+        //     ? `no. ${complianceId}` 
+        //     : (complianceName ? `'${complianceName}'` : '');
+
+        if (response.success) {
+            $(alertId).css('display', 'block');
+
+            // switch(action) {
+            //     case 'create_compliance':
+            //         message = `Compliance ${complianceRef} has been created successfully.`;
+            //         break;
+            //     case 'edit_compliance':
+            //         message = `Compliance ${complianceRef} has been edited successfully.`;
+            //         break;
+            //     case 'delete_compliance':
+            //         message = `Compliance ${complianceRef} has been deleted successfully.`;
+            //         break;
+            //     case 'request_create_compliance':
+            //         message = `Request for compliance ${complianceRef} creation has been submitted.`;
+            //         break;
+            //     case 'request_edit_compliance':
+            //         message = `Request for compliance ${complianceRef} editing has been submitted.`;
+            //         break;
+            //     case 'request_delete_compliance':
+            //         message = `Request for compliance ${complianceRef} deletion has been submitted.`;
+            //         break;
+            //     case 'approve_create_compliance':
+            //         message = `Compliance ${complianceRef} creation has been approved.`;
+            //         break;
+            //     case 'approve_edit_compliance':
+            //         message = `Compliance ${complianceRef} edit has been approved.`;
+            //         break;
+            //     case 'approve_delete_compliance':
+            //         message = `Compliance ${complianceRef} deletion has been approved.`;
+            //         break;
+            //     case 'cancel_create_compliance':
+            //         message = `Compliance ${complianceRef} creation has been canceled.`;
+            //         break;
+            //     case 'cancel_edit_compliance':
+            //         message = `Compliance ${complianceRef} edit has been canceled.`;
+            //         break;
+            //     case 'cancel_delete_compliance':
+            //         message = `Compliance ${complianceRef} deletion has been canceled.`;
+            //         break;
+            //     case 'cancel_request_create_compliance':
+            //         message = `Request for compliance ${complianceRef} creation has been canceled.`;
+            //         break;
+            //     case 'cancel_request_edit_compliance':
+            //         message = `Request for compliance ${complianceRef} editing has been canceled.`;
+            //         break;
+            //     case 'cancel_request_delete_compliance':
+            //         message = `Request for compliance ${complianceRef} deletion has been canceled.`;
+            //         break;
+            //     case 'edit_profile':
+            //         message = `Profile updated successfully.`;
+            //         break;
+            //     default:
+            //         message = 'Action not recognized.';
+            //         break;
+            // }
+            
+            $(alertId).text(message);
+        
+            setTimeout(function() {
+                $(alertId).fadeOut();
+            }, 3000);
+        }
+    }
+    
+
+    let initialProfileFormData = {
+        username: $('#username').val(),
+        email: $('#email').val(),
+        // departmentId: $('#departmentSelect').val(),
+        departmentId: $('select[name="department_id"]').val(),
+        roleId: $('select[name="role_id"]').val(),
+    }; 
+
+    $('#updateProfileForm').on('submit', function(event) {
+        event.preventDefault();
+
+        const currentProfileFormData = {
+            username: $('#username').val(),
+            email: $('#email').val(),
+            departmentId: $('#departmentSelect').val(),
+            roleId: $('select[name="role_id"]').val(),
+        }
+
+        const hasChanges = Object.keys(currentProfileFormData).some(key => currentProfileFormData[key] !== initialProfileFormData[key]);
+
+        if (!hasChanges) {
+            alert('No changes detected. Please make changes to update your profile.');
+            return;
+        }
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'POST',
+            data: $(this).serialize(),
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                showAlert('#alertProfileUpdate', response);
+
+                // Get the username from your data object
+                let username = currentProfileFormData['username'];
+                let role = currentProfileFormData['roleId'];
+                let department = currentProfileFormData['departmentId'];
+                
+                // Capitalize the first letter of the username
+                let capitalizedUsername = username.charAt(0).toUpperCase() + username.slice(1);
+                
+                // Set the capitalized username to the sidebar element
+                $('#sidebar-username').text(capitalizedUsername);
+                $('#sidebar-role').text(roleMapping[role - 1].role_name);
+                $('#sidebar-department').text(departmentMapping[department - 1].department_name + ' Department');
+
+                initialProfileFormData = currentProfileFormData;
+            },
+            error: function(xhr) {
+                
+            }
+        });
+    });
+
+    $('#updatePasswordForm').on('submit', function(event) {
+        event.preventDefault();
+
+        // Get the values of each password field
+        let oldPassword = $('#old_password').val();
+        let newPassword = $('#new_password').val();
+        let confirmPassword = $('#confirm_password').val();
+
+        // Check if any of the fields are empty
+        if (!oldPassword || !newPassword || !confirmPassword) {
+            alert('Please fill out all password fields.');
+            return; // Stop the function if any field is empty
+        } 
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'POST',
+            data: $(this).serialize(),
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+
+            },
+            error: function(xhr) {
+                
+            }
+        });
+    });
+
+</script>
+
+<script>
     function togglePassswordVisibility(icon, fieldId) {
 
         const toggleIcon = document.getElementById(icon);
@@ -284,7 +455,7 @@
     function autoCloseAlert(timeout = 3000) {
         // Select all elements with the 'auto-close-alert' class
         const alertElements = document.querySelectorAll('.auto-close-alert');
-        
+
         // Loop through each alert element and set a timeout to hide it
         alertElements.forEach(alertElement => {
             setTimeout(() => {

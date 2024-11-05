@@ -49,8 +49,7 @@ class UserProfileController extends Controller
         }
 
         if ($request->input('update_type') === 'profile') {
-            // dd('profile');
-            
+
             // Validate and update profile details
             $fields = $request->validate([
                 'username' => 'required|string|max:255',
@@ -66,11 +65,14 @@ class UserProfileController extends Controller
                 'role_id' => $fields['role_id'],
             ]);
 
-            return redirect()->back()->with('success_profile', 'Profile updated successfully.');
+            return response()->json([
+                'success' => true,
+                'message' => 'Profile updated successfully.',
+            ]);
+
+            // return redirect()->back()->with('success_profile', 'Profile updated successfully.');
 
         } 
-        
 
-        // return view('profile.my-account');
     }
 }

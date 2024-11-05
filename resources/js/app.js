@@ -12,6 +12,7 @@ import './components/navigation-links';
 import './components/media-query';
 
 
+
 function formatDate(dateString) {
     // Create an array of month names
     const monthNames = ["January", "February", "March", "April", "May", "June", 
@@ -39,7 +40,7 @@ function showToast() {
     }, 3000);
 }
 
-function alert(alertId, complianceId = null, complianceName = null, response) {
+function toast(alertId, complianceId = null, complianceName = null, response) {
     let message = '';
     let action = response.action;
     let complianceRef = complianceId 
@@ -95,6 +96,9 @@ function alert(alertId, complianceId = null, complianceName = null, response) {
                 break;
             case 'cancel_request_delete_compliance':
                 message = `Request for compliance ${complianceRef} deletion has been canceled.`;
+                break;
+            case 'edit_profile':
+                message = `Profile updated successfully.`;
                 break;
             default:
                 message = 'Action not recognized.';
@@ -152,7 +156,7 @@ $('#newComplianceForm').on('submit', function(event) {
             $('#newComplianceModal').modal('hide');
             $('#complianceListTable').DataTable().ajax.reload();  // Reload DataTable data
             $('#newComplianceForm')[0].reset();
-            alert('#alert-compliance-created', null, response.compliance_name, response);
+            toast('#alert-compliance-created', null, response.compliance_name, response);
         },
         error: function(xhr) {
             $('.invalid-feedback').text(''); // Display the first message
@@ -214,7 +218,7 @@ $('#editComplianceForm').on('submit', function(event) {
             $('#editComplianceModal').modal('hide');
             $('#complianceListTable').DataTable().ajax.reload();  // Reload DataTable data
 
-            alert('#alert-compliance-edited', complianceId, null, response);
+            toast('#alert-compliance-edited', complianceId, null, response);
         },
         error: function(xhr) {
             $('.invalid-feedback').text(''); // Display the first message
@@ -254,7 +258,7 @@ $('#deleteComplianceForm').on('submit', function(event) {
             $('#deleteComplianceModal').modal('hide');
             $('#complianceListTable').DataTable().ajax.reload();  // Reload DataTable data
 
-            alert('#alert-compliance-deleted', complianceId, null, response);
+            toast('#alert-compliance-deleted', complianceId, null, response);
         },
     });
 });

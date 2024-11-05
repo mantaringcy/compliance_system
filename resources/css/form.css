@@ -81,6 +81,11 @@ select {
     border: var(--input-border) solid !important;
     border-radius: 8px !important;
     border-width: thin !important;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="date"] {
     background: var(--input-color) !important;
 }
 
