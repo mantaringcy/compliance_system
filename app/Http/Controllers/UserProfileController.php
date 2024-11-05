@@ -16,63 +16,62 @@ class UserProfileController extends Controller
         return view('profile.my-account');
     }
 
-    public function update(Request $request)
+    public function updateProfile(Request $request)
     {
         $user = auth()->user();
         $userPassword = Auth::user()->password;
 
-        if ($request->input('update_type') === 'password') {
-            // Set up the validator with basic rules
-            $validator = Validator::make($request->all(), [
-                'old_password' => ['required'],
-                'new_password' => ['required', 'min:3', 'confirmed'],
+        // Validate and update profile details
+        $fields = $request->validate([
+            'username' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'department_id' => 'required|integer',
+            'role_id' => 'required|integer',
+        ]);
+
+        $user->update([
+            'username' => $fields['username'],
+            'email' => $fields['email'],
+            'department_id' => $fields['department_id'],
+            'role_id' => $fields['role_id'],
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Profile updated successfully.',
+        ]);
+    }
+
+    public function updatePassword(Request $request)
+    {
+
+        // Validate the request
+        $request->validate([
+            'old_password' => ['required'],
+            'new_password' => ['required', 'min:3', 'confirmed'],
+        ]);
+
+        // Get the currently authenticated user
+        $user = Auth::user();
+
+        // Check if the old password is correct
+        if (!Hash::check($request->old_password, $user->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'The old password is incorrect.'
             ]);
-    
-            // Add a custom validation error if the old password does not match
-            $validator->after(function ($validator) use ($request, $user) {
-                if (!Hash::check($request->old_password, $user->password)) {
-                    $validator->errors()->add('old_password', 'The old password is incorrect.');
-                }
-            });
-    
-            // If validation fails, redirect back with errors and input
-            if ($validator->fails()) {
-                return redirect()->back()
-                    ->withErrors($validator)
-                    ->withInput();
-            }
-    
-            // Update the password if validation passes
-            $user->update(['password' => Hash::make($request->new_password)]);
-    
-            return redirect()->back()->with('success_password', 'Password updated successfully.');
         }
 
-        if ($request->input('update_type') === 'profile') {
+        // Update the password
+        $user->password = Hash::make($request->new_password);
+        $user->save();
 
-            // Validate and update profile details
-            $fields = $request->validate([
-                'username' => 'required|string|max:255',
-                'email' => 'required|email|unique:users,email,' . $user->id,
-                'department_id' => 'required|integer',
-                'role_id' => 'required|integer',
-            ]);
+        return response()->json([
+            'success' => true,
+            'message' => 'Password updated successfully.'
+        ]);
+        // return redirect()->back()->with('success_password', 'Password updated successfully.');
 
-            $user->update([
-                'username' => $fields['username'],
-                'email' => $fields['email'],
-                'department_id' => $fields['department_id'],
-                'role_id' => $fields['role_id'],
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Profile updated successfully.',
-            ]);
-
-            // return redirect()->back()->with('success_profile', 'Profile updated successfully.');
-
-        } 
 
     }
 }

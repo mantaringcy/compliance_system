@@ -60,7 +60,8 @@ Route::middleware('auth')->group(function() {
 
     // User Profile
     Route::get('/account-profile', [UserProfileController::class, 'index'])->name('profile.update');
-    Route::post('/account-profile', [UserProfileController::class, 'update'])->name('profile.update');
+    Route::post('/account-profile/profile-udpate', [UserProfileController::class, 'updateProfile'])->name('update.profile');
+    Route::post('/account-profile/password-update', [UserProfileController::class, 'updatePassword'])->name('update.password');
     Route::view('/account-settings', 'profile.my-account-settings');
 
     // Logout

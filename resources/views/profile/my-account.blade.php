@@ -24,7 +24,7 @@
                 </div>
 
                 {{-- Form --}}
-                <form action="{{ route('profile.update') }}" method="post" id="updateProfileForm">
+                <form action="{{ route('update.profile') }}" method="post" id="updateProfileForm">
                     @csrf
 
                     <input type="hidden" name="update_type" value="profile">
@@ -100,7 +100,10 @@
 
             <div class="card-body">
 
-                <div class="custom-alert custom-alert-green" id="alertPasswordUpdate" style="display: none;">
+                <div class="custom-alert custom-alert-green" id="alertPasswordUpdateSuccess" style="display: none;">
+                </div>
+
+                <div class="custom-alert custom-alert-red" id="alertPasswordUpdateError" style="display: none;">
                 </div>
 
                 {{-- @if(session('success_password')) --}}
@@ -116,8 +119,9 @@
                 @enderror --}}
 
                 {{-- Form --}}
-                <form method="POST" id="updatePasswordForm">
+                <form action="{{ route('update.password') }}" method="post" id="updatePasswordForm">
                     @csrf
+                    {{-- @method('PUT') --}}
 
                     <input type="hidden" name="update_type" value="password">
 
@@ -177,13 +181,13 @@
                                 name="new_password_confirmation" 
                                 class="form-control @error('new_password_confirmation') is-invalid @enderror" 
                                 placeholder="Confirm Password" 
-                                id="new_password_confirmation"
-                                oninput="toggleIconVisibility('new_password_confirmation', 'new_password_confirmation_icon')"
+                                id="password_confirmation"
+                                oninput="toggleIconVisibility('password_confirmation', 'new_password_confirmation_icon')"
                             >    
                             <i 
                             class="togglePasswordIcon fa-solid fa-eye" 
                             id="new_password_confirmation_icon" 
-                            onclick="togglePassswordVisibility('new_password_confirmation_icon', 'new_password_confirmation')"
+                            onclick="togglePassswordVisibility('new_password_confirmation_icon', 'password_confirmation')"
                             style="display: none !important;"
                             >
                             </i>  
@@ -271,67 +275,15 @@
 
         if (response.success) {
             $(alertId).css('display', 'block');
-
-            // switch(action) {
-            //     case 'create_compliance':
-            //         message = `Compliance ${complianceRef} has been created successfully.`;
-            //         break;
-            //     case 'edit_compliance':
-            //         message = `Compliance ${complianceRef} has been edited successfully.`;
-            //         break;
-            //     case 'delete_compliance':
-            //         message = `Compliance ${complianceRef} has been deleted successfully.`;
-            //         break;
-            //     case 'request_create_compliance':
-            //         message = `Request for compliance ${complianceRef} creation has been submitted.`;
-            //         break;
-            //     case 'request_edit_compliance':
-            //         message = `Request for compliance ${complianceRef} editing has been submitted.`;
-            //         break;
-            //     case 'request_delete_compliance':
-            //         message = `Request for compliance ${complianceRef} deletion has been submitted.`;
-            //         break;
-            //     case 'approve_create_compliance':
-            //         message = `Compliance ${complianceRef} creation has been approved.`;
-            //         break;
-            //     case 'approve_edit_compliance':
-            //         message = `Compliance ${complianceRef} edit has been approved.`;
-            //         break;
-            //     case 'approve_delete_compliance':
-            //         message = `Compliance ${complianceRef} deletion has been approved.`;
-            //         break;
-            //     case 'cancel_create_compliance':
-            //         message = `Compliance ${complianceRef} creation has been canceled.`;
-            //         break;
-            //     case 'cancel_edit_compliance':
-            //         message = `Compliance ${complianceRef} edit has been canceled.`;
-            //         break;
-            //     case 'cancel_delete_compliance':
-            //         message = `Compliance ${complianceRef} deletion has been canceled.`;
-            //         break;
-            //     case 'cancel_request_create_compliance':
-            //         message = `Request for compliance ${complianceRef} creation has been canceled.`;
-            //         break;
-            //     case 'cancel_request_edit_compliance':
-            //         message = `Request for compliance ${complianceRef} editing has been canceled.`;
-            //         break;
-            //     case 'cancel_request_delete_compliance':
-            //         message = `Request for compliance ${complianceRef} deletion has been canceled.`;
-            //         break;
-            //     case 'edit_profile':
-            //         message = `Profile updated successfully.`;
-            //         break;
-            //     default:
-            //         message = 'Action not recognized.';
-            //         break;
-            // }
-            
             $(alertId).text(message);
-        
-            setTimeout(function() {
-                $(alertId).fadeOut();
-            }, 3000);
+        } else {
+            $(alertId).css('display', 'block');
+            $(alertId).text(message);
         }
+
+        setTimeout(function() {
+            $(alertId).fadeOut();
+        }, 3000);
     }
     
 
@@ -391,32 +343,49 @@
         });
     });
 
-    $('#updatePasswordForm').on('submit', function(event) {
-        event.preventDefault();
+    $('#updatePasswordForm').on('submit', function(e) {
+        e.preventDefault(); // Prevent the default form submission
 
-        // Get the values of each password field
         let oldPassword = $('#old_password').val();
         let newPassword = $('#new_password').val();
-        let confirmPassword = $('#confirm_password').val();
+        let confirmPassword = $('#password_confirmation').val();
 
-        // Check if any of the fields are empty
+        // Validate that all fields are filled
         if (!oldPassword || !newPassword || !confirmPassword) {
             alert('Please fill out all password fields.');
-            return; // Stop the function if any field is empty
-        } 
+            return; // Exit the function if any field is empty
+        }
 
         $.ajax({
+            type: "POST",
             url: $(this).attr('action'),
-            type: 'POST',
             data: $(this).serialize(),
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function(response) {
-
+                if (response.success) {
+                    showAlert('#alertPasswordUpdateSuccess', response);
+                    $('#updatePasswordForm').trigger('reset');
+                } else {
+                    showAlert('#alertPasswordUpdateError', response);
+                }
             },
-            error: function(xhr) {
-                
+            error: function(xhr, status, error) {
+                if (xhr.status === 422) {
+                    let errors = xhr.responseJSON.errors;
+
+                    if (errors.new_password) {
+                        alert(errors.new_password[0]); // Display error for new password mismatch
+                    }
+
+                    if (errors.old_password) {
+                        alert(errors.old_password[0]); // Display error if old password is incorrect
+                    }
+                }
+
+                console.error('Password update error:', error);
+                $('#alert').text('An error occurred while updating the password.').show();
             }
         });
     });

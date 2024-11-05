@@ -12,7 +12,6 @@ import './components/navigation-links';
 import './components/media-query';
 
 
-
 function formatDate(dateString) {
     // Create an array of month names
     const monthNames = ["January", "February", "March", "April", "May", "June", 
