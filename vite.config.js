@@ -12,6 +12,7 @@ export default defineConfig({
             input: ['resources/css/app.css', 
                     'resources/css/alert.css', 
                     'resources/css/auth-app.css', 
+                    'resources/css/badge.css', 
                     'resources/css/form.css', 
                     'resources/css/modal.css', 
                     'resources/css/theme-switch.css', 

@@ -32,7 +32,7 @@
     "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-v4compatibility.woff2"
   },
   "resources/css/alert.css": {
-    "file": "assets/alert-DI6_hvRE.css",
+    "file": "assets/alert-7zxctCOe.css",
     "src": "resources/css/alert.css",
     "isEntry": true
   },
@@ -46,6 +46,11 @@
     "src": "resources/css/auth-app.css",
     "isEntry": true
   },
+  "resources/css/badge.css": {
+    "file": "assets/badge-CbKhSdAt.css",
+    "src": "resources/css/badge.css",
+    "isEntry": true
+  },
   "resources/css/form.css": {
     "file": "assets/form-CdbcCqvy.css",
     "src": "resources/css/form.css",
@@ -57,7 +62,7 @@
     "isEntry": true
   },
   "resources/css/theme-colors.css": {
-    "file": "assets/theme-colors-Pp40Epvs.css",
+    "file": "assets/theme-colors-ChbOVmyY.css",
     "src": "resources/css/theme-colors.css",
     "isEntry": true
   },
@@ -72,7 +77,7 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-Dv_Ir68P.js",
+    "file": "assets/app-DYFEFJf-.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,

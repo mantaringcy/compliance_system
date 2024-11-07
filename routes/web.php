@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Auth;
 // Controllers
 use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\ComplianceController;
+use App\Http\Controllers\LogController;
+use App\Http\Controllers\RequestController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\UserProfileController;
 use Carbon\Carbon;
@@ -48,15 +50,15 @@ Route::middleware('auth')->group(function() {
     Route::resource('/compliances', ComplianceController::class);
     
     // Logs - Records of changes on the system
-    Route::get('/logs', [ComplianceController::class, 'getAllLogs'])->name('logs.data');
+    Route::get('/logs', [LogController::class, 'index'])->name('logs.data');
 
-    Route::get('/logs-sample', [ComplianceController::class, 'showAllLogs'])->name('logs.sample');
+    Route::get('/logs-sample', [LogController::class, 'showAllLogs'])->name('logs.sample');
 
 
     // Request - Request for Compliance Change
-    Route::get('/admin/compliance/requests', [ComplianceController::class, 'reviewRequests'])->name('complianceRequests');
-    Route::post('/admin/compliance/approve/{id}', [ComplianceController::class, 'approveRequest'])->name('approveRequest');
-    Route::post('/admin/compliance/cancel/{id}', [ComplianceController::class, 'cancelRequest'])->name('cancelRequest');
+    Route::get('/admin/compliance/requests', [RequestController::class, 'index'])->name('complianceRequests');
+    Route::post('/admin/compliance/approve/{id}', [RequestController::class, 'approveRequest'])->name('approveRequest');
+    Route::post('/admin/compliance/cancel/{id}', [RequestController::class, 'cancelRequest'])->name('cancelRequest');
 
     // User Profile
     Route::get('/account-profile', [UserProfileController::class, 'index'])->name('profile.update');

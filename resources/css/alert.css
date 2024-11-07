@@ -21,3 +21,9 @@
     background: var(--alert-red) !important;
     color: var(--alert-red-text) !important;
 }
+
+.custom-alert-secondary {
+    border: 1px solid var(--alert-secondary-border) !important;
+    background: var(--alert-secondary) !important;
+    color: var(--alert-secondary-text) !important;
+}

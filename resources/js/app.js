@@ -267,16 +267,27 @@ $('#deleteComplianceForm').on('submit', function(event) {
 $('#addApproveButton').on('click', function(e) {
     e.preventDefault();
 
+
     if(confirm("Are you sure you want to approve this compliance?")) {
         $.ajax({
             url:'/admin/compliance/approve/' + requestId,  
             type: 'POST',  
+            data: $(this).serialize(),
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function(response) {
                 $('#addRequestComplianceModal').modal('hide');
-                location.reload()
+                $('#requestComplianceTable').DataTable().ajax.reload(); 
+
+                const customResponse = {
+                    success: true,
+                    action: 'approve_create_compliance',
+                    compliance_name: responseComplianceName,
+                }
+
+                toast('#alert-compliance-request-add', null, customResponse.compliance_name, customResponse);
+
             }
         });
 
@@ -296,7 +307,8 @@ $('#addCancelButton').on('click', function(e) {
             },
             success: function(response) {
                 $('#addRequestComplianceModal').modal('hide');
-                location.reload()
+                $('#requestComplianceTable').DataTable().ajax.reload(); 
+                toast('#alert-compliance-request-cancel', null, response.compliance_name, response);
             }
         });
 
@@ -316,8 +328,16 @@ $('#deleteApproveButton').on('click', function(e) {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function(response) {
-                $('#addRequestComplianceModal').modal('hide');
-                location.reload()
+                $('#deleteRequestComplianceModal').modal('hide');
+                $('#requestComplianceTable').DataTable().ajax.reload();
+
+                const customResponse = {
+                    success: true,
+                    action: 'approve_delete_compliance',
+                    compliance_name: responseComplianceName,
+                }
+
+                toast('#alert-compliance-request-delete', null, customResponse.compliance_name, customResponse);
             }
         });
 
@@ -336,8 +356,9 @@ $('#deleteCancelButton').on('click', function(e) {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function(response) {
-                $('#addRequestComplianceModal').modal('hide');
-                location.reload()
+                $('#deleteRequestComplianceModal').modal('hide');
+                $('#requestComplianceTable').DataTable().ajax.reload(); 
+                toast('#alert-compliance-request-cancel', null, response.compliance_name, response);
             }
         });
 
@@ -357,8 +378,16 @@ $('#editApproveButton').on('click', function(e) {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function(response) {
-                $('#addRequestComplianceModal').modal('hide');
-                location.reload()
+                $('#editRequestComplianceModal').modal('hide');
+                $('#requestComplianceTable').DataTable().ajax.reload(); 
+
+                const customResponse = {
+                    success: true,
+                    action: 'approve_edit_compliance',
+                    compliance_name: responseComplianceName,
+                }
+
+                toast('#alert-compliance-request-edit', null, customResponse.compliance_name, customResponse);
             }
         });
 
@@ -378,8 +407,10 @@ $('#editCancelButton').on('click', function(e) {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function(response) {
-                $('#addRequestComplianceModal').modal('hide');
-                location.reload()
+                $('#editRequestComplianceModal').modal('hide');
+                $('#requestComplianceTable').DataTable().ajax.reload();
+
+                toast('#alert-compliance-request-cancel', null, response.compliance_name, response);
             }
         });
 

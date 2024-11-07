@@ -6,6 +6,7 @@
         'resources/css/app.css',
         'resources/css/alert.css',
         'resources/css/auth-app.css',
+        'resources/css/badge.css',
         'resources/css/form.css',
         'resources/css/modal.css', 
         'resources/css/theme-switch.css',
@@ -171,12 +172,6 @@
                                 <span>Compliance</span>
                             </a>
                         </li>
-                        {{-- <li class="sidebar-item2 mb-1">
-                            <a href="new-compliance">
-                                <i class="fa-solid fa-file-circle-plus"></i>
-                                <span>New Compliance</span>
-                            </a>
-                        </li> --}}
                         <li class="sidebar-item2">
                             <a href="{{ route('complianceRequests') }}">
                                 <div class="d-flex justify-content-between">
@@ -186,9 +181,7 @@
                                     </div>
                                     <div>
                                         @if (!empty($totalRequestsCount))
-                                            <span class="circle-badge">{{ $totalRequestsCount }}</span>
-                                        @else
-                                            
+                                            <span class="circle-badge" id="requestBadge">{{ $totalRequestsCount }}</span>
                                         @endif
                                     </div>
                                 </div>
