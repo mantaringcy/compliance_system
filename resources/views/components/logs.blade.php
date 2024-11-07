@@ -151,15 +151,16 @@
             @endforeach
         </tbody>
     </table> --}}
+    <h2 class="fw-bold mb-5" style="font-size: 30px !important;">Logs</h2>
 
     <div>
-        <div class="card-lg table-card">
+        <div class="card-lg custom-table-card-sm">
 
-            <div class="card-top">
+            {{-- <div class="card-top">
                 <h5 class="fw-semibold m-0 p-0" style="font-size: 16px !important;">Logs</h5>
-            </div>
+            </div> --}}
             
-            <table class="table logs-table w-100" id="logsTable">
+            <table class="table custom-table custom-table-sm w-100" id="logsTable">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -178,60 +179,6 @@
 </x-main>
 
 <style>
-    .table-card {
-        padding: 25px !important;
-    }
-
-   .card-top {
-        font-weight: 500;
-        margin-bottom: 25px !important;
-    }
-
-    .logs-table {
-        width: 100%; /* Full width */
-        border-collapse: collapse;
-        border-top: 1px solid var(--border) !important;
-        border-bottom: 1px solid var(--border) !important;
-    }
-
-    .logs-table thead tr th {
-        /* padding: 14.5px 5px !important; */
-        text-align: left !important;
-        vertical-align: middle !important;
-    }
-
-    .logs-table th {
-        font-size: 13px !important;
-    }
-
-    .logs-table tbody tr:last-child {
-        border-bottom: 1px solid var(--card-fill) !important;
-    }
-
-    .logs-table tbody tr td {
-        background: var(--card-fill) !important;
-        color: var(--primary-color-text) !important;
-        padding: 8px 5px !important;
-    }
-
-    .logs-table th, td {
-        text-align: left; /* Horizontally center text */
-        vertical-align: middle; /* Vertically center text */
-    }
-
-    .logs-table thead th {
-        color: var(--primary-color-text) !important;
-        background: #FCFCFC !important;
-        padding: 8px 8px !important
-    }
-
-    body.dark .logs-table thead th {
-        background: #303F4F !important;
-    }
-
-    
-
-
     /* Datatable CSS */
     table.dataTable td {
         color: var(--primary-color-text) !important;
@@ -257,11 +204,12 @@
     .dataTables_filter input[type="search"] {
         background-color: var(--input-color) !important;
         border: 1px solid var(--input-border) !important;
-        padding: 15px !important;
-        border-radius: 10px !important;
+        /* padding: 15px !important; */
+        border-radius: 6px !important;
         font-size: 14px !important;
         /* margin-right: 25px !important; */
-        height: 47px !important;
+        height: 20px !important;
+        width: 160px !important;
     }
 
     /* Change focus styles for the search input */
@@ -276,10 +224,12 @@
     }
 
     .dataTables_length select {
-        width: 100px !important;
+        width: 80px !important;
         padding: 5px 10px !important;
-        border-radius: 10px !important;
-        font-size: 14px;
+        border-radius: 6px !important;
+        font-size: 12px;
+        height: 30px !important;
+        margin-right: 5px !important;
     }
 
     .dataTables_info,
@@ -343,9 +293,12 @@
     $(document).ready(function () {
         $('#logsTable').DataTable({
             language: {
+                emptyTable: "No logs available", // When no data is in the table
+                zeroRecords: "No matching logs found", // When search results in no data
+                infoEmpty: "No logs to display", // When there are no records available
                 lengthMenu: "_MENU_ entries per page", // Change "Show entries" text
-                search: '', // Set search label to an empty string
-                searchPlaceholder: 'Search...' // Set the placeholder text
+                search: 'Search:', // Set search label to an empty string
+                searchPlaceholder: '' // Set the placeholder text
             },
             pageLength: 20, // Default entries to display
             lengthMenu: [20, 30, 40, 50, 100], // Options available in the dropdown

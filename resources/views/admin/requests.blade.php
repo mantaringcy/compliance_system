@@ -13,6 +13,7 @@
 </script>
 
 <x-main>
+
     {{-- Toast --}}
     <div id="customToast" class="custom-toast">
         {{-- Compliance Create --}}
@@ -36,18 +37,19 @@
 
 
     <div>
-        <div class="card-lg">
+        <div class="card-lg custom-table-card-lg">
 
-            <div class="card-top">
+            {{-- <div class="card-top">
                 <h5 class="fw-semibold m-0 p-0" style="font-size: 16px !important;">Request for Change</h5>
-            </div>
+            </div> --}}
           
-            <table class="table table-hover w-100 request-table" id="requestComplianceTable">
+            <table class="table table-hover w-100 request-table custom-table custom-table-lg" id="requestComplianceTable">
                 
 
                 <thead>
 
                     <tr>
+                        <th scope="col">#</th>
                         <th scope="col">#</th>
                         <th scope="col">COMPLIANCE NAME</th>
                         <th scope="col">DEPARTMENT NAME</th>
@@ -134,70 +136,15 @@
         </div>
     </div>
 
-    {{-- @foreach ($requestsWithCompliance as $item)
-        <div class="compliance-comparison">
-            <h4>Requested Changes:</h4>
-            <p>Compliance Name: {{ $item['changes']['compliance_name'] ?? 'No Change' }}</p>
-            <p>Department: {{ $item['departments'][$item['changes']['department_id']] ?? 'Unknown Department' }}</p>
-
-            <h4>Original Compliance:</h4>
-            <p>Compliance Name: {{ $item['originalCompliance']->compliance_name }}</p>
-            <p>Department: {{ $item['originalCompliance']->department->department_name }}</p>
-        </div>
-    @endforeach --}}
-
 </x-main>
-
-<style>
-    .card-top {
-        padding: 25px !important;
-        font-weight: 500;
-    }
-
-    .request-table {
-        border-collapse: collapse;
-        border-bottom: 1px solid var(--border) !important;
-        background: red !important;
-    }
-
-    .request-table thead tr th {
-        vertical-align: middle !important;
-    }
-
-    .request-table th {
-        font-size: 13px !important;
-    }
-
-    .request-table tbody tr:last-child {
-        border-bottom: 1px solid var(--card-fill) !important;
-    }
-
-    .request-table tbody tr td {
-        background: var(--card-fill) !important;
-        color: var(--primary-color-text) !important;
-        font-size: 14px !important;
-        padding: 17.5px 0px !important;
-    }
-
-    .request-table thead th {
-        color: var(--primary-color-text) !important;
-        background: #FCFCFC !important;
-    }
-
-    th, td {
-        text-align: center; /* Horizontally center text */
-        vertical-align: middle; /* Vertically center text */
-    }
-
-    body.dark .request-table thead th {
-        background: #303F4F !important;
-    }
-</style>
 
 <script>
     // Request Table
     let requestTable = $('#requestComplianceTable').DataTable({
         language: {
+            emptyTable: "No requests for change available",
+            zeroRecords: "No matching requests found",
+            infoEmpty: "No requests to display",
             lengthMenu: "_MENU_ entries per page", // Change "Show entries" text
             search: '', // Set search label to an empty string
             searchPlaceholder: 'Search...' // Set the placeholder text
@@ -207,13 +154,17 @@
         processing: true,
         serverSide: true,
         ajax: '{{ route('complianceRequests') }}',
+        paging: false,
+        info: false,
         columns: [
-            { data: 'id', name: 'id' },
+            { data: 'id', name: 'id', visible: false },
+            { data: 'complianceId', name: 'complianceId' },
             { data: 'compliance_name', name: 'compliance_name' },
             { data: 'department_name', name: 'department_name' },
             { data: 'request_type', name: 'request_type' },
             { data: 'action', name: 'action' },
         ],
+        order: [[0, 'desc']],
     });
 
     requestTable.on('draw', function () {
@@ -344,3 +295,53 @@
     });
 
 </script>
+
+<style>
+    /* Datatable CSS */
+    .dataTable td {
+        color: var(--primary-color-text) !important;
+        text-align: center !important;
+        font-size: 14px !important;
+        background: var(--card-fill) !important;
+        border: 0 !important;
+        border-top: 1px solid var(--border) !important;
+        padding: 20px 10px !important;
+        max-width: 300px; /* Adjust this width as needed */
+        white-space: normal; /* Allow line breaks */
+        overflow: hidden; /* Hide overflow if necessary */
+        text-overflow: ellipsis; /* Show ellipsis if text overflows */
+    }
+
+    .dataTables_filter {
+        margin-top: 25px !important;
+        margin-bottom: 5px !important;
+    }
+
+    /* Custom styles for the search input */
+    .dataTables_filter input[type="search"] {
+        background-color: var(--input-color) !important;
+        border: 1px solid var(--input-border) !important;
+        padding: 15px !important;
+        border-radius: 10px !important;
+        font-size: 14px !important;
+        margin-right: 25px !important;
+        height: 47px !important;
+    }
+
+    /* Change focus styles for the search input */
+    .dataTables_filter input[type="search"]:focus {
+        border-color: var(--profile-fill-hover) !important; 
+        /* outline: none !important;  */
+    }
+
+    /* Hide the sorting arrows for all columns */
+    th.sorting::before, 
+    th.sorting_asc::before, 
+    th.sorting_desc::before,
+    th.sorting::after, 
+    th.sorting_asc::after, 
+    th.sorting_desc::after {
+        content: '' !important;        
+        background: none !important;
+    }
+</style>

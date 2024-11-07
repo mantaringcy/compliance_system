@@ -9,6 +9,7 @@
         'resources/css/badge.css',
         'resources/css/form.css',
         'resources/css/modal.css', 
+        'resources/css/table.css', 
         'resources/css/theme-switch.css',
         'resources/css/theme-colors.css',
         'resources/css/toast.css',
@@ -152,12 +153,12 @@
                                 <span>Logs</span>
                             </a>
                         </li>
-                        <li class="sidebar-item2 mb-1">
+                        {{-- <li class="sidebar-item2 mb-1">
                             <a href="{{ route('logs.sample') }}">
                                 <i class="fa-solid fa-book"></i>
                                 <span>Logs Sample</span>
                             </a>
-                        </li>
+                        </li> --}}
 
                         {{-- <li class="sidebar-item2 mb-1">
                             <a href="accounts">

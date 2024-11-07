@@ -29,24 +29,11 @@
     {{-- @endif --}}
 
     <div>
-        <div class="card-lg">
+        <div class="card-lg custom-table-card-lg">
+
             <div class="card-top">
 
-                {{-- ALERTS --}}
-                {{-- Compliance Create --}}
-                <div class="custom-alert custom-alert-blue" style="display: none;"  id="alert-compliance-created">
-                </div>
-
-                {{-- Compliance Edit --}}
-                <div class="custom-alert custom-alert-green" style="display: none;"  id="alert-compliance-edited">
-                </div>
-
-                {{-- Compliance Delete --}}
-                <div class="custom-alert custom-alert-red" style="display: none;"  id="alert-compliance-deleted">
-                </div>
-
                 <div class="text-end">
-
                     <!-- Add Compliance -->
                     <button type="button border-0" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newComplianceModal"  
                     data-departments='@json($departments)'>
@@ -57,7 +44,7 @@
             </div>
             
             
-            <table class="table table-hover data-table w-100" id="complianceListTable">
+            <table class="table table-hover custom-table custom-table-lg w-100" id="complianceListTable">
                 
 
                 <thead>
@@ -73,7 +60,7 @@
              
                 </thead>
      
-              </table>
+            </table>
 
         </div>
     </div>
@@ -96,6 +83,9 @@
     $(document).ready(function() {
         $('#complianceListTable').DataTable({
             language: {
+                emptyTable: "No compliance records found",
+                zeroRecords: "No matching compliance records",
+                infoEmpty: "No compliance records to display",
                 lengthMenu: "_MENU_ entries per page", // Change "Show entries" text
                 search: '', // Set search label to an empty string
                 searchPlaceholder: 'Search...' // Set the placeholder text
@@ -201,58 +191,8 @@
 
 
 <style>
-    .table td {
-        vertical-align: middle; /* Center align vertically */
-    }
-
-    .card-top {
-        /* border-radius: 100px !important; */
-        font-weight: 500;
-        padding: 15px 15px 15px 15px !important;
-        /* border: 1px solid red !important */
-    }
-
-    .card-top button {
-        /* font-size: 100px !important; */
-        padding: 8px 15px 8px 15px !important;
-        border-radius: 100px !important;
-        font-weight: 500 !important;
-        background: var(--profile-fill-hover) !important;
-        border: 0 !important;
-        margin-bottom: 10px !important;
-    }
-
-    .card-top button:hover {
-        background-color: #3f78ff !important;
-    }
-
-    .table {
-        width: 100%; /* Full width */
-        border-collapse: collapse;
-    }
-
-    .table th {
-        font-size: 13px !important;
-        border-bottom: 1px solid var(--border) !important;
-        padding: 10px 0px !important;
-    }
-
-    th, td {
-        text-align: center; /* Horizontally center text */
-        vertical-align: middle; /* Vertically center text */
-    }
-
-    .table thead th {
-        color: var(--primary-color-text) !important;
-        background: #FCFCFC !important;
-        padding: 10px 20px !important
-    }
-
-    body.dark .table thead th {
-        background: #303F4F !important;
-    }
-
-    table.dataTable td {
+    /* Datatable CSS */
+    .dataTable td {
         color: var(--primary-color-text) !important;
         text-align: center !important;
         font-size: 14px !important;
@@ -276,8 +216,8 @@
         margin-bottom: 5px !important;
     }
 
-     /* Custom styles for the search input */
-     .dataTables_filter input[type="search"] {
+    /* Custom styles for the search input */
+    .dataTables_filter input[type="search"] {
         background-color: var(--input-color) !important;
         border: 1px solid var(--input-border) !important;
         padding: 15px !important;
@@ -350,6 +290,4 @@
         outline: none !important; /* Removes the default focus outline */
         box-shadow: none !important; /* Remove any focus shadow if applied */
     }
-
-
 </style>

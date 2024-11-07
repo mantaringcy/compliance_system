@@ -51,9 +51,14 @@ class RequestController extends Controller
         if ($request->ajax()) {
             return DataTables::of($requestsWithCompliance)
             ->addColumn('id', function ($requestCompliance) {
-                $id = $requestCompliance['originalCompliance']->id ?? '#';
+                $complianceId = $requestCompliance['request']->id;
 
-                return $id;
+                return $complianceId;
+            })
+            ->addColumn('complianceId', function ($requestCompliance) {
+                $complianceId = $requestCompliance['originalCompliance']->id ?? '#';
+
+                return $complianceId;
             })
             ->addColumn('compliance_name', function ($requestCompliance) {
                 return $requestCompliance['originalCompliance']->compliance_name ?? $requestCompliance['changes']['compliance_name'];

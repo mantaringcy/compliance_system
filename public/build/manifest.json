@@ -61,6 +61,11 @@
     "src": "resources/css/modal.css",
     "isEntry": true
   },
+  "resources/css/table.css": {
+    "file": "assets/table-ajSc6Hnq.css",
+    "src": "resources/css/table.css",
+    "isEntry": true
+  },
   "resources/css/theme-colors.css": {
     "file": "assets/theme-colors-ChbOVmyY.css",
     "src": "resources/css/theme-colors.css",
@@ -77,7 +82,7 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-DYFEFJf-.js",
+    "file": "assets/app-C1lOEAV6.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,

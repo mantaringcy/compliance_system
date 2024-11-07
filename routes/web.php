@@ -52,7 +52,7 @@ Route::middleware('auth')->group(function() {
     // Logs - Records of changes on the system
     Route::get('/logs', [LogController::class, 'index'])->name('logs.data');
 
-    Route::get('/logs-sample', [LogController::class, 'showAllLogs'])->name('logs.sample');
+    // Route::get('/logs-sample', [LogController::class, 'showAllLogs'])->name('logs.sample');
 
 
     // Request - Request for Compliance Change

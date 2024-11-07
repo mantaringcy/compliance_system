@@ -15,6 +15,7 @@ export default defineConfig({
                     'resources/css/badge.css', 
                     'resources/css/form.css', 
                     'resources/css/modal.css', 
+                    'resources/css/table.css', 
                     'resources/css/theme-switch.css', 
                     'resources/css/theme-colors.css', 
                     'resources/css/toast.css', 
