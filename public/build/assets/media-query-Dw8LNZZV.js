@@ -1,0 +1,1 @@
+function e(s){c.matches?(document.querySelector("#sidebar").classList.toggle("collapsed"),document.querySelector("#main").classList.toggle("collapsed")):(document.querySelector("#sidebar").classList.remove("collapsed"),document.querySelector("#main").classList.remove("collapsed"))}const c=window.matchMedia("(max-width: 1000px)");e();c.addEventListener("change",function(){e()});

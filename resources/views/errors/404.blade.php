@@ -2,14 +2,13 @@
 <html lang="en">
 <head>
     <!-- Vite -->
-     @vite([
+    @vite([
         'resources/css/app.css',
-        'resources/css/auth-app.css',
-        'resources/css/form.css',
-        'resources/css/modal.css', 
-        'resources/css/theme-switch.css',
-        'resources/css/theme-colors.css',
-        'resources/js/app.js'])
+        // 'resources/css/main/auth-app.css', 
+        // 'resources/css/main/theme-colors.css', 
+        // 'resources/css/main/theme-switch.css', 
+        'resources/js/app.js'
+        ])
 
         <style>
             button {

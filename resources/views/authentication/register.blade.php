@@ -33,19 +33,33 @@
         </div>
 
         <!-- Password -->
-        <div class="mb-2">
+        <x-password-input
+            class="mb-2"
+            inputName="password"
+            iconName="password_icon"
+            placeholder="Password"
+        />
+
+        {{-- <div class="mb-2">
             <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Password">
 
             @error('password')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
 
-        </div>
+        </div> --}}
 
         <!-- Confirm Password -->
-        <div class="mb-2">
+        <x-password-input
+            class="mb-2"
+            inputName="password_confirmation"
+            iconName="password_confirmation_icon"
+            placeholder="Confirm Password"
+        />
+        
+        {{-- <div class="mb-2">
             <input type="password" name="password_confirmation" class="form-control @error('password_confirmation') is-invalid @enderror" placeholder="Confirm Password">
-        </div>
+        </div> --}}
 
         <!-- Department -->
         <div class="mb-2">

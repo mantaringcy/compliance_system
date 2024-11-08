@@ -1,23 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+    <!-- Vite -->
+    @vite([
+        'resources/css/app.css',
+        'resources/js/app.js'
+    ])
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-    <!-- Vite -->
-    @vite([
-        'resources/css/auth-app.css', 
-        'resources/css/form.css',
-        'resources/css/theme-switch.css',
-        'resources/css/theme-colors.css',
-        'resources/js/app.js'])
+ 
     
     <!-- Title -->
     <title>@yield('title') | {{ config('app.name') }}</title>
     
 </head>
-<body>
+<body id="main-auth-layout">
 
     <!-- Theme Switch -->
     <div>

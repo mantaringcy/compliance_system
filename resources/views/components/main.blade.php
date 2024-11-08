@@ -1,19 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
     <!-- Vite -->
     @vite([
         'resources/css/app.css',
-        'resources/css/alert.css',
-        'resources/css/auth-app.css',
-        'resources/css/badge.css',
-        'resources/css/form.css',
-        'resources/css/modal.css', 
-        'resources/css/table.css', 
-        'resources/css/theme-switch.css',
-        'resources/css/theme-colors.css',
-        'resources/css/toast.css',
-        'resources/js/app.js'])
+        // 'resources/css/main/auth-app.css', 
+        // 'resources/css/main/theme-colors.css', 
+        // 'resources/css/main/theme-switch.css', 
+        'resources/js/app.js'
+        ])
         
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -38,11 +34,7 @@
 
     
 </head>
-<body>
-
-    {{-- @include('modals.edit-compliance-modal')
-    @include('modals.view-compliance-modal')
-    @include('modals.new-compliance-modal') --}}
+<body id="main-layout">
 
     <div class="wrapper">
 
@@ -306,6 +298,14 @@
             </main>
         </div>
     </div>
+
+    <script>
+        const departmentMapping = @json($departments);
+        const roleMapping = @json($roles);
+        const frequencyMapping = @json(config('static_data.frequency'));
+        const startWorkingOnMapping = @json(config('static_data.start_working_on'));
+        const submitOnMapping = @json(config('static_data.submit_on'));
+    </script>
 
 </body>
 </html>

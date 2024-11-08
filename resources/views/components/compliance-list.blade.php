@@ -67,11 +67,6 @@
 </x-main>
 
 <script>
-    const departmentMapping = @json($departments);
-    const frequencyMapping = @json(config('static_data.frequency'));
-    const startWorkingOnMapping = @json(config('static_data.start_working_on'));
-    const submitOnMapping = @json(config('static_data.submit_on'));
-
     // Format Date
     function formatDate(myDate) {
         const date = new Date(myDate); // Create a new Date object

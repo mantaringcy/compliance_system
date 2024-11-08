@@ -5,13 +5,6 @@
 @include('modals.edit-request-compliance-modal')
 @include('modals.delete-request-compliance-modal')
 
-<script>
-    const departmentMapping = @json($departments);
-    const frequencyMapping = @json(config('static_data.frequency'));
-    const startWorkingOnMapping = @json(config('static_data.start_working_on'));
-    const submitOnMapping = @json(config('static_data.submit_on'));
-</script>
-
 <x-main>
 
     {{-- Toast --}}

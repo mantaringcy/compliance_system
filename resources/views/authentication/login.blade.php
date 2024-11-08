@@ -24,15 +24,21 @@
         </div>
 
         <!-- Password -->
-        <div class="mb-4">
-            {{-- <label for="password">Password</label> --}}
+        <x-password-input
+            class="mb-4"
+            inputName="password"
+            iconName="password_icon"
+            placeholder="Password"
+        />
+
+        {{-- <div class="mb-4">
             <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Password">
 
             @error('password')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
 
-        </div>
+        </div> --}}
 
         <!-- Remember Me, Forgot Password -->
         <div class="after-button-div mb-3">
@@ -50,7 +56,14 @@
         @enderror
         
         <!-- Button -->
-        <button class="btn border-0 text-white w-100 ">Login</button>
+        {{-- <button class="btn border-0 text-white w-100 ">Login</button> --}}
+        <x-button 
+            class="update-btn w-100" 
+            id="loginBtn" 
+            spinnerId="buttonLoginSpinner" 
+            textId="buttonLoginText" 
+            text="Login" 
+        />
 
         <!-- Create Account -->
         <div class="after-button-div">

@@ -1,1 +1,0 @@
-.custom-toast{position:fixed;bottom:1px;right:20px;opacity:0;transform:translateY(50px);transition:opacity .3s ease,transform .3s ease;z-index:1055}.custom-toast-close{background:none;border:none;color:#fff;font-size:16px;cursor:pointer}.custom-toast.show{opacity:1;transform:translateY(0)}

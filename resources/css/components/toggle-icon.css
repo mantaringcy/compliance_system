@@ -1,0 +1,8 @@
+.togglePasswordIcon {
+    float: right !important;
+    margin-left: -25px !important;
+    margin-top: -30px !important;
+    right: 10px !important;
+    position: relative !important;
+    z-index: 100 !important;
+}

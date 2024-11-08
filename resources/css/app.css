@@ -2,6 +2,20 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
+/* ------------------- Components ---------------------- */
+@import 'components/alert.css';
+@import 'components/auth-app.css';
+@import 'components/badge.css';
+@import 'components/form.css';
+@import 'components/modal.css';
+@import 'components/table.css';
+@import 'components/toast.css';
+@import 'components/toggle-icon.css';
+
+/* ------------------- Theme ---------------------- */
+@import 'theme/theme-colors.css';
+@import 'theme/theme-switch.css';
+
 *,
 ::after,
 ::before {

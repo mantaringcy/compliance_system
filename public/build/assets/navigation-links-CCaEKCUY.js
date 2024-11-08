@@ -1,0 +1,1 @@
+const a=window.location.pathname;document.querySelectorAll(".sidebar .sidebar-nav a").forEach(e=>{e.href.includes(`${a}`)&&e.classList.add("sidebar-item-active")});const s=document.getElementById("profile-list");document.querySelectorAll(".sidebar .profile a").forEach(e=>{e.href.includes(`${a}`)&&(e.classList.add("profile-list-active"),s.classList.remove("collapse"))});

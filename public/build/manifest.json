@@ -31,61 +31,24 @@
     "file": "assets/fa-v4compatibility-BX8XWJtE.woff2",
     "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-v4compatibility.woff2"
   },
-  "resources/css/alert.css": {
-    "file": "assets/alert-7zxctCOe.css",
-    "src": "resources/css/alert.css",
-    "isEntry": true
-  },
   "resources/css/app.css": {
-    "file": "assets/app-1PGvnDvP.css",
+    "file": "assets/app-D1gnUSeF.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
-  "resources/css/auth-app.css": {
-    "file": "assets/auth-app-8ndlknqw.css",
-    "src": "resources/css/auth-app.css",
-    "isEntry": true
-  },
-  "resources/css/badge.css": {
-    "file": "assets/badge-CbKhSdAt.css",
-    "src": "resources/css/badge.css",
-    "isEntry": true
-  },
-  "resources/css/form.css": {
-    "file": "assets/form-CdbcCqvy.css",
-    "src": "resources/css/form.css",
-    "isEntry": true
-  },
-  "resources/css/modal.css": {
-    "file": "assets/modal-Cwhz9nnr.css",
-    "src": "resources/css/modal.css",
-    "isEntry": true
-  },
-  "resources/css/table.css": {
-    "file": "assets/table-ajSc6Hnq.css",
-    "src": "resources/css/table.css",
-    "isEntry": true
-  },
-  "resources/css/theme-colors.css": {
-    "file": "assets/theme-colors-ChbOVmyY.css",
-    "src": "resources/css/theme-colors.css",
-    "isEntry": true
-  },
-  "resources/css/theme-switch.css": {
-    "file": "assets/theme-switch-CNYfYZ9P.css",
-    "src": "resources/css/theme-switch.css",
-    "isEntry": true
-  },
-  "resources/css/toast.css": {
-    "file": "assets/toast-D7R84HGT.css",
-    "src": "resources/css/toast.css",
-    "isEntry": true
-  },
   "resources/js/app.js": {
-    "file": "assets/app-C1lOEAV6.js",
+    "file": "assets/app-BjRcYMMX.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
+    "dynamicImports": [
+      "resources/js/components/sidebar.js",
+      "resources/js/components/media-query.js",
+      "resources/js/components/navigation-links.js",
+      "resources/js/forms/account-update.js",
+      "resources/js/forms/compliance-form.js",
+      "resources/js/forms/request-form.js"
+    ],
     "css": [
       "assets/app-DT3_6-Lb.css"
     ],
@@ -98,6 +61,51 @@
       "assets/fa-solid-900-BV3CbEM2.ttf",
       "assets/fa-v4compatibility-BX8XWJtE.woff2",
       "assets/fa-v4compatibility-B9MWI-E6.ttf"
+    ]
+  },
+  "resources/js/components/media-query.js": {
+    "file": "assets/media-query-Dw8LNZZV.js",
+    "name": "media-query",
+    "src": "resources/js/components/media-query.js",
+    "isDynamicEntry": true
+  },
+  "resources/js/components/navigation-links.js": {
+    "file": "assets/navigation-links-CCaEKCUY.js",
+    "name": "navigation-links",
+    "src": "resources/js/components/navigation-links.js",
+    "isDynamicEntry": true
+  },
+  "resources/js/components/sidebar.js": {
+    "file": "assets/sidebar-CPB5SyhM.js",
+    "name": "sidebar",
+    "src": "resources/js/components/sidebar.js",
+    "isDynamicEntry": true
+  },
+  "resources/js/forms/account-update.js": {
+    "file": "assets/account-update-C0cpgs8S.js",
+    "name": "account-update",
+    "src": "resources/js/forms/account-update.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "resources/js/forms/compliance-form.js": {
+    "file": "assets/compliance-form-7Nviatjv.js",
+    "name": "compliance-form",
+    "src": "resources/js/forms/compliance-form.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "resources/js/forms/request-form.js": {
+    "file": "assets/request-form-BdDe-yKt.js",
+    "name": "request-form",
+    "src": "resources/js/forms/request-form.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
     ]
   }
 }
