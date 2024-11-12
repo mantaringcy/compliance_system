@@ -143,7 +143,7 @@ $('#deleteComplianceForm').on('submit', function(event) {
         success: function(response) {
             // Handle success, e.g., update the DataTable or show a success message
             $('#deleteComplianceModal').modal('hide');
-            $('#complianceListTable').DataTable().ajax.reload(null, FontFaceSetLoadEvent);  // Reload DataTable data
+            $('#complianceListTable').DataTable().ajax.reload(null, false);  // Reload DataTable data
 
             toast('#alert-compliance-deleted', complianceId, null, response);
         },

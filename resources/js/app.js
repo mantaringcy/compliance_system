@@ -193,4 +193,3 @@ export function toast(alertId, complianceId = null, complianceName = null, respo
         }, 3000);
     }
 }
-

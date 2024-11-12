@@ -41,7 +41,7 @@ Route::middleware('auth')->group(function() {
     Route::view('/dashboard', 'components.dashboard')->middleware('verified')->name('dashboard');
 
     // Overview - Compliance for the Month
-    Route::get('/overview', [ComplianceController::class, 'projections'])->name('overview');
+    Route::get('/overview', [ComplianceController::class, 'monthlyCompliances'])->name('overview');
 
     // Projection - 12 Months Compliance Projection
     Route::get('/projection', [ComplianceController::class, 'projections'])->name('projections');

@@ -63,7 +63,7 @@
         </div>
     </div>
 
-    <button onclick="showToast()">Show Custom Toast</button>
+    {{-- <button onclick="showToast()">Show Custom Toast</button> --}}
 
     
 </x-main>
