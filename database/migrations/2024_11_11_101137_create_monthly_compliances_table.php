@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('compliance_name', 255); // Cached compliance name
             $table->unsignedSmallInteger('department_id'); // Department ID for quick access
             $table->enum('status', ['pending', 'in_progress', 'completed'])->default('pending'); // Status of compliance
-            $table->string('image', 255)->nullable(); // Image path (optional)
+            $table->longText('file_path')->nullable(); // Image path (optional)
             $table->boolean('approve')->default(false); // Approval status
             $table->timestamp('approved_at')->nullable(); // Approval timestamp
             $table->timestamps(); // Created and updated timestamps

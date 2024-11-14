@@ -130,13 +130,40 @@
                         <li class="sidebar-item2 mb-1">
                             <a href="{{ route('overview') }}">
                                 <i class="fa-solid fa-square-poll-vertical"></i>
-                                <span>Overview</span>
+                                <span>Compliance Due</span>
                             </a>
                         </li>
                         <li class="sidebar-item2 mb-1">
                             <a href="{{ route('projections') }}">
                                 <i class="fa-solid fa-chart-line"></i>
-                                <span>Projection</span>
+                                <span>Compliance Projection</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item2 mb-1">
+                            <a href="{{ route('compliances.index') }}">
+                                <i class="fa-solid fa-file-circle-plus"></i>
+                                <span>Compliance List</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item2">
+                            <a href="{{ route('complianceRequests') }}">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <i class="fa-solid fa-file-import"></i>
+                                        <span>Compliance Request</span>
+                                    </div>
+                                    <div>
+                                        @if (!empty($totalRequestsCount))
+                                            <span class="circle-badge" id="requestBadge">{{ $totalRequestsCount }}</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="sidebar-item2 mb-1">
+                            <a href="{{ route('compliance-management.index') }}">
+                                <i class="fa-solid fa-folder-open"></i>
+                                <span>Compliance Management</span>
                             </a>
                         </li>
                         <li class="sidebar-item2 mb-1">
@@ -159,27 +186,8 @@
                             </a>
                         </li> --}}
 
-                        <li class="sidebar-item2 mb-1">
-                            <a href="{{ route('compliances.index') }}">
-                                <i class="fa-solid fa-file-circle-plus"></i>
-                                <span>Compliance</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-item2">
-                            <a href="{{ route('complianceRequests') }}">
-                                <div class="d-flex justify-content-between">
-                                    <div>
-                                        <i class="fa-solid fa-file-import"></i>
-                                        <span>Requests</span>
-                                    </div>
-                                    <div>
-                                        @if (!empty($totalRequestsCount))
-                                            <span class="circle-badge" id="requestBadge">{{ $totalRequestsCount }}</span>
-                                        @endif
-                                    </div>
-                                </div>
-                            </a>
-                        </li>
+                  
+                    
                     </ul>
                 </div>
 

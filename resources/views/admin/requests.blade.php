@@ -1,4 +1,4 @@
-@section('title', 'Request')
+@section('title', 'Compliance Request')
 
 {{-- Modal --}}
 @include('modals.add-request-compliance-modal')

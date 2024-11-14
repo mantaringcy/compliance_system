@@ -6,10 +6,13 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'App\\Console\\Commands\\RefreshMonthlyCompliance' => $baseDir . '/app/Console/Commands/RefreshMonthlyCompliance.php',
     'App\\Http\\Controllers\\AuthenticationController' => $baseDir . '/app/Http/Controllers/AuthenticationController.php',
     'App\\Http\\Controllers\\ComplianceController' => $baseDir . '/app/Http/Controllers/ComplianceController.php',
     'App\\Http\\Controllers\\Controller' => $baseDir . '/app/Http/Controllers/Controller.php',
+    'App\\Http\\Controllers\\LogController' => $baseDir . '/app/Http/Controllers/LogController.php',
     'App\\Http\\Controllers\\MainController' => $baseDir . '/app/Http/Controllers/MainController.php',
+    'App\\Http\\Controllers\\RequestController' => $baseDir . '/app/Http/Controllers/RequestController.php',
     'App\\Http\\Controllers\\ResetPasswordController' => $baseDir . '/app/Http/Controllers/ResetPasswordController.php',
     'App\\Http\\Controllers\\RoleController' => $baseDir . '/app/Http/Controllers/RoleController.php',
     'App\\Http\\Controllers\\UserProfileController' => $baseDir . '/app/Http/Controllers/UserProfileController.php',
@@ -22,10 +25,13 @@ return array(
     'App\\Models\\ComplianceLog' => $baseDir . '/app/Models/ComplianceLog.php',
     'App\\Models\\ComplianceRequest' => $baseDir . '/app/Models/ComplianceRequest.php',
     'App\\Models\\Department' => $baseDir . '/app/Models/Department.php',
+    'App\\Models\\MonthlyCompliance' => $baseDir . '/app/Models/MonthlyCompliance.php',
     'App\\Models\\Role' => $baseDir . '/app/Models/Role.php',
     'App\\Models\\User' => $baseDir . '/app/Models/User.php',
     'App\\Policies\\RolePolicy' => $baseDir . '/app/Policies/RolePolicy.php',
     'App\\Providers\\AppServiceProvider' => $baseDir . '/app/Providers/AppServiceProvider.php',
+    'App\\Services\\ComplianceService' => $baseDir . '/app/Services/ComplianceService.php',
+    'App\\View\\Components\\PasswordInput' => $baseDir . '/app/View/Components/PasswordInput.php',
     'Attribute' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
     'Brick\\Math\\BigDecimal' => $vendorDir . '/brick/math/src/BigDecimal.php',
     'Brick\\Math\\BigInteger' => $vendorDir . '/brick/math/src/BigInteger.php',

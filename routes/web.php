@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 // Controllers
 use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\ComplianceController;
+use App\Http\Controllers\ComplianceManagementController;
 use App\Http\Controllers\LogController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\ResetPasswordController;
@@ -51,6 +52,20 @@ Route::middleware('auth')->group(function() {
     
     // Logs - Records of changes on the system
     Route::get('/logs', [LogController::class, 'index'])->name('logs.data');
+
+    Route::resource('compliance-management', ComplianceManagementController::class);
+
+    Route::post('compliance-management/{id}/upload-image', [ComplianceManagementController::class, 'uploadImage'])->name('compliance-management.upload-image');
+
+    // Route::delete('/compliance-management/{complianceId}/image/{filePath}', [ComplianceManagementController::class, 'deleteImage'])->name('deleteImage');
+    
+    // Route::get('/compliance-management/{complianceId}/image/{filePath}', [ComplianceManagementController::class, 'deleteImage'])->name('deleteImage');
+
+    Route::delete('/compliance-management/{id}/delete-image', [ComplianceManagementController::class, 'deleteImage'])->name('compliance-management.delete-image');
+
+    // Route::match(['delete', 'post'], '/compliance-management/{complianceId}/image/{filePath}', [ComplianceManagementController::class, 'deleteImage'])->name('delete.image');
+
+
 
     // Route::get('/logs-sample', [LogController::class, 'showAllLogs'])->name('logs.sample');
 

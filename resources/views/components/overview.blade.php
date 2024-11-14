@@ -1,4 +1,4 @@
-@section('title', 'Overview')
+@section('title', 'Compliance Due')
 
 <x-main>
 

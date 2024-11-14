@@ -1,4 +1,4 @@
-@section('title', 'Projection')
+@section('title', 'Compliance Projection')
 
 <x-main>
     <h2 class="fw-bold mb-5">Monthly Projection</h2>

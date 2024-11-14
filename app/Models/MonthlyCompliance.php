@@ -14,7 +14,7 @@ class MonthlyCompliance extends Model
         'compliance_name', 
         'department_id', 
         'status', 
-        'image', 
+        'file_path', 
         'approve', 
         'approved_at', 
         'computed_start_date', 
