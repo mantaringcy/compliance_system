@@ -60,7 +60,7 @@ class UserProfileController extends Controller
                 'success' => false,
                 'message' => 'The old password is incorrect.'
             ]);
-        }
+        } 
 
         // Update the password
         $user->password = Hash::make($request->new_password);
