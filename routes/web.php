@@ -8,6 +8,7 @@ use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\ComplianceController;
 use App\Http\Controllers\ComplianceManagementController;
 use App\Http\Controllers\LogController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\UserProfileController;
@@ -55,6 +56,10 @@ Route::middleware('auth')->group(function() {
 
     Route::resource('compliance-management', ComplianceManagementController::class);
 
+    Route::post('/compliance/update-status/{id}', [ComplianceManagementController::class, 'updateStatus'])->name('compliance.updateStatus');
+
+    Route::post('/compliance/approve/{id}', [ComplianceManagementController::class, 'approve'])->name('compliance.approve');
+
     Route::post('compliance-management/{id}/upload-image', [ComplianceManagementController::class, 'uploadImage'])->name('compliance-management.upload-image');
 
     // Route::delete('/compliance-management/{complianceId}/image/{filePath}', [ComplianceManagementController::class, 'deleteImage'])->name('deleteImage');
@@ -62,6 +67,10 @@ Route::middleware('auth')->group(function() {
     // Route::get('/compliance-management/{complianceId}/image/{filePath}', [ComplianceManagementController::class, 'deleteImage'])->name('deleteImage');
 
     Route::delete('/compliance-management/{id}/delete-image', [ComplianceManagementController::class, 'deleteImage'])->name('compliance-management.delete-image');
+
+    Route::post('/compliance-management/{id}/messages', [MessageController::class, 'store'])->name('compliance-management.store-message');
+    Route::get('/compliance-management/{id}/messages', [MessageController::class, 'fetch'])->name('compliance-management.fetch-message');
+
 
     // Route::match(['delete', 'post'], '/compliance-management/{complianceId}/image/{filePath}', [ComplianceManagementController::class, 'deleteImage'])->name('delete.image');
 

@@ -41,4 +41,9 @@ class MonthlyCompliance extends Model
     {
         return $this->belongsTo(Department::class);
     }
+
+    public function messages()
+    {
+        return $this->hasMany(Message::class);
+    }
 }

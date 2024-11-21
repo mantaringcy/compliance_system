@@ -23,7 +23,7 @@
        </div>
     </div>
     
-    <h2 class="fw-bold mb-5" style="font-size: 30px !important;">Compliance List</h2>
+    <h2 class="fw-bold mb-5" style="font-size: 30px !important;">Compliance Reference</h2>
 
     {{-- @if(session('success')) --}}
     {{-- @endif --}}

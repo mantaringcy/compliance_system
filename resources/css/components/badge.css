@@ -19,6 +19,11 @@
     background-color: var(--badge-red) !important;
 }
 
+.badge-yellow {
+    color: white !important;
+    background-color: var(--badge-yellow) !important;
+}
+
 .badge-blue-light {
     color: var(--badge-blue) !important;
     background-color: var(--badge-blue-light) !important;
@@ -32,6 +37,11 @@
 .badge-red-light {
     color: var(--badge-red) !important;
     background-color: var(--badge-red-light) !important;
+}
+
+.badge-yellow-light {
+    color: var(--badge-yellow-light) !important;
+    background-color: var(--badge-yellow) !important;
 }
 
 .badge-light {

@@ -67,44 +67,172 @@ class ComplianceService
 
     public function monthlyCompliances()
     {
-       $result = $this->allCompliances(); 
+        $result = $this->allCompliances(); 
 
-       $currentMonth = Carbon::now()->format('Y-m'); // Format: YYYY-MM
+        $startOfCurrentMonth = now()->startOfMonth();
+        $endOfCurrentMonth = now()->endOfMonth();
+    
+        foreach ($result as $compliance) {
+            // Parse the relevant dates
+            $startDate = Carbon::parse($compliance['startWorkingOn']);
+            $submitDate = Carbon::parse($compliance['submitOn']);
+            $deadline = Carbon::parse($compliance['deadline']);
+    
+            // Check if startWorkingOn OR deadline falls within the current month
+            if (
+                $startDate->between($startOfCurrentMonth, $endOfCurrentMonth) ||
+                $deadline->between($startOfCurrentMonth, $endOfCurrentMonth)
+            ) {
+                // Find the related record in monthly_compliances
+                $monthlyCompliance = MonthlyCompliance::where('compliance_id', $compliance['compliance']['id'])
+                    ->where('department_id', $compliance['compliance']['department_id'])
+                    ->where('computed_start_date', $startDate)
+                    ->where('computed_submit_date', $submitDate)
+                    ->where('computed_deadline', $deadline)
+                    ->first();
+    
+                if ($monthlyCompliance) {
+                    // Update the existing record if details have changed
+                    $monthlyCompliance->update([
+                        'compliance_name' => $compliance['compliance']['compliance_name'],
+                        'department_id' => $compliance['compliance']['department_id'],
+                        'computed_start_date' => $startDate,
+                        'computed_submit_date' => $submitDate,
+                        'computed_deadline' => $deadline,
+                    ]);
+                } else {
+                    // Create a new record if it doesn't exist
+                    MonthlyCompliance::create([
+                        'compliance_id' => $compliance['compliance']['id'],
+                        'compliance_name' => $compliance['compliance']['compliance_name'],
+                        'department_id' => $compliance['compliance']['department_id'],
+                        'status' => $compliance['status'] ?? 'pending', // Retain status or set default
+                        'computed_start_date' => $startDate,
+                        'computed_submit_date' => $submitDate,
+                        'computed_deadline' => $deadline,
+                    ]);
+                }
+            }
+        }
+    
 
-        $currentMonthDeadlines = array_filter($result, function($item) use ($currentMonth) {
-            return Carbon::parse($item['deadline'])->format('Y-m') === $currentMonth;
-        }); 
+        // Filter to include both current month's deadlines and start dates
+        // $currentMonthDeadlines = array_filter($result, function ($item) use ($currentMonth) {
+        //     return Carbon::parse($item['deadline'])->format('Y-m') === $currentMonth || Carbon::parse($item['startWorkingOn'])->format('Y-m') === $currentMonth;
+        // });
 
+        // foreach ($currentMonthDeadlines as $monthlyCompliance) {
+        //     // Check if the record exists for the current compliance and department
+        //     $existingCompliance = MonthlyCompliance::where('compliance_id', $monthlyCompliance['compliance']['id'])
+        //         ->where('department_id', $monthlyCompliance['compliance']['department_id'])
+        //         ->where(function ($query) use ($monthlyCompliance, $currentMonth) {
+        //             $query->whereBetween('computed_deadline', [now()->startOfMonth(), now()->endOfMonth()])
+        //                 ->orWhereBetween('computed_start_date', [now()->startOfMonth(), now()->endOfMonth()]);
+        //         })
+        //         ->first();
 
+        //     // Prepare the new data for creation or comparison
+        //     $newData = [
+        //         'compliance_name' => $monthlyCompliance['compliance']['compliance_name'],
+        //         'computed_deadline' => $monthlyCompliance['deadline'], // Assuming this is the reference_date
+        //         'computed_start_date' => null, // Default to null, will set if current month
+        //     ];
+
+        //     // Check if start date is within the current month
+        //     if (Carbon::parse($monthlyCompliance['startWorkingOn'])->format('Y-m') === $currentMonth) {
+        //         $newData['computed_start_date'] = $monthlyCompliance['startWorkingOn'];
+        //     }
+
+        //     // Check if the compliance exists
+        //     if ($existingCompliance) {
+        //         // If the compliance exists and has differences, update it
+        //         if (
+        //             $existingCompliance->status !== 'approved' && // Only update if not approved
+        //             (
+        //                 $existingCompliance->compliance_name !== $newData['compliance_name'] ||
+        //                 $existingCompliance->computed_start_date !== $newData['computed_start_date'] ||
+        //                 $existingCompliance->computed_deadline !== $newData['computed_deadline']
+        //             )
+        //         ) {
+        //             $existingCompliance->update($newData); // Update only fields in $newData, preserving `status`
+        //         }
+        //     } else {
+        //         // If the compliance does not exist, create a new record with default status
+        //         MonthlyCompliance::create(array_merge($newData, [
+        //             'compliance_id' => $monthlyCompliance['compliance']['id'],
+        //             'department_id' => $monthlyCompliance['compliance']['department_id'],
+        //             'status' => 'pending', // Default status only for new records
+        //         ]));
+        //     }
+
+        //     // Handle the next month's compliance if the CSD is in the current month
+        //     $nextMonthStart = Carbon::parse($monthlyCompliance['startWorkingOn'])->addMonth();
+        //     $nextMonthDeadline = Carbon::parse($monthlyCompliance['deadline'])->addMonth();
+
+        //     // Check if the next month's computed start date is within the current month
+        //     if ($nextMonthStart->format('Y-m') === $currentMonth) {
+        //         // Prepare data for the next month's compliance
+        //         $nextMonthData = [
+        //             'compliance_name' => $monthlyCompliance['compliance']['compliance_name'],
+        //             'computed_deadline' => $nextMonthDeadline, // Deadline is in the next month
+        //             'computed_start_date' => $nextMonthStart,   // Start date is in the current month
+        //         ];
+
+        //         // Check if the next month's compliance already exists in the database
+        //         $existingNextMonthCompliance = MonthlyCompliance::where('compliance_id', $monthlyCompliance['compliance']['id'])
+        //             ->where('department_id', $monthlyCompliance['compliance']['department_id'])
+        //             ->where('computed_start_date', $nextMonthStart)
+        //             ->first();
+
+        //         if (!$existingNextMonthCompliance) {
+        //             // Create next month's compliance if it doesn't exist
+        //             MonthlyCompliance::create(array_merge($nextMonthData, [
+        //                 'compliance_id' => $monthlyCompliance['compliance']['id'],
+        //                 'department_id' => $monthlyCompliance['compliance']['department_id'],
+        //                 'status' => 'pending', // Default status for the new record
+        //             ]));
+        //         }
+        //     }
+        // }
         
 
-        foreach ($currentMonthDeadlines as $monthlyCompliance) {
-            // Check if the monthly compliance record already exists for this compliance_id and department_id
-            $existingCompliance = MonthlyCompliance::where('compliance_id', $monthlyCompliance['compliance']['id'])
-            ->where('department_id', $monthlyCompliance['compliance']['department_id'])
-            ->whereBetween('computed_deadline', [now()->startOfMonth(), now()->endOfMonth()])
-            ->first();
+        return $result;
 
-            // If the record already exists, skip creating it
-            if ($existingCompliance) {
-                continue;  // Skip this iteration and move to the next one
-            }
+        // return view('components.overview', ['currentMonthDeadlines' => $currentMonthDeadlines]);
 
-            MonthlyCompliance::create([
-                'compliance_id' => $monthlyCompliance['compliance']['id'],
-                'compliance_name' => $monthlyCompliance['compliance']['compliance_name'],
-                'department_id' => $monthlyCompliance['compliance']['department_id'],
-                'status' => 'pending', // Or whatever the status is
-                'computed_start_date' => $monthlyCompliance['startWorkingOn'],
-                'computed_submit_date' => $monthlyCompliance['submitOn'],
-                'computed_deadline' => $monthlyCompliance['deadline'], // Assuming deadline is the reference_date
-            ]);
-        }
+        
+    }
 
-        // return $currentMonthDeadlines;
+    public function complianceOverview()
+    {
+        $currentMonthStart = now()->startOfMonth();
+        $currentMonthEnd = now()->endOfMonth();
 
+        // Get all compliances with start date or deadline in the current month or future months
+        $totalCompliances = MonthlyCompliance::where(function ($query) use ($currentMonthStart, $currentMonthEnd) {
+            $query->whereBetween('computed_start_date', [$currentMonthStart, $currentMonthEnd])
+                  ->orWhereBetween('computed_deadline', [$currentMonthStart, $currentMonthEnd]);
+        })->count();
 
-        return view('components.overview', ['currentMonthDeadlines' => $currentMonthDeadlines]);
+        // Get all completed compliances (status = 'completed') in the current or future months
+        $completedCompliances = MonthlyCompliance::where(function ($query) use ($currentMonthStart, $currentMonthEnd) {
+            $query->whereBetween('computed_deadline', [$currentMonthStart, $currentMonthEnd])
+                  ->orWhereBetween('computed_start_date', [$currentMonthStart, $currentMonthEnd]);
+        })
+        ->where('status', 'completed') // Ensure it's marked as completed
+        ->count();
+
+        // Calculate the completion percentage (if there are any compliances at all)
+        $completionPercentage = $totalCompliances > 0
+            ? round(($completedCompliances / $totalCompliances) * 100, 2)
+            : 0;
+            
+
+        return [
+            'totalCompliances' => $totalCompliances,
+            'completedCompliances' => $completedCompliances,
+            'completionPercentage' => $completionPercentage,
+        ];
     }
 
     private function allCompliances()

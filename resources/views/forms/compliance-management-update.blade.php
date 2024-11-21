@@ -1,8 +1,459 @@
 @section('title', 'Compliance Management Update')
 
 <x-main>
-    <h2 class="fw-bold mb-5" style="font-size: 30px !important;">{{ $monthlyCompliance->compliance_name }}</h2>
+    {{-- <h2 class="fw-bold mb-5" style="font-size: 30px !important;">{{ $monthlyCompliance->compliance_name }}</h2> --}}
 
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div class="">
+            <h2 class="fw-bold" style="font-size: 30px !important;">{{ $monthlyCompliance->compliance_name }}</h2>
+        </div>
+
+        @if (Auth::user()->role->id == 3)
+            <div class="d-flex">
+                <!-- Status -->
+                <div class="me-2">
+                    {{-- <label for="status" class="mb-2">Status</label> --}}
+                    <select name="status" id="status" class="form-select" onchange="updateStatus()">
+                        @foreach($enumValues as $value)
+                            <option value="{{ $value }}" {{ $monthlyCompliance->status === $value ? 'selected' : '' }}>
+                                {{ ucwords(str_replace('_', ' ', $value)) }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+    
+                <!-- Approve Button -->
+                <button class="btn btn-success" id="approveButton" onclick="approveCompliance()">Approve</button>
+            </div>
+        @endif
+
+        
+
+    </div>
+
+    
+
+    {{-- Image Upload --}}
+    @php
+        $filePaths = json_decode($monthlyCompliance->file_path, true);
+    @endphp
+
+    <div class="bottom-content mb-5">
+        {{-- Image UI --}}
+        <div class="bottom-left col-7">
+            <div class="card-bottom h-50" style="margin-bottom: 20px !important;">
+                <form action="{{ route('compliance-management.update', $monthlyCompliance->id) }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+    
+                    {{-- <input type="hidden" name="update_type" value="profile"> --}}
+    
+                    <div class="row">
+
+                        <div class="col-6 mb-4">
+                            <p>Compliance ID</p>
+                            <h6 class="fw-semibold" id="vComplianceName">{{ $monthlyCompliance->compliance_id }}</h6>
+                        </div>
+
+                        <div class="col-6 mb-4">
+                            <p>Department Name</p>
+                            <h6 class="fw-semibold" id="vComplianceName">{{ $monthlyCompliance->department->department_name }}</h6>
+                        </div>
+
+                        <div class="col-6 mb-4">
+                            <p>Start Date</p>
+                            <h6 class="fw-semibold" id="vComplianceName">{{ \Carbon\Carbon::parse($monthlyCompliance['computed_start_date'])->format('F j, Y') }}</h6>
+                        </div>
+
+                        <div class="col-6 mb-4">
+                            <p>Submit Date</p>
+                            <h6 class="fw-semibold" id="vComplianceName">{{ \Carbon\Carbon::parse($monthlyCompliance['computed_submit_date'])->format('F j, Y') }}</h6>
+                        </div>
+
+                        <div class="col-12">
+                            <p>Deadline</p>
+                            <h6 class="fw-semibold" id="vComplianceName">{{ \Carbon\Carbon::parse($monthlyCompliance['computed_deadline'])->format('F j, Y') }}</h6>
+                        </div>
+    
+                        <!-- Status -->
+                        {{-- <div class="">
+                            <label for="status" class="mb-2">Status</label>
+                            <select name="status" id="status" class="form-select">
+                                @foreach($enumValues as $value)
+                                    <option value="{{ $value }}" {{ $monthlyCompliance->status === $value ? 'selected' : '' }}>
+                                        {{ ucwords(str_replace('_', ' ', $value)) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div> --}}
+    
+                        <!-- Approval -->
+                        {{-- <div class="">
+                            <label for="status" class="mb-2">Approval</label>
+                            <select name="approve" id="approve" class="form-control">
+                                <option value="0" {{ $monthlyCompliance->approve == 0 ? 'selected' : '' }}>Disapprove</option>
+                                <option value="1" {{ $monthlyCompliance->approve == 1 ? 'selected' : '' }}>Approve</option>
+                            </select>
+                        </div> --}}
+
+                    </div>
+    
+                    {{-- <button type="submit" class="btn btn-success">Update Status</button> --}}
+                    {{-- End of Card Body --}}
+                
+                </form>
+            </div>
+
+            <div class="card-image h-50">
+                @if (!empty($filePaths))
+        
+                    <form id="uploadForm" enctype="multipart/form-data">
+        
+                        <div class="upload-container" onclick="document.getElementById('images').click()">
+        
+                            {{-- <div class="upload-text">
+                                Click to upload or drag and drop images here
+                            </div> --}}
+                        
+                            @foreach ($filePaths as $filePath)
+                                <div class="position-relative d-inline-block image-card uploaded-images" style="width: 100; height: 100;">
+        
+                                    <!-- Image -->
+                                    <img src="{{ asset('storage/' . $filePath) }}" alt="Compliance Image" >
+                                
+                                    <!-- Hover Overlay -->
+                                    <div class="overlay d-flex flex-column justify-content-center align-items-center position-absolute top-0 start-0 bg-dark bg-opacity-50 text-white" style="display: none;" onclick="event.stopPropagation()">
+            
+                                        <!-- View Full Image Button -->
+                                        <a href="{{ asset('storage/' . $filePath) }}" target="_blank" class="btn btn-sm btn-light mb-1">View Image</a>
+            
+                                        <!-- Delete Button -->
+                                        <form action="{{ route('compliance-management.delete-image', $monthlyCompliance->id) }}" method="POST" class="delete-form">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button 
+                                                onclick="deleteImage({{ $monthlyCompliance->id }}, '{{ $filePath }}')"
+                                                class="btn btn-sm btn-danger"
+                                            >
+                                                Delete
+                                            </button>
+                                        </form>
+                            
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+        
+                        <input 
+                            type="file" 
+                            id="images" 
+                            name="images[]" 
+                            accept=".jpg,.jpeg,.png,.pdf" 
+                            multiple 
+                            {{-- onchange="uploadImages(event)"  --}}
+                            style="display: none;"
+                        >
+        
+                    </form>
+        
+          
+                @else
+                    <form id="uploadForm" enctype="multipart/form-data">
+        
+                        <div class="container upload-container" onclick="document.getElementById('images').click()">
+        
+                            <div class="upload-text">
+                                Click to upload or drag and drop images here
+                            </div>
+        
+                        </div>
+        
+                        <input 
+                            type="file" 
+                            id="images" 
+                            name="images[]" 
+                            accept=".jpg,.jpeg,.png,.pdf" 
+                            multiple 
+                            onchange="uploadImages(event)" 
+                            style="display: none;"
+                        >
+                    </form>
+                @endif
+            </div>
+        </div>
+    
+        {{-- Message UI --}}
+        <div class="card-lg card-message col-5">
+            <div class="card-top">
+                <span class="profile-image">
+                    <img src="{{ URL('images/avatar-1.jpg') }}" alt="logo">
+                </span>
+
+                <div class="profile-details">
+                    @php
+                        // Get the current user's ID
+                        $currentUserId = auth()->id();
+
+                        // Collect unique usernames and department IDs of other users
+                        $otherUsers = $monthlyCompliance->messages
+                            ->filter(fn($message) => $message->user_id !== $currentUserId) // Exclude current user
+                            ->map(fn($message) => [
+                                'username' => $message->user->username,
+                                'department_name' => $message->user->department->department_name ?? 'Unknown'
+                            ])
+                            ->unique('username'); // Ensure uniqueness by username
+                    @endphp
+
+                    <!-- Display the usernames and department IDs of other users -->
+                    @foreach ($otherUsers as $user)
+                        <h6 class="fw-semibold m-0" style="margin-bottom: 2px !important;">{{ $user['username'] }}</h6>
+                        <span class="m-0" style="font-size: 12px !important; color: #585C5E !important;">
+                           {{ $user['department_name'] }}
+                        </span>
+                    @endforeach
+
+                </div>
+            </div>
+    
+            <span class="line-message"></span>
+    
+            <div class="card-body">
+    
+                {{-- <div class="message-secondary">
+                    <div class="message-profile">
+                        <img src="{{ URL('images/avatar-2.jpg') }}" alt="logo">
+                    </div>
+    
+                    <div class="message-body">
+                        <div class="message-name">
+                            <p class="m-0">
+                                Cymon
+                                <small style="font-size: 11px !important; color: #585C5E !important;">
+                                    12:00
+                                </small>
+                            </p>
+                        </div>
+    
+                        <div class="message-content">
+                            <div class="message-user">
+                                <p class="m-0">Hello</p>
+                            </div>
+        
+                            <div class="message-user">
+                                <p class="m-0">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.</p>
+                            </div>
+                        </div>
+        
+                    </div>
+    
+    
+                </div>
+    
+                <div class="message-primary">
+                    <div class="message-body">
+                        <div class="message-name text-end">
+                            <small style="font-size: 11px !important; color: #585C5E !important;">
+                                9h ago
+                            </small>
+                        </div>
+    
+                        <div class="message-content">
+                            <div class="message-user">
+                                <p class="m-0">Hello</p>
+                            </div>
+        
+                            <div class="message-user">
+                                <p class="m-0">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.</p>
+                            </div>
+                        </div>
+        
+                    </div>
+                </div>
+    
+                <div class="message-secondary">
+                    <div class="message-profile">
+                        <img src="{{ URL('images/avatar-2.jpg') }}" alt="logo">
+                    </div>
+    
+                    <div class="message-body">
+                        <div class="message-name">
+                            <p class="m-0">
+                                Cymon
+                                <small style="font-size: 11px !important; color: #585C5E !important;">
+                                    12:00
+                                </small>
+                            </p>
+                        </div>
+    
+                        <div class="message-content">
+                            <div class="message-user">
+                                <p class="m-0">Hello</p>
+                            </div>
+        
+                            <div class="message-user">
+                                <p class="m-0">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.</p>
+                            </div>
+                        </div>
+        
+                    </div>
+    
+    
+                </div>
+    
+                <div class="message-primary">
+                    <div class="message-body">
+                        <div class="message-name text-end">
+                            <small style="font-size: 11px !important; color: #585C5E !important;">
+                                9h ago
+                            </small>
+                        </div>
+    
+                        <div class="message-content">
+                            <div class="message-user">
+                                <p class="m-0">Hello</p>
+                            </div>
+        
+                            <div class="message-user">
+                                <p class="m-0">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.</p>
+                            </div>
+                        </div>
+        
+                    </div>
+                </div> --}}
+
+                @php
+                    $lastUserId = null; // Tracks the user of the last message
+                @endphp
+               
+                
+                @foreach ($monthlyCompliance->messages as $message)
+
+                    @php
+                        $showTime = $lastUserId !== $message->user->id; // Show time only for the first message of a new user block
+                    @endphp
+                    
+                    @if ($message->user->id === auth()->id()) 
+                        <div class="message-primary">
+                            <div class="message-body">
+                                <div class="message-name text-end">
+
+                                    <!-- Show the time only for the first message of the block -->
+                                    @if ($showTime)
+                                        <small style="font-size: 11px !important; color: #585C5E !important;">
+                                            {{ $message->created_at->diffForHumans() }}
+                                        </small>
+                                    @endif
+
+                                </div>
+            
+                                <div class="message-content">
+                                    <div class="message-user">
+                                        <p class="m-0">{{ $message->message }}</p>
+                                    </div>
+                                </div>
+                
+                            </div>
+                        </div>
+
+                        <!-- Current user's message (Right-aligned) -->
+                        {{-- <div class="message-primary text-end">
+                            <div class="message-body">
+                                <div class="message-name text-end">
+                                    <small style="font-size: 11px !important; color: #585C5E !important;">
+                                        {{ $message->created_at->diffForHumans() }}
+                                    </small>
+                                </div>
+            
+                                <div class="message-content">
+                                    <div class="message-user">
+                                        <p class="m-0">{{ $message->message }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> --}}
+                    @else
+                        <div class="message-secondary">
+                            {{-- <div class="message-profile">
+                                <img src="{{ URL('images/avatar-2.jpg') }}" alt="logo">
+                            </div> --}}
+            
+                            <div class="message-body">
+                                <div class="message-name">
+                                    <p class="m-0">
+                                        {{-- <small style="font-size: 11px !important; color: #585C5E !important;">
+                                            {{ $message->created_at->format('H:i') }}
+                                        </small> --}}
+
+                                        @if ($showTime)
+                                            <small style="font-size: 11px !important; color: #585C5E !important;">
+                                                {{ $message->created_at->format('h:i A') }}
+                                            </small>
+                                        @endif
+
+                                    </p>
+                                </div>
+            
+                                <div class="message-content">
+                                    <div class="message-user">
+                                        <p class="m-0">{{ $message->message }}</p>
+                                    </div>
+                
+                                    {{-- <div class="message-user">
+                                        <p class="m-0">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.</p>
+                                    </div> --}}
+                                </div>
+                
+                            </div>
+            
+            
+                        </div>
+                            <!-- Other user's message (Left-aligned) -->
+                            {{-- <div class="message-secondary">
+                                <div class="message-body">
+                                    <div class="message-name">
+                                        <p class="m-0">
+                                            {{ $message->user->name }}
+                                            <small style="font-size: 11px !important; color: #585C5E !important;">
+                                                {{ $message->created_at->format('H:i') }}
+                                            </small>
+                                        </p>
+                                    </div>
+                
+                                    <div class="message-content">
+                                        <div class="message-user">
+                                            <p class="m-0">{{ $message->message }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> --}}
+                    @endif
+
+                    @php
+                        // Update the last user ID
+                        $lastUserId = $message->user->id;
+                    @endphp
+
+                @endforeach
+            </div>
+    
+            <span class="line-message"></span>
+    
+            <div class="card-bottom">
+                <div class="textarea-container">
+                    <form action="" id="chat-form">
+                        {{-- <input type="hidden" name="monthly_compliance_id" value="{{ $monthlyCompliance->id }}"> --}}
+                        <textarea class="message" id="chat-message" placeholder="Type a Message"></textarea>
+                        <button class="send-button" type="submit">
+                            <i class="fa-regular fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+    
+        </div>
+    </div>
+
+    {{-- Top Content --}}
     <div>
         <div class="card-lg custom-table-card-lg mb-4">
 
@@ -15,7 +466,6 @@
                     @csrf
                     @method('PUT')
     
-                    {{-- <input type="hidden" name="update_type" value="profile"> --}}
     
                     <div class="row">
 
@@ -117,228 +567,151 @@
 
         </div>
     </div>
-
-    {{-- Image Upload --}}
-    @php
-        $filePaths = json_decode($monthlyCompliance->file_path, true);
-    @endphp
-
-    <div class="bottom-content">
-        {{-- Image UI --}}
-        <div class="card-lg col-7 card-image">
-            @if (!empty($filePaths))
     
-                <form id="uploadForm" enctype="multipart/form-data">
-    
-                    <div class="upload-container" onclick="document.getElementById('images').click()">
-    
-                        {{-- <div class="upload-text">
-                            Click to upload or drag and drop images here
-                        </div> --}}
-                    
-                        @foreach ($filePaths as $filePath)
-                            <div class="position-relative d-inline-block image-card uploaded-images" style="width: 100; height: 100;">
-    
-                                <!-- Image -->
-                                <img src="{{ asset('storage/' . $filePath) }}" alt="Compliance Image" >
-                            
-                                <!-- Hover Overlay -->
-                                <div class="overlay d-flex flex-column justify-content-center align-items-center position-absolute top-0 start-0 bg-dark bg-opacity-50 text-white" style="display: none;" onclick="event.stopPropagation()">
-        
-                                    <!-- View Full Image Button -->
-                                    <a href="{{ asset('storage/' . $filePath) }}" target="_blank" class="btn btn-sm btn-light mb-1">View Image</a>
-        
-                                    <!-- Delete Button -->
-                                    <form action="{{ route('compliance-management.delete-image', $monthlyCompliance->id) }}" method="POST" class="delete-form">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button 
-                                            onclick="deleteImage({{ $monthlyCompliance->id }}, '{{ $filePath }}')"
-                                            class="btn btn-sm btn-danger"
-                                        >
-                                            Delete
-                                        </button>
-                                    </form>
-                        
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-    
-                    <input 
-                        type="file" 
-                        id="images" 
-                        name="images[]" 
-                        accept=".jpg,.jpeg,.png,.pdf" 
-                        multiple 
-                        {{-- onchange="uploadImages(event)"  --}}
-                        style="display: none;"
-                    >
-    
-                </form>
-    
-      
-            @else
-                <form id="uploadForm" enctype="multipart/form-data">
-    
-                    <div class="container upload-container" onclick="document.getElementById('images').click()">
-    
-                        <div class="upload-text">
-                            Click to upload or drag and drop images here
-                        </div>
-    
-                    </div>
-    
-                    <input 
-                        type="file" 
-                        id="images" 
-                        name="images[]" 
-                        accept=".jpg,.jpeg,.png,.pdf" 
-                        multiple 
-                        onchange="uploadImages(event)" 
-                        style="display: none;"
-                    >
-                </form>
-            @endif
-        </div>
-    
-        {{-- Message UI --}}
-        <div class="card-lg card-message col-5">
-            <div class="card-top">
-                <span class="profile-image">
-                    <img src="{{ URL('images/avatar-1.jpg') }}" alt="logo">
-                </span>
-    
-                <div class="profile-details">
-                    <h6 class="fw-semibold m-0" style="margin-bottom: 2px !important;">Cymon</h6>
-                    <span class="m-0" style="font-size: 12px !important; color: #585C5E !important;">IT Department
-                    </span>
-                </div>
-            </div>
-    
-            <span class="line-message"></span>
-    
-            <div class="card-body ">
-    
-                <div class="message-secondary">
-                    <div class="message-profile">
-                        <img src="{{ URL('images/avatar-2.jpg') }}" alt="logo">
-                    </div>
-    
-                    <div class="message-body">
-                        <div class="message-name">
-                            <p class="m-0">
-                                Cymon
-                                <small style="font-size: 11px !important; color: #585C5E !important;">
-                                    12:00
-                                </small>
-                            </p>
-                        </div>
-    
-                        <div class="message-content">
-                            <div class="message-user">
-                                <p class="m-0">Hello</p>
-                            </div>
-        
-                            <div class="message-user">
-                                <p class="m-0">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.</p>
-                            </div>
-                        </div>
-        
-                    </div>
-    
-    
-                </div>
-    
-                <div class="message-primary">
-                    <div class="message-body">
-                        <div class="message-name text-end">
-                            <small style="font-size: 11px !important; color: #585C5E !important;">
-                                9h ago
-                            </small>
-                        </div>
-    
-                        <div class="message-content">
-                            <div class="message-user">
-                                <p class="m-0">Hello</p>
-                            </div>
-        
-                            <div class="message-user">
-                                <p class="m-0">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.</p>
-                            </div>
-                        </div>
-        
-                    </div>
-                </div>
-    
-                <div class="message-secondary">
-                    <div class="message-profile">
-                        <img src="{{ URL('images/avatar-2.jpg') }}" alt="logo">
-                    </div>
-    
-                    <div class="message-body">
-                        <div class="message-name">
-                            <p class="m-0">
-                                Cymon
-                                <small style="font-size: 11px !important; color: #585C5E !important;">
-                                    12:00
-                                </small>
-                            </p>
-                        </div>
-    
-                        <div class="message-content">
-                            <div class="message-user">
-                                <p class="m-0">Hello</p>
-                            </div>
-        
-                            <div class="message-user">
-                                <p class="m-0">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.</p>
-                            </div>
-                        </div>
-        
-                    </div>
-    
-    
-                </div>
-    
-                <div class="message-primary">
-                    <div class="message-body">
-                        <div class="message-name text-end">
-                            <small style="font-size: 11px !important; color: #585C5E !important;">
-                                9h ago
-                            </small>
-                        </div>
-    
-                        <div class="message-content">
-                            <div class="message-user">
-                                <p class="m-0">Hello</p>
-                            </div>
-        
-                            <div class="message-user">
-                                <p class="m-0">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.</p>
-                            </div>
-                        </div>
-        
-                    </div>
-                </div>
-            </div>
-    
-            <span class="line-message"></span>
-    
-            <div class="card-bottom">
-                <div class="textarea-container">
-                    <textarea class="textarea-input" placeholder="Type a Message"></textarea>
-                    <button class="send-button">
-                        <i class="fa-regular fa-paper-plane"></i> <!-- Unicode for a send icon (arrow) -->
-                    </button>
-                </div>
-            </div>
-    
-        </div>
-    </div>
-
-
 </x-main>
+
+{{-- Approve Button --}}
+<script>
+    // Function to handle the approve button click
+    function approveCompliance() {
+        const complianceId = {{ $monthlyCompliance->id }}; // Pass the compliance ID dynamically
+        const approvedStatus = 1; // Assuming 1 represents "approved" status
+        const completedStatus = 'completed'; // Set to "completed" status for the select dropdown
+
+        // Send the AJAX request to update the status to approved
+        fetch(`/compliance/approve/${complianceId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}', // CSRF token for security
+            },
+            body: JSON.stringify({ status: approvedStatus }), // Send the approved status
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Change the button text to "Approved"
+                const approveButton = document.getElementById('approveButton');
+                approveButton.textContent = 'Approved'; // Change text
+                approveButton.classList.remove('btn-success'); // Optional: remove success class
+                approveButton.classList.add('btn-secondary'); // Optional: change button color to indicate approval
+                approveButton.disabled = true; // Optionally disable the button to prevent further clicks
+
+                // Change the status dropdown to "completed"
+                const statusDropdown = document.getElementById('status');
+                statusDropdown.value = completedStatus; // Change the dropdown value to "completed"
+
+                alert('Compliance has been approved and status is updated to "Completed"!');
+            } else {
+                alert('There was an error approving the compliance.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error occurred while approving compliance.');
+        });
+    }
+</script>
+
+{{-- Update Status --}}
+<script>
+    // Function to handle status change and send an AJAX request to update the database
+    function updateStatus() {
+        const status = document.getElementById('status').value;
+        const complianceId = {{ $monthlyCompliance->id }}; // Pass the compliance ID dynamically
+
+        // Send the AJAX request to update the status
+        fetch(`/compliance/update-status/${complianceId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}', // CSRF token for security
+            },
+            body: JSON.stringify({ status: status }), // Send the updated status
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Status updated successfully');
+                // Optionally, show a success message or update the UI
+            } else {
+                console.error('Error updating status');
+                // Optionally, show an error message
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+</script>
+
+{{-- Chat Form --}}
+<script>
+    $('#chat-form').on('submit', function (e) {
+        e.preventDefault();
+
+        let message = $('#chat-message').val().trim();
+
+        if (!message) {
+            alert('Message cannot be empty.');
+            return;
+        }
+
+        let monthlyComplianceId = {{ $monthlyCompliance->id }};
+
+        $.post(`/compliance-management/${monthlyComplianceId}/messages`, {
+            message: message,
+            _token: '{{ csrf_token() }}',
+        })
+        .done(function (response) {
+            // fetchMessages(monthlyComplianceId); // Reload chat after sending
+            $('#chat-message').val(''); // Clear the input field
+        })
+        .fail(function () {
+            alert('Error sending message.');
+        });
+    });
+
+    // function fetchMessages(complianceId) {
+    //     $.get(`/compliance-management/${complianceId}/messages`, function (messages) {
+    //         const chatBox = $('#chat-box');
+    //         chatBox.empty();
+
+    //         messages.forEach((msg) => {
+    //             const messageHtml = `
+    //                 <div>
+    //                     <strong>${msg.user.name}:</strong> ${msg.message}
+    //                     <small class="text-muted">${new Date(msg.created_at).toLocaleString()}</small>
+    //                 </div>
+    //                 <hr>
+    //             `;
+    //             chatBox.append(messageHtml);
+    //         });
+
+    //         chatBox.scrollTop(chatBox.prop('scrollHeight')); // Scroll to the latest message
+    //     });
+    // }
+</script>
+
+<style>
+    .bottom-content {
+        /* background: red !important; */
+    }
+
+    .bottom-content .bottom-left {
+        /* background: yellow !important; */
+    }
+
+    .bottom-content .bottom-left .card-bottom {
+        display: flex !important;
+        align-items: center !important;
+        background: #fff !important;
+        border: 1px solid #E7EAEE;
+        border-radius: 8px !important;
+        padding: 25px !important;
+        text-align: center !important;
+    }
+</style>
 
 <style>
     .bottom-content {
@@ -367,7 +740,7 @@
       /* max-width: 500px; Optional max width */
     }
 
-    .textarea-input {
+    .message {
         width: 100%; /* Full width of the container */
         padding: 10px 40px 10px 10px; /* Add padding-right to make space for the button */
         border-radius: 5px;
@@ -379,7 +752,7 @@
 
     }
 
-    .textarea-input::placeholder {
+    .message::placeholder {
         color: #BEC8D0 !important;
     }
 
@@ -432,6 +805,7 @@
 
     .card-message .card-body {
         padding: 0px 25px !important;
+        min-height: 400px !important;
         max-height: 400px; /* Restrict the height */
         overflow-y: auto; /* Enable vertical scrolling */
 
@@ -599,6 +973,7 @@
     }
     
     .upload-container {
+        position: relative !important;
         width: 100%;
         height: 100% !important;
         /* max-width: 400px; */
@@ -625,7 +1000,7 @@
         transform: translate(-50%, -50%);
         color: #007bff;
         font-size: 14px;
-        opacity: 0;
+        /* opacity: 0; */
         transition: opacity 0.3s ease;
         z-index: 10;
     }

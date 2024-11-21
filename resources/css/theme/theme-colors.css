@@ -44,6 +44,9 @@
     --badge-light: #E5F7F9 !important;
     --badge-light-color: #3EC9D6 !important;
 
+    --badge-yellow: #FBEDDE !important;
+    --badge-yellow-light: #E48A01 !important;
+
     /* Alert */
     --alert-blue-text: #2E63FF !important;
     --alert-red-text: #CE1618 !important;
@@ -107,4 +110,7 @@ body.dark {
 
     --badge-light: #233C46 !important;
     --badge-light-color: #3EC9D6 !important;
+
+    --badge-yellow: #FBEDDE !important;
+    --badge-yellow-light: #E48A01 !important;
 }

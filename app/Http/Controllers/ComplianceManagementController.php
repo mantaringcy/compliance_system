@@ -2,17 +2,73 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Department;
 use App\Models\MonthlyCompliance;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\DataTables;
 
 class ComplianceManagementController extends Controller
 {
+    private function token()
+    {
+        $client_id = \Config('static_data.google.client_id');
+        $client_secret = \Config('static_data.google.client_secret');
+        $refresh_token = \Config('static_data.google.refresh_token'); 
+    
+        $response = Http::post('https://oauth2.googleapis.com/token', [
+            'client_id' => $client_id,
+            'client_secret' => $client_secret,
+            'refresh_token' => $refresh_token,
+            'grant_type' => 'refresh_token',
+        ]);
+    
+        if ($response->successful()) {
+            $data = $response->json();
+            return $data['access_token'] ?? null;
+        }
+    
+        // Log the error or throw an exception
+        Log::error('Failed to refresh Google API token.', [
+            'status' => $response->status(),
+            'body' => $response->body(),
+        ]);
+    
+        return null; // or throw an exception
+    }
+
     public function index(Request $request)
     {
         $monthlyCompliances = MonthlyCompliance::all();
+
+        // Retrieve departments from the database
+        $departments = Department::all()->toArray(); 
+
+        // Fetch monthly compliances and map department name and days difference
+        $monthlyCompliances = MonthlyCompliance::all()->map(function ($compliance) use ($departments) {
+            // Calculate days difference
+            $compliance->days_difference = now()->startOfDay()->diffInDays(\Carbon\Carbon::parse($compliance->computed_deadline)->startOfDay(), false);
+        
+            // Get department name using the method
+            $compliance->department_name = $this->getDepartmentName($compliance->department_id, $departments);
+            
+            return $compliance;
+        });
+
+        // Sort the compliances:
+        // - First by 'status' (completed at the bottom)
+        // - Then by 'deadline' in ascending order
+        $monthlyCompliances = $monthlyCompliances->sortBy(function($compliance) {
+            // First, sort by 'status', completed should come last
+            return $compliance['status'] == 'completed' ? 1 : 0;
+        })->sortBy(function($compliance) {
+            // Then, sort by 'deadline' (ascending)
+            return Carbon::parse($compliance['deadline']);
+        });
 
         if ($request->ajax()) {
             return DataTables::of($monthlyCompliances)
@@ -23,18 +79,34 @@ class ComplianceManagementController extends Controller
                     return $monthlyCompliance->compliance_name;
                 })
                 ->addColumn('department_id', function ($monthlyCompliance) {
-                    return $monthlyCompliance->department_id;
+                    return $monthlyCompliance->department_name;
                 })
                 ->addColumn('deadline', function ($monthlyCompliance) {
-                    return $monthlyCompliance->computed_deadline;
+                    $deadline = \Carbon\Carbon::parse($monthlyCompliance['computed_deadline'])->format('F j, Y');
+                    return $deadline;
                 })
                 ->addColumn('status', function ($monthlyCompliance) {
-                    return $monthlyCompliance->status;
+                    $status = $monthlyCompliance->status;
+
+                    switch($status) {
+                        case 'completed':
+                            return '<span class="badge badge-green">COMPLETED</span>';
+                            break;
+                        case 'in_progress':
+                            return '<span class="badge badge-blue-light">IN PROGRESS</span>';
+                            break;
+                        case 'pending':
+                            return '<span class="badge badge-yellow-light">PENDING</span>';
+                            break;
+                        default: '<span class="badge badge-yellow-light">PENDING</span>';
+                    }
+
+                    return $status;
                 })
                 ->addColumn('action', function ($monthlyCompliance) {
-                    // return 'Action';
-                    return '<a href="' . route('compliance-management.edit', $monthlyCompliance->id) . '" class="">Edit</a>';
+                    return '<a href="' . route('compliance-management.edit', $monthlyCompliance->id) . '" class="edit-btn edit-compliance"><i class="fa-regular fa-pen-to-square"></i></a>';
                 })
+                ->escapeColumns([])
                 ->make(true);
         }
 
@@ -44,11 +116,20 @@ class ComplianceManagementController extends Controller
     public function edit($id)
     {
         $monthlyCompliance = MonthlyCompliance::findOrFail($id);
+
+        $monthlyComplianceMessage = MonthlyCompliance::with('messages.user') // Load messages with user info
+        ->findOrFail($id);
+
+        // Retrieve departments from the database
+
+        $departments = Department::pluck('department_name', 'id'); // Returns an associative array: [id => name]
+
+
         
         // Fetch ENUM values for the `status` column
         $enumValues = $this->getEnumValues('monthly_compliances', 'status');
 
-        return view('forms.compliance-management-update', compact('monthlyCompliance', 'enumValues'));
+        return view('forms.compliance-management-update', compact('monthlyCompliance', 'enumValues', 'monthlyComplianceMessage', 'departments'));
     }
 
     private function getEnumValues($table, $column)
@@ -170,8 +251,6 @@ class ComplianceManagementController extends Controller
             'filePaths' => $uploadedPaths,
         ]);
        
-
-        // return redirect()->back()->with('success', 'Image uploaded successfully.');
     }
 
     public function deleteImage(Request $request, $id)
@@ -218,5 +297,37 @@ class ComplianceManagementController extends Controller
         // return 
         // return response()->json(['error' => 'Image not found.'], 404);
         
+    }
+
+    // Change Numeric to DepartmentName
+    public function getDepartmentName($departmentId, $departments) {
+        return $departments[$departmentId - 1]['department_name'] ?? 'Unknown Department';
+    }
+
+    public function updateStatus($id, Request $request)
+    {
+        $compliance = MonthlyCompliance::findOrFail($id); // Find the compliance record by ID
+        
+        // Update the status
+        $compliance->status = $request->status;
+        $compliance->save();
+
+        return response()->json(['success' => true]);
+    }
+
+    public function approve($id, Request $request)
+    {
+        // dd($request->status);
+
+        // Find the compliance record by ID
+        $compliance = MonthlyCompliance::findOrFail($id);
+
+        // Update the status to "approved" (1)
+        $compliance->approve = $request->status;
+        $compliance->status = 'completed';
+        $compliance->save();
+
+        // Return a JSON response indicating success
+        return response()->json(['success' => true]);
     }
 }

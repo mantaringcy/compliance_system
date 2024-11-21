@@ -142,7 +142,7 @@
                         <li class="sidebar-item2 mb-1">
                             <a href="{{ route('compliances.index') }}">
                                 <i class="fa-solid fa-file-circle-plus"></i>
-                                <span>Compliance List</span>
+                                <span>Compliance Reference</span>
                             </a>
                         </li>
                         <li class="sidebar-item2">

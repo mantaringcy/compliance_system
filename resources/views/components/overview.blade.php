@@ -2,7 +2,7 @@
 
 <x-main>
 
-    <h2 class="fw-bold mb-5">Overview</h2>
+    <h2 class="fw-bold mb-5">Compliance Due</h2>
 
     <div class="custom-alert custom-alert-blue custom-toast" id="alert-compliance-created">
         Sample toast!
@@ -21,6 +21,23 @@
             <div class="card-top">
                 <h5 class="fw-semibold m-0 p-0" style="font-size: 16px !important;">{{ \Carbon\Carbon::now()->format('F') }} Compliances</h5>
             </div>
+
+            <div class="compliance-overview">
+                {{-- <h4>Compliance Overview</h4> --}}
+                <p>Total Compliances: {{ $overviewData['totalCompliances'] }}</p>
+                <p>Completed Compliances: {{ $overviewData['completedCompliances'] }}</p>
+                {{-- <p>Completion Percentage: {{ $overviewData['completionPercentage'] }}%</p> --}}
+            
+                <div class="progress mb-3" style="height: 20px;">
+                    <div class="progress-bar" role="progressbar" 
+                         style="width: {{ $overviewData['completionPercentage'] }}%;" 
+                         aria-valuenow="{{ $overviewData['completionPercentage'] }}" 
+                         aria-valuemin="0" 
+                         aria-valuemax="100">
+                        {{ $overviewData['completionPercentage'] }}%
+                    </div>
+                </div>
+            </div>
             
             <table class="table table-hover overview-table w-100" id="complianceListTable">
                 <thead>
@@ -32,10 +49,10 @@
                         <th>DEADLINE</th>
                         <th>DAYS LEFT</th>
                         <th>DEPARTMENT</th>
-                        <th>ACTION</th>
+                        <th>STATUS</th>
                     </tr>
                 </thead>
-                <tbody>
+                {{-- <tbody>
                     @if(!empty($currentMonthDeadlines))
                         @foreach($currentMonthDeadlines as $item)
                             <tr>
@@ -58,7 +75,56 @@
                     @else
                         <p>No deadlines for the current month.</p>
                     @endif
+                </tbody> --}}
+
+                @php
+                    
+                @endphp
+
+                <tbody>
+                    @if(!empty($monthlyCompliances))
+                        @foreach($monthlyCompliances as $monthlyCompliance)
+                            <tr 
+                                class="{{ $monthlyCompliance['status'] == 'completed' ? 'completed' : '' }}"
+                                onclick="window.open('{{ route('compliance-management.edit', $monthlyCompliance['id']) }}', '_blank');" 
+                                style="cursor: pointer;"
+                            >
+                                    <td>{{ $monthlyCompliance['compliance_id'] }}</td>
+                                    <td>{{ $monthlyCompliance['compliance_name'] }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($monthlyCompliance['computed_start_date'])->format('F j, Y') }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($monthlyCompliance['computed_submit_date'])->format('F j, Y') }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($monthlyCompliance['computed_deadline'])->format('F j, Y') }}</td>
+                                    <td>
+                                        @if ($monthlyCompliance->status == 'completed')
+                                            <span>0</span>  <!-- Show N/A if status is completed -->
+                                        @else
+
+                                        @if ($monthlyCompliance->days_difference > 0)
+                                            <span style="color: green;">{{ $monthlyCompliance->days_difference }} days remaining</span>
+                                        @elseif ($monthlyCompliance->days_difference < 0)
+                                            <span style="color: red;">{{ abs($monthlyCompliance->days_difference) }} days overdue</span>
+                                        @else
+                                            <span style="color: orange;">Deadline is today</span>
+                                        @endif
+                                    @endif
+                                    </td>
+                                    <td>{{ $monthlyCompliance->department_name }}</td>
+                                    <td>
+                                        @if($monthlyCompliance['status'] == 'completed')
+                                            <span class="badge badge-green">COMPLIED</span>
+                                        @elseif($monthlyCompliance['status'] == 'in_progress')
+                                            <span class="badge badge-blue-light">IN PROGRESS</span>
+                                        @elseif($monthlyCompliance['status'] == 'pending')
+                                            <span class="badge badge-yellow-light">PENDING</span>
+                                        @endif
+                                    </td>
+                            </tr>
+                        @endforeach
+                    @else
+                        <p>No deadlines for the current month.</p>
+                    @endif
                 </tbody>
+
             </table>
         </div>
     </div>
@@ -67,6 +133,25 @@
 
     
 </x-main>
+
+<style>
+    .overview-table tbody .completed td {
+        background-color: #f0f0f0 !important;   /* Light gray background */
+        color: #888;  /* Light gray text */
+        text-decoration: line-through;  /* Optional: strikethrough text */
+    }
+
+
+    .progress {
+        font-size: 14px !important;
+        border-radius: 8px !important;
+        background: var(--body-color) !important;
+    }
+
+    .progress .progress-bar {
+        background: var(--profile-fill-hover) !important;
+    }
+</style>
 
 <script>
     function showToast() {

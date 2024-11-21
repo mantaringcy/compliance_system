@@ -22,6 +22,7 @@ return [
         '9' => '4 Months Before',
         '10' => '5 Months Before'
     ],
+
     'submit_on' => [
         '1' => '3 Days Before',
         '2' => '1 Week Before',
@@ -31,4 +32,11 @@ return [
         '6' => '3 Months Before',
         '7' => '4 Months Before'
     ],
+        
+    'google' => [
+        'client_id' => env('GOOGLE_DRIVE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_DRIVE_CLIENT_SECRET'),
+        'refresh_token' => env('GOOGLE_DRIVE_REFRESH_TOKEN'),
+        'folder_id' => env('GOOGLE_DRIVE_FOLDER_ID')
+    ]
 ];

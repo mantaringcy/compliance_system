@@ -424,9 +424,41 @@ class ComplianceController extends Controller
     public function monthlyCompliances(Request $request)
     {
        $monthlyCompliance = $this->complianceService->monthlyCompliances();
+    //    $monthlyCompliance = $this->complianceService->monthlyCompliances();
 
-       return $monthlyCompliance;
-   
+       $complianceOverview = $this->complianceService->complianceOverview();
+
+
+        // Retrieve departments from the database
+        $departments = Department::all()->toArray(); 
+
+        // Fetch monthly compliances and map department name and days difference
+        $monthlyCompliances = MonthlyCompliance::all()->map(function ($compliance) use ($departments) {
+            // Calculate days difference
+            $compliance->days_difference = now()->startOfDay()->diffInDays(\Carbon\Carbon::parse($compliance->computed_deadline)->startOfDay(), false);
+        
+            // Get department name using the method
+            $compliance->department_name = $this->getDepartmentName($compliance->department_id, $departments);
+            
+            return $compliance;
+        });
+
+        // Sort the compliances:
+        // - First by 'status' (completed at the bottom)
+        // - Then by 'deadline' in ascending order
+        $monthlyCompliances = $monthlyCompliances->sortBy(function($compliance) {
+            // First, sort by 'status', completed should come last
+            return $compliance['status'] == 'completed' ? 1 : 0;
+        })->sortBy(function($compliance) {
+            // Then, sort by 'deadline' (ascending)
+            return Carbon::parse($compliance['deadline']);
+        });
+
+        return view('components.overview', [
+            'monthlyCompliances' => $monthlyCompliances,
+            'overviewData' => $complianceOverview,
+
+        ]);
     }
 
 }

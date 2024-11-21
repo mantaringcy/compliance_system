@@ -25,7 +25,7 @@
 </x-main>
 
 <script>
-        $(document).ready(function () {
+    $(document).ready(function () {
         $('#complianceManagementTable').DataTable({
             language: {
                 emptyTable: "No compliance due available", // When no data is in the table
@@ -40,6 +40,7 @@
             processing: true,
             serverSide: true,
             ajax: '{{ route('compliance-management.index') }}',
+            order: [], // Disable default sorting
             columns: [
                 { data: 'compliance_id', name: 'compliance_id' },
                 { data: 'compliance_name', name: 'compliance_name' },
@@ -48,9 +49,23 @@
                 { data: 'status', name: 'status' },
                 { data: 'action', name: 'action' },
             ],
+            createdRow: function (row, data) {
+                // Check if the status is completed
+                if (data.status.includes('COMPLETED')) {
+                    $(row).addClass('completed'); // Use Bootstrap's gray class
+                }
+            }
         });
     });
 </script>
+
+<style>
+    table tbody .completed td {
+        background-color: #f0f0f0 !important;   /* Light gray background */
+        color: #888;  /* Light gray text */
+        /* text-decoration: line-through; */
+    }
+</style>
 
 <style>
     /* Datatable CSS */
