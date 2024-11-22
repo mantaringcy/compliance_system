@@ -424,24 +424,39 @@ class ComplianceController extends Controller
     public function monthlyCompliances(Request $request)
     {
        $monthlyCompliance = $this->complianceService->monthlyCompliances();
-    //    $monthlyCompliance = $this->complianceService->monthlyCompliances();
 
-       $complianceOverview = $this->complianceService->complianceOverview();
+       $complianceOverview = $this->complianceService->complianceOverview(Auth::user());
 
 
         // Retrieve departments from the database
         $departments = Department::all()->toArray(); 
 
-        // Fetch monthly compliances and map department name and days difference
-        $monthlyCompliances = MonthlyCompliance::all()->map(function ($compliance) use ($departments) {
-            // Calculate days difference
-            $compliance->days_difference = now()->startOfDay()->diffInDays(\Carbon\Carbon::parse($compliance->computed_deadline)->startOfDay(), false);
+        $user = Auth::user();
+
+        // $departments = Department::pluck('department_name', 'id');
         
-            // Get department name using the method
-            $compliance->department_name = $this->getDepartmentName($compliance->department_id, $departments);
-            
-            return $compliance;
-        });
+        // Check if the user's credentials match the criteria
+        if (in_array($user->department_id, [1, 2]) && in_array($user->role_id, [1, 2, 3])) {
+            // Show all $monthlyCompliances if the user meets the criteria
+            $monthlyCompliances = MonthlyCompliance::all()->map(function ($compliance) use ($departments) {
+                $compliance->days_difference = now()->startOfDay()->diffInDays(
+                    \Carbon\Carbon::parse($compliance->computed_deadline)->startOfDay(),
+                    false
+                );
+                $compliance->department_name = $this->getDepartmentName($compliance->department_id, $departments);
+                return $compliance;
+            });
+        } else {
+            // Filter by the current user's department
+            $monthlyCompliances = MonthlyCompliance::where('department_id', $user->department_id)->get()->map(function ($compliance) use ($departments) {
+                $compliance->days_difference = now()->startOfDay()->diffInDays(
+                    \Carbon\Carbon::parse($compliance->computed_deadline)->startOfDay(),
+                    false
+                );
+                $compliance->department_name = $this->getDepartmentName($compliance->department_id, $departments);
+                return $compliance;
+            });
+        }
 
         // Sort the compliances:
         // - First by 'status' (completed at the bottom)

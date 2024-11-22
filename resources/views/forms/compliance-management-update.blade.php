@@ -39,70 +39,38 @@
     @endphp
 
     <div class="bottom-content mb-5">
-        {{-- Image UI --}}
+        {{-- Details UI & Image UI --}}
         <div class="bottom-left col-7">
-            <div class="card-bottom h-50" style="margin-bottom: 20px !important;">
-                <form action="{{ route('compliance-management.update', $monthlyCompliance->id) }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    @method('PUT')
-    
-                    {{-- <input type="hidden" name="update_type" value="profile"> --}}
-    
-                    <div class="row">
 
-                        <div class="col-6 mb-4">
-                            <p>Compliance ID</p>
-                            <h6 class="fw-semibold" id="vComplianceName">{{ $monthlyCompliance->compliance_id }}</h6>
-                        </div>
-
-                        <div class="col-6 mb-4">
-                            <p>Department Name</p>
-                            <h6 class="fw-semibold" id="vComplianceName">{{ $monthlyCompliance->department->department_name }}</h6>
-                        </div>
-
-                        <div class="col-6 mb-4">
-                            <p>Start Date</p>
-                            <h6 class="fw-semibold" id="vComplianceName">{{ \Carbon\Carbon::parse($monthlyCompliance['computed_start_date'])->format('F j, Y') }}</h6>
-                        </div>
-
-                        <div class="col-6 mb-4">
-                            <p>Submit Date</p>
-                            <h6 class="fw-semibold" id="vComplianceName">{{ \Carbon\Carbon::parse($monthlyCompliance['computed_submit_date'])->format('F j, Y') }}</h6>
-                        </div>
-
-                        <div class="col-12">
-                            <p>Deadline</p>
-                            <h6 class="fw-semibold" id="vComplianceName">{{ \Carbon\Carbon::parse($monthlyCompliance['computed_deadline'])->format('F j, Y') }}</h6>
-                        </div>
-    
-                        <!-- Status -->
-                        {{-- <div class="">
-                            <label for="status" class="mb-2">Status</label>
-                            <select name="status" id="status" class="form-select">
-                                @foreach($enumValues as $value)
-                                    <option value="{{ $value }}" {{ $monthlyCompliance->status === $value ? 'selected' : '' }}>
-                                        {{ ucwords(str_replace('_', ' ', $value)) }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div> --}}
-    
-                        <!-- Approval -->
-                        {{-- <div class="">
-                            <label for="status" class="mb-2">Approval</label>
-                            <select name="approve" id="approve" class="form-control">
-                                <option value="0" {{ $monthlyCompliance->approve == 0 ? 'selected' : '' }}>Disapprove</option>
-                                <option value="1" {{ $monthlyCompliance->approve == 1 ? 'selected' : '' }}>Approve</option>
-                            </select>
-                        </div> --}}
-
-                    </div>
-    
-                    {{-- <button type="submit" class="btn btn-success">Update Status</button> --}}
-                    {{-- End of Card Body --}}
-                
-                </form>
+            <div class="card-bottom" style="margin-bottom: 20px !important;">
+                        
+                <table class="table table-striped m-0 table-details">
+                    <tbody>
+                        <tr class="border-top">
+                            <td class="fw-bold">Compliance ID:</td>
+                            <td>{{ $monthlyCompliance->compliance_id }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Department Name:</td>
+                            <td>{{ $monthlyCompliance->department->department_name }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Start Date:</td>
+                            <td>{{ \Carbon\Carbon::parse($monthlyCompliance['computed_start_date'])->format('F j, Y') }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Submit Date:</td>
+                            <td>{{ \Carbon\Carbon::parse($monthlyCompliance['computed_submit_date'])->format('F j, Y') }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Deadline:</td>
+                            <td>{{ \Carbon\Carbon::parse($monthlyCompliance['computed_deadline'])->format('F j, Y') }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            
             </div>
+
 
             <div class="card-image h-50">
                 @if (!empty($filePaths))
@@ -454,7 +422,7 @@
     </div>
 
     {{-- Top Content --}}
-    <div>
+    {{-- <div>
         <div class="card-lg custom-table-card-lg mb-4">
 
             <div class="card-top">
@@ -494,45 +462,6 @@
                             <h6 class="fw-semibold" id="vComplianceName">{{ $monthlyCompliance->computed_deadline }}</h6>
                         </div>
     
-                        <!-- Compliance ID -->
-                        {{-- <div class="col-md-6 mb-5">
-                            <label for="compliance_id" class="mb-2">Compliance ID</label>
-                            <input type="text" name="compliance_id" class="form-control" value="{{ $monthlyCompliance->compliance_id }}" readonly>      
-                        </div> --}}
-
-                      
-    
-                        <!-- Department Name -->
-                        {{-- <div class="col-md-6 mb-3">
-                            <label for="department_id" class="mb-2">Department Name</label>
-                            <input type="text" name="department_id" class="form-control" value="{{ $monthlyCompliance->department_id }}" readonly>             
-                        </div> --}}
-    
-                        <!-- Computed Start Date -->
-                        {{-- <div class="col-md-6 mb-3">
-                            <label for="computed_start_date" class="mb-2">Start Date</label>
-                            <input type="text" name="computed_start_date" class="form-control" value="{{ $monthlyCompliance->computed_start_date }}" readonly>             
-                        </div> --}}
-    
-                        <!-- Computed Submit Date -->
-                        {{-- <div class="col-md-6 mb-3">
-                            <label for="computed_submit_date" class="mb-2">Submit Date</label>
-                            <input type="text" name="computed_submit_date" class="form-control" value="{{ $monthlyCompliance->computed_submit_date }}" readonly>             
-                        </div> --}}
-    
-                        <!-- Deadline -->
-                        {{-- <div class="col-md-6 mb-3">
-                            <label for="computed_deadline" class="mb-2">Deadline</label>
-                            <input type="text" name="computed_deadline" class="form-control" value="{{ $monthlyCompliance->computed_deadline }}" readonly>             
-                        </div> --}}
-    
-                        <!-- Upload -->
-                        {{-- <div class="col-md-6 mb-3">
-                            <label for="images" class="mb-2">Upload Image</label>
-                            <input class="form-control" type="file" name="images[]" id="images" accept=".jpg,.jpeg,.png,.pdf" multiple>
-                        </div> --}}
-    
-                        <!-- Status -->
                         <div class="col-md-6">
                             <label for="status" class="mb-2">Status</label>
                             <select name="status" id="status" class="form-select">
@@ -544,7 +473,6 @@
                             </select>
                         </div>
     
-                        <!-- Approval -->
                         <div class="col-md-6">
                             <label for="status" class="mb-2">Approval</label>
                             <select name="approve" id="approve" class="form-control">
@@ -556,7 +484,6 @@
                     </div>
     
                         <button type="submit" class="btn btn-success">Update Status</button>
-                    {{-- End of Card Body --}}
                     </div>
                 
                 </form>
@@ -566,7 +493,7 @@
             
 
         </div>
-    </div>
+    </div> --}}
     
 </x-main>
 
@@ -704,12 +631,16 @@
 
     .bottom-content .bottom-left .card-bottom {
         display: flex !important;
-        align-items: center !important;
+        /* align-items: center !important; */
         background: #fff !important;
         border: 1px solid #E7EAEE;
         border-radius: 8px !important;
         padding: 25px !important;
         text-align: center !important;
+    }
+
+    .bottom-content .bottom-left .card-bottom .table-details td {
+        padding: 10px !important;
     }
 </style>
 

@@ -203,35 +203,39 @@ class ComplianceService
         
     }
 
-    public function complianceOverview()
+    public function complianceOverview($user)
     {
         $currentMonthStart = now()->startOfMonth();
         $currentMonthEnd = now()->endOfMonth();
-
-        // Get all compliances with start date or deadline in the current month or future months
-        $totalCompliances = MonthlyCompliance::where(function ($query) use ($currentMonthStart, $currentMonthEnd) {
+    
+        // Check if the user has access to all compliances
+        $hasFullAccess = in_array($user->role_id, [1, 2, 3]) && in_array($user->department_id, [1, 2]);
+    
+        // Filter compliances based on user access
+        $query = MonthlyCompliance::where(function ($query) use ($currentMonthStart, $currentMonthEnd) {
             $query->whereBetween('computed_start_date', [$currentMonthStart, $currentMonthEnd])
                   ->orWhereBetween('computed_deadline', [$currentMonthStart, $currentMonthEnd]);
-        })->count();
-
-        // Get all completed compliances (status = 'completed') in the current or future months
-        $completedCompliances = MonthlyCompliance::where(function ($query) use ($currentMonthStart, $currentMonthEnd) {
-            $query->whereBetween('computed_deadline', [$currentMonthStart, $currentMonthEnd])
-                  ->orWhereBetween('computed_start_date', [$currentMonthStart, $currentMonthEnd]);
-        })
-        ->where('status', 'completed') // Ensure it's marked as completed
-        ->count();
-
-        // Calculate the completion percentage (if there are any compliances at all)
+        });
+    
+        if (!$hasFullAccess) {
+            // Limit to the user's department
+            $query->where('department_id', $user->department_id);
+        }
+    
+        // Get total and completed compliances
+        $totalCompliances = $query->count();
+        $completedCompliances = $query->where('status', 'completed')->count();
+    
+        // Calculate percentage
         $completionPercentage = $totalCompliances > 0
             ? round(($completedCompliances / $totalCompliances) * 100, 2)
             : 0;
-            
-
+    
         return [
             'totalCompliances' => $totalCompliances,
             'completedCompliances' => $completedCompliances,
             'completionPercentage' => $completionPercentage,
+            'hasFullAccess' => $hasFullAccess, // Pass this for Blade display logic
         ];
     }
 

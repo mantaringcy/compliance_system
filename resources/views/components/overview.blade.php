@@ -86,7 +86,7 @@
                         @foreach($monthlyCompliances as $monthlyCompliance)
                             <tr 
                                 class="{{ $monthlyCompliance['status'] == 'completed' ? 'completed' : '' }}"
-                                onclick="window.open('{{ route('compliance-management.edit', $monthlyCompliance['id']) }}', '_blank');" 
+                                onclick="window.location.href='{{ route('compliance-management.edit', $monthlyCompliance['id']) }}';"
                                 style="cursor: pointer;"
                             >
                                     <td>{{ $monthlyCompliance['compliance_id'] }}</td>
