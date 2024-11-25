@@ -62,7 +62,9 @@ class ComplianceService
         // }
 
         // Pass the results to the Blade view
-        return view('components.projection', compact('groupedResults'));
+
+        return $groupedResults;
+
     }
 
     public function monthlyCompliances()

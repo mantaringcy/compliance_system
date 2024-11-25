@@ -24,6 +24,9 @@
     <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.js"></script>
     {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> --}}
 
+    <!-- FullCalendar CSS -->
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+
     <!-- Bootstrap Datatable -->
     <link href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
 
@@ -137,6 +140,12 @@
                             <a href="{{ route('projections') }}">
                                 <i class="fa-solid fa-chart-line"></i>
                                 <span>Compliance Projection</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item2 mb-1">
+                            <a href="{{ route('calendar') }}">
+                                <i class="fa-solid fa-calendar-days"></i>
+                                <span>Calendar</span>
                             </a>
                         </li>
                         <li class="sidebar-item2 mb-1">

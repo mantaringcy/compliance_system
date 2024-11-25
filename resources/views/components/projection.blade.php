@@ -20,7 +20,7 @@
 
     {{-- Monthly Projection Table - 12 Months --}}
     <div>
-        @foreach ($groupedResults as $monthYear => $items)
+        @foreach ($projections as $monthYear => $items)
             <div class="card-lg table-card mb-5">
 
                 <div class="card-top">
@@ -60,7 +60,7 @@
                     </tbody>
                 </table>
             </div>
-            @endforeach
+        @endforeach
     </div>
 
     {{-- Initial Data No UI --}}

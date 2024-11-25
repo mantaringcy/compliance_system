@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Auth;
 
 // Controllers
 use App\Http\Controllers\AuthenticationController;
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ComplianceController;
 use App\Http\Controllers\ComplianceManagementController;
 use App\Http\Controllers\LogController;
@@ -44,6 +45,8 @@ Route::middleware('auth')->group(function() {
 
     // Overview - Compliance for the Month
     Route::get('/overview', [ComplianceController::class, 'monthlyCompliances'])->name('overview');
+
+    Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar');
 
     // Projection - 12 Months Compliance Projection
     Route::get('/projection', [ComplianceController::class, 'projections'])->name('projections');

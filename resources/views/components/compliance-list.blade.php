@@ -56,6 +56,7 @@
                         <th scope="col">REFERENCE DATE</th>
                         <th scope="col">FREQUENCY</th>
                         <th scope="col">ACTION</th>
+                        <th style="">VIEW</th> <!-- Hidden column -->
                     </tr>
              
                 </thead>
@@ -109,21 +110,47 @@
                     }
                  },
                 { data: 'action', name: 'action', orderable: false, searchable: false },
+                { data: 'view', name: 'view', orderable: false, searchable: false, className: 'hidden-column' },
             ],
             columnDefs: [
                 { orderable: false, targets: [0, 1, 2, 3, 4] }, 
                 { width: "15%", targets: -1},
-                // {
-                //     target: 3,
-                //     width: '2000px'
-                // }
             ],
         });
     });
 
+    $('#complianceListTable').on('click', 'tr', function() {
+            if ($(event.target).closest('a, button').length) {
+                return; // Stop the event from propagating to the row click handler
+            }
+
+            let hiddenButton = $(this).find('.view-btn'); // Find hidden button in the row
+
+            // Retrieve data from the hidden button
+            let complianceId = hiddenButton.data('compliance-id');
+            let complianceName = hiddenButton.data('compliance-name');
+            let departmentId = hiddenButton.data('department-id');
+            let referenceDate = hiddenButton.data('compliance-reference-date');
+            let frequency = hiddenButton.data('compliance-frequency');
+            let startWorkingOn = hiddenButton.data('compliance-start-working-on');
+            let submitOn = hiddenButton.data('compliance-submit-on');
+
+            // Populate modal fields
+            $('#viewComplianceModal').modal('show');  // Show the modal
+            $('#viewComplianceModal #vComplianceName').text(complianceName);
+            $('#viewComplianceModal #vDepartmentName').text(departmentMapping[departmentId - 1].department_name);
+            $('#viewComplianceModal #vreferenceDate').text(formatDate(referenceDate));
+            $('#viewComplianceModal #vfrequency').text(frequencyMapping[frequency]);
+            $('#viewComplianceModal #vStartWorkingOn').text(startWorkingOnMapping[startWorkingOn]);
+            $('#viewComplianceModal #vsubmitOn').text(submitOnMapping[submitOn]);
+    });
+
     // Edit Button
-    $(document).on('click', '.edit-compliance', function() {
+    $(document).on('click', '.edit-compliance', function(event) {
+        // event.stopPropagation();
         event.preventDefault();
+
+
         // Get the data attributes from the clicked anchor tag
         const id = $(this).attr('data-compliance-id');
         const complianceName = $(this).attr('data-compliance-name');
@@ -182,7 +209,13 @@
         $('#deleteComplianceForm').attr('action', '/compliances/' + complianceId);
     });
 </script>
-    
+
+<style>
+    #complianceListTable .hidden-column {
+        display: none !important;
+    }
+</style>
+
 
 
 <style>

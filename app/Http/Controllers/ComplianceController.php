@@ -24,11 +24,11 @@ class ComplianceController extends Controller
 {
     protected $complianceService;
 
-     // Inject the ComplianceService into the controller
-     public function __construct(ComplianceService $complianceService)
-     {
-         $this->complianceService = $complianceService;
-     }
+    // Inject the ComplianceService into the controller
+    public function __construct(ComplianceService $complianceService)
+    {
+        $this->complianceService = $complianceService;
+    }
 
 
     // Returns data to the Compliance List Module
@@ -53,17 +53,7 @@ class ComplianceController extends Controller
 
             return DataTables::of($compliancesByDepartment)
                 ->addColumn('action', function($row){
-                    $viewAnchor = '<a href="#" class="view-btn view-compliance" 
-                            data-bs-toggle="modal" 
-                            data-bs-target="#viewComplianceModal"
-                            data-compliance-id="'.$row->id.'"
-                            data-compliance-name="'.$row->compliance_name.'"
-                            data-department-id="'.$row->department_id.'"
-                            data-compliance-reference-date="'.$row->reference_date.'"
-                            data-compliance-frequency="'.$row->frequency.'"
-                            data-compliance-start-working-on="'.$row->start_working_on.'"
-                            data-compliance-submit-on="'.$row->submit_on.'"
-                            ><i class="fa-regular fa-eye"></i></a>';
+             
 
                     $editAnchor = '<a href="#" class="edit-btn edit-compliance" 
                             data-bs-toggle="modal" 
@@ -84,8 +74,20 @@ class ComplianceController extends Controller
                             data-compliance-name="'.$row->compliance_name.'"
                             ><i class="fa-regular fa-trash-can"></i></a>';
 
-                    return $viewAnchor. '' .$editAnchor. '' .$deleteAnchor;
+                    return $editAnchor. '' .$deleteAnchor;
                 })
+                ->addColumn('view', function ($row) {
+                    return '<a href="#" class="view-btn view-compliance" 
+                        data-compliance-id="'.$row->id.'"
+                        data-compliance-name="'.$row->compliance_name.'"
+                        data-department-id="'.$row->department_id.'"
+                        data-compliance-reference-date="'.$row->reference_date.'"
+                        data-compliance-frequency="'.$row->frequency.'"
+                        data-compliance-start-working-on="'.$row->start_working_on.'"
+                        data-compliance-submit-on="'.$row->submit_on.'"
+                        ><i class="fa-regular fa-eye"></i></a>';
+                })
+                ->rawColumns(['action', 'view']) // Ensure the button is rendered as HTML
                 ->make(true);
         }
 
@@ -417,8 +419,7 @@ class ComplianceController extends Controller
     {
         $projections = $this->complianceService->monthlyProjections();
 
-        return $projections;
-
+        return view('components.projection', compact('projections'));
     }
 
     public function monthlyCompliances(Request $request)
