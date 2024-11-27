@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -45,5 +46,18 @@ class MonthlyCompliance extends Model
     public function messages()
     {
         return $this->hasMany(Message::class);
+    }
+
+    protected $appends = ['days_left'];
+
+    public function getDaysLeftAttribute()
+    {
+        $today = Carbon::now()->startOfDay(); // Ensures we're comparing from the start of today
+        $deadline = Carbon::parse($this->computed_deadline)->startOfDay();
+
+        // Calculate days left
+        $daysLeft = $today->diffInDays($deadline, false); // `false` includes negative values
+
+        return $daysLeft;
     }
 }

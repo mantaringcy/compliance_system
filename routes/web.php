@@ -9,6 +9,7 @@ use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ComplianceController;
 use App\Http\Controllers\ComplianceManagementController;
 use App\Http\Controllers\LogController;
+use App\Http\Controllers\MailController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\ResetPasswordController;
@@ -104,6 +105,8 @@ Route::middleware('auth')->group(function() {
 
     // Resending the Verification Email
     Route::post('/email/verification-notification', [AuthenticationController::class, 'verifyHandler'])->middleware('throttle:6,1')->name('verification.send');
+
+    Route::get('test-email', [MailController::class, 'sendMonthlyReminders'])->name('monthly.email');
 });
 
 // Fallback route
