@@ -29,8 +29,6 @@ class ComplianceReminder extends Mailable
         $this->complianceData = $complianceData;
         $this->emailSubject = $emailSubject;
         $this->emailType = $emailType;  // Set email type
-
-        // dd($complianceData[1]['days_left']);
     }
 
     /**
@@ -50,6 +48,9 @@ class ComplianceReminder extends Mailable
                 break;
             case 'deadline':
                 $view = 'emails.deadline-compliance-reminder';
+                break;
+            case 'today_deadline':
+                $view = 'emails.today-compliance-reminder';
                 break;
             default:
                 $view = 'emails.default-compliance-reminder';

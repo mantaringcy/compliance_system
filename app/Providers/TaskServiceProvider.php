@@ -25,9 +25,6 @@ class TaskServiceProvider extends ServiceProvider
 
     public function schedule(Schedule $schedule)
     {
-        // A simple task that logs a message every minute
-        $schedule->call(function () {
-            \Illuminate\Support\Facades\Log::info('Task executed at ' . now());
-        })->everyMinute();  // Run every minute
+   
     }
 }
