@@ -171,9 +171,6 @@ class ComplianceManagementController extends Controller
                 'images.*' => 'mimes:png,jpg,jpeg,pdf|max:2048', // Validate file types and size
             ]);
             
-            // Find the compliance record
-            // $monthlyCompliance = MonthlyCompliance::findOrFail($id);
-    
             // Get existing file paths from the database (if any)
             $existingPaths = json_decode($monthlyCompliance->file_path, true) ?? [];
     
@@ -246,6 +243,10 @@ class ComplianceManagementController extends Controller
 
         $uploadedPaths = json_decode($monthlyCompliance->file_path, true) ?? [];
 
+        $monthlyCompliance->update([
+            'status' => 'in_progress',
+        ]);
+
        return response()->json([
             'success' => true,
             'filePaths' => $uploadedPaths,
@@ -317,8 +318,6 @@ class ComplianceManagementController extends Controller
 
     public function approve($id, Request $request)
     {
-        // dd($request->status);
-
         // Find the compliance record by ID
         $compliance = MonthlyCompliance::findOrFail($id);
 

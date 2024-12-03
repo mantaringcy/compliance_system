@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ComplianceMail;
 use App\Models\Compliance;
 use App\Models\ComplianceLog;
 use App\Models\ComplianceRequest;
 use App\Models\Department;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class RequestController extends Controller
 {
@@ -199,6 +202,20 @@ class RequestController extends Controller
                 'changes' => json_encode($newCompliance)
             ]);
 
+            // Fetch users in the same department
+            $departmentUsers = User::where('department_id', $newCompliance['department_id'])->get();
+
+            // Fetch superadmins with role_id 1, 2, or 3
+            $superAdmins = User::whereIn('role_id', [1, 2, 3])->get();
+
+            // Merge department users and superadmins
+            $recipients = $departmentUsers->merge($superAdmins);
+
+            // Send email to each user in the department
+            foreach ($recipients as $recipient) {
+                Mail::to($recipient->email)->queue(new ComplianceMail($newCompliance, 'approve-create-superadmin'));
+            }
+
         } else if ($request->action == 'edit') {
             $compliance = Compliance::find($request->compliance_id);
             $oldCompliance = $compliance->toArray(); // Capture old data for logging
@@ -217,6 +234,20 @@ class RequestController extends Controller
                     'new' => $newCompliance, // Store new data excluding _token
                 ]),
             ]);
+
+            // Fetch users in the same department
+            $departmentUsers = User::where('department_id', $newCompliance['department_id'])->get();
+
+            // Fetch superadmins with role_id 1, 2, or 3
+            $superAdmins = User::whereIn('role_id', [1, 2, 3])->get();
+
+            // Merge department users and superadmins
+            $recipients = $departmentUsers->merge($superAdmins);
+
+            // Send email to each user in the department
+            foreach ($recipients as $recipient) {
+                Mail::to($recipient->email)->queue(new ComplianceMail($newCompliance, 'approve-update-superadmin'));
+            }
         } else if ($request->action == 'delete') {
             $compliance = Compliance::find($request->compliance_id);
 
@@ -228,6 +259,20 @@ class RequestController extends Controller
                 'department_id' => $compliance->department_id,
                 'changes' => json_encode($request),
             ]);
+
+            // Fetch users in the same department
+            $departmentUsers = User::where('department_id', $compliance['department_id'])->get();
+
+            // Fetch superadmins with role_id 1, 2, or 3
+            $superAdmins = User::whereIn('role_id', [1, 2, 3])->get();
+
+            // Merge department users and superadmins
+            $recipients = $departmentUsers->merge($superAdmins);
+
+            // Send email to each user in the department
+            foreach ($recipients as $recipient) {
+                Mail::to($recipient->email)->queue(new ComplianceMail($compliance, 'approve-delete-superadmin'));
+            }
 
             $compliance->delete();
         }
@@ -259,6 +304,20 @@ class RequestController extends Controller
                 'department_id' => $newCompliance['department_id'],
                 'changes' => json_encode($newCompliance)
             ]);
+            
+            // Fetch users in the same department
+            $departmentUsers = User::where('department_id', $newCompliance['department_id'])->get();
+
+            // Fetch superadmins with role_id 1, 2, or 3
+            $superAdmins = User::whereIn('role_id', [1, 2, 3])->get();
+
+            // Merge department users and superadmins
+            $recipients = $departmentUsers->merge($superAdmins);
+
+            // Send email to each user in the department
+            foreach ($recipients as $recipient) {
+                Mail::to($recipient->email)->queue(new ComplianceMail($newCompliance, 'disapprove-superadmin'));
+            }
 
             if ($request->action == 'add') {
                 return response()->json([
@@ -279,6 +338,8 @@ class RequestController extends Controller
                     'compliance_name' => $complianceName
                 ]);
             }
+
+       
 
         } else {
             return response()->json(['error' => 'Request not found'], 404);

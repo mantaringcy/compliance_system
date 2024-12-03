@@ -85,6 +85,9 @@ class ComplianceService
                 $startDate->between($startOfCurrentMonth, $endOfCurrentMonth) ||
                 $deadline->between($startOfCurrentMonth, $endOfCurrentMonth)
             ) {
+                // Calculate days_left
+                $daysLeft = now()->startOfDay()->diffInDays($deadline->startOfDay(), false);
+
                 // Find the related record in monthly_compliances
                 $monthlyCompliance = MonthlyCompliance::where('compliance_id', $compliance['compliance']['id'])
                     ->where('department_id', $compliance['compliance']['department_id'])
@@ -101,6 +104,7 @@ class ComplianceService
                         'computed_start_date' => $startDate,
                         'computed_submit_date' => $submitDate,
                         'computed_deadline' => $deadline,
+                        'days_left' => $daysLeft,
                     ]);
                 } else {
                     // Create a new record if it doesn't exist
@@ -112,6 +116,7 @@ class ComplianceService
                         'computed_start_date' => $startDate,
                         'computed_submit_date' => $submitDate,
                         'computed_deadline' => $deadline,
+                        'days_left' => $daysLeft,
                     ]);
                 }
             }

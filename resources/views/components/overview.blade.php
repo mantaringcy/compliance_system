@@ -99,10 +99,10 @@
                                             <span>0</span>  <!-- Show N/A if status is completed -->
                                         @else
 
-                                        @if ($monthlyCompliance->days_difference > 0)
-                                            <span style="color: green;">{{ $monthlyCompliance->days_difference }} days remaining</span>
-                                        @elseif ($monthlyCompliance->days_difference < 0)
-                                            <span style="color: red;">{{ abs($monthlyCompliance->days_difference) }} days overdue</span>
+                                        @if ($monthlyCompliance->days_left > 0)
+                                            <span style="color: #2CA87F;">{{ $monthlyCompliance->days_left }} days remaining</span>
+                                        @elseif ($monthlyCompliance->days_left < 0)
+                                            <span style="color: #DC2625;">{{ abs($monthlyCompliance->days_left) }} days overdue</span>
                                         @else
                                             <span style="color: orange;">Deadline is today</span>
                                         @endif

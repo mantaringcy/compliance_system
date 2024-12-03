@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ComplianceMail;
 use App\Models\Compliance;
 use App\Models\ComplianceLog;
 use App\Models\ComplianceRequest;
@@ -18,6 +19,7 @@ use Yajra\DataTables\DataTables;
 use Carbon\Carbon;
 use Hamcrest\Core\HasToString;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
 class ComplianceController extends Controller
@@ -139,14 +141,10 @@ class ComplianceController extends Controller
             'submit_on.required' => 'Please provide a submission date.',
         ]);
 
-        // dd('ok');
-
-        
         // Check if user is a super admin
         if (Auth::user()->role_id == 3) {
             // Directly create compliance if super admin
             $compliance = Compliance::create($fields);
-
 
             // Log the add
             ComplianceLog::create([
@@ -157,6 +155,20 @@ class ComplianceController extends Controller
                 'changes' => json_encode($request->all())
             ]);
 
+            // Fetch users in the same department
+            $departmentUsers = User::where('department_id', $request->department_id)->get();
+
+            // Fetch superadmins with role_id 1, 2, or 3
+            $superAdmins = User::whereIn('role_id', [1, 2, 3])->get();
+
+            // Merge department users and superadmins
+            $recipients = $departmentUsers->merge($superAdmins);
+
+            // Send email to each user in the department
+            foreach ($recipients as $recipient) {
+                Mail::to($recipient->email)->queue(new ComplianceMail($compliance, 'create-superadmin'));
+            }
+
             return response()->json([
                 'success' => true,
                 'action' => 'create_compliance',
@@ -164,8 +176,6 @@ class ComplianceController extends Controller
             ]);
 
         } else {
-            // $compliance = Compliance::create($fields);
-
             // Log the add
             ComplianceLog::create([
                 'user_id' => Auth::id(),
@@ -176,12 +186,26 @@ class ComplianceController extends Controller
             ]);
 
             // Store the request for super admin review
-            ComplianceRequest::create([
+            $complianceRequest = ComplianceRequest::create([
                 'user_id' => Auth::id(),
                 'action' => 'add',
                 // 'compliance_id' => 1,
                 'changes' => json_encode($request->all()),
             ]);
+
+            // Fetch users in the same department
+            $departmentUsers = User::where('department_id', $request->department_id)->get();
+
+            // Fetch superadmins with role_id 1, 2, or 3
+            $superAdmins = User::whereIn('role_id', [1, 2, 3])->get();
+
+            // Merge department users and superadmins
+            $recipients = $departmentUsers->merge($superAdmins);
+
+            // Send email to each user in the department
+            foreach ($recipients as $recipient) {
+                Mail::to($recipient->email)->queue(new ComplianceMail($fields, 'create-user'));
+            }
 
             
             return response()->json([
@@ -190,9 +214,6 @@ class ComplianceController extends Controller
                 'compliance_name' => $fields['compliance_name']
             ]);
         }
-
-     
-        // return back()->with('success', 'Your post was created.');
     }
 
     // Update Compliance
@@ -243,6 +264,20 @@ class ComplianceController extends Controller
                 ]),
             ]);
 
+            // Fetch users in the same department
+            $departmentUsers = User::where('department_id', $request->department_id)->get();
+
+            // Fetch superadmins with role_id 1, 2, or 3
+            $superAdmins = User::whereIn('role_id', [1, 2, 3])->get();
+
+            // Merge department users and superadmins
+            $recipients = $departmentUsers->merge($superAdmins);
+
+            // Send email to each user in the department
+            foreach ($recipients as $recipient) {
+                Mail::to($recipient->email)->queue(new ComplianceMail($compliance, 'update-superadmin'));
+            }
+
             return response()->json([
                 'success' => true,
                 'action' => 'edit_compliance'
@@ -270,6 +305,20 @@ class ComplianceController extends Controller
                 'changes' => json_encode($request->all()),
             ]);
 
+            // Fetch users in the same department
+            $departmentUsers = User::where('department_id', $request->department_id)->get();
+
+            // Fetch superadmins with role_id 1, 2, or 3
+            $superAdmins = User::whereIn('role_id', [1, 2, 3])->get();
+
+            // Merge department users and superadmins
+            $recipients = $departmentUsers->merge($superAdmins);
+
+            // Send email to each user in the department
+            foreach ($recipients as $recipient) {
+                Mail::to($recipient->email)->queue(new ComplianceMail($fields, 'update-user'));
+            }
+
             return response()->json([
                 'success' => true,
                 'action' => 'request_edit_compliance'
@@ -288,6 +337,22 @@ class ComplianceController extends Controller
 
 
         if (Auth::user()->role_id == 3) {
+            // Fetch users in the same department
+            $departmentUsers = User::where('department_id', $request->department_id)->get();
+
+            // Fetch superadmins with role_id 1, 2, or 3
+            $superAdmins = User::whereIn('role_id', [1, 2, 3])->get();
+
+            // Merge department users and superadmins
+            $recipients = $departmentUsers->merge($superAdmins);
+
+            $complianceData = $compliance; // Convert to array to retain data after deletion
+
+            // Send email to each user in the department
+            foreach ($recipients as $recipient) {
+                Mail::to($recipient->email)->queue(new ComplianceMail($complianceData, 'delete-superadmin'));
+            }
+
             // Directly delete compliance if super admin
             $compliance->delete(); // Delete the record
 
@@ -323,6 +388,20 @@ class ComplianceController extends Controller
                 'action' => 'delete',
                 'changes' => json_encode($changes),
             ]);
+
+            // Fetch users in the same department
+            $departmentUsers = User::where('department_id', $request->department_id)->get();
+
+            // Fetch superadmins with role_id 1, 2, or 3
+            $superAdmins = User::whereIn('role_id', [1, 2, 3])->get();
+
+            // Merge department users and superadmins
+            $recipients = $departmentUsers->merge($superAdmins);
+
+            // Send email to each user in the department
+            foreach ($recipients as $recipient) {
+                Mail::to($recipient->email)->queue(new ComplianceMail($compliance, 'delete-user'));
+            }
 
             return response()->json([
                 'success' => true,
@@ -424,17 +503,14 @@ class ComplianceController extends Controller
 
     public function monthlyCompliances(Request $request)
     {
-       $monthlyCompliance = $this->complianceService->monthlyCompliances();
+        $monthlyCompliance = $this->complianceService->monthlyCompliances();
 
-       $complianceOverview = $this->complianceService->complianceOverview(Auth::user());
-
+        $complianceOverview = $this->complianceService->complianceOverview(Auth::user());
 
         // Retrieve departments from the database
         $departments = Department::all()->toArray(); 
 
         $user = Auth::user();
-
-        // $departments = Department::pluck('department_name', 'id');
         
         // Check if the user's credentials match the criteria
         if (in_array($user->department_id, [1, 2]) && in_array($user->role_id, [1, 2, 3])) {
@@ -455,6 +531,7 @@ class ComplianceController extends Controller
                     false
                 );
                 $compliance->department_name = $this->getDepartmentName($compliance->department_id, $departments);
+                
                 return $compliance;
             });
         }
@@ -473,7 +550,6 @@ class ComplianceController extends Controller
         return view('components.overview', [
             'monthlyCompliances' => $monthlyCompliances,
             'overviewData' => $complianceOverview,
-
         ]);
     }
 

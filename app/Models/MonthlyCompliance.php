@@ -20,7 +20,8 @@ class MonthlyCompliance extends Model
         'approved_at', 
         'computed_start_date', 
         'computed_deadline', 
-        'computed_submit_date'
+        'computed_submit_date',
+        'days_left'
     ];
 
     protected $dates = [
