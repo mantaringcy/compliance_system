@@ -81,22 +81,34 @@
                     <form id="uploadForm" enctype="multipart/form-data">
         
                         <div class="upload-container" onclick="document.getElementById('images').click()">
-        
-                            {{-- <div class="upload-text">
-                                Click to upload or drag and drop images here
-                            </div> --}}
-                        
                             @foreach ($filePaths as $filePath)
+                                @php
+                                    $extension = pathinfo($filePath, PATHINFO_EXTENSION);
+                                    $isPdf = strtolower($extension) === 'pdf';
+                                @endphp
+
                                 <div class="position-relative d-inline-block image-card uploaded-images" style="width: 100; height: 100;">
         
                                     <!-- Image -->
-                                    <img src="{{ asset('storage/' . $filePath) }}" alt="Compliance Image" >
+                                    {{-- <img src="{{ asset('storage/' . $filePath) }}" alt="Compliance Image" > --}}
+
+                                    @if ($isPdf)
+                                        <img src="{{ asset('images/pdf.png') }}" alt="PDF Icon" style="width: 100%; height: 100%; object-fit: cover;">
+                                    @else
+                                        <img src="{{ asset('storage/' . $filePath) }}" alt="Compliance Image" style="width: 100%; height: 100%; object-fit: cover;">
+                                    @endif
                                 
                                     <!-- Hover Overlay -->
                                     <div class="overlay d-flex flex-column justify-content-center align-items-center position-absolute top-0 start-0 bg-dark bg-opacity-50 text-white" style="display: none;" onclick="event.stopPropagation()">
             
                                         <!-- View Full Image Button -->
-                                        <a href="{{ asset('storage/' . $filePath) }}" target="_blank" class="btn btn-sm btn-light mb-1">View Image</a>
+                                        @if ($isPdf)
+                                            <a href="{{ asset('storage/' . $filePath) }}" target="_blank" class="btn btn-sm btn-light mb-1">View PDF</a>
+                                        @else
+                                            <a href="{{ asset('storage/' . $filePath) }}" target="_blank" class="btn btn-sm btn-light mb-1">View Image</a>
+                                        @endif
+
+                                        {{-- <a href="{{ asset('storage/' . $filePath) }}" target="_blank" class="btn btn-sm btn-light mb-1">View Image</a> --}}
             
                                         <!-- Delete Button -->
                                         <form action="{{ route('compliance-management.delete-image', $monthlyCompliance->id) }}" method="POST" class="delete-form">
