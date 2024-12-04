@@ -21,9 +21,12 @@
                         @endforeach
                     </select>
                 </div>
-    
+        
                 <!-- Approve Button -->
-                <button class="btn btn-success" id="approveButton" onclick="approveCompliance()">Approve</button>
+                <button class="btn btn-success" id="approveButton" onclick="approveCompliance()" 
+                    {{ $monthlyCompliance->status === 'completed' ? 'disabled' : '' }}>
+                    {{ $monthlyCompliance->status === 'completed' ? 'Approved' : 'Approve' }}
+                </button>
             </div>
         @endif
 

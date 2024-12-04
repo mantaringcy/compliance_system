@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Department;
 use App\Models\MonthlyCompliance;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\DataTables;
+use Yaza\LaravelGoogleDriveStorage\Gdrive;
 
 class ComplianceManagementController extends Controller
 {
@@ -165,32 +167,32 @@ class ComplianceManagementController extends Controller
             'approved_at' => now(), // Set the current timestamp when approving
         ]);
 
-        if ($request->hasFile('images')) {
-            $request->validate([
-                'images' => 'required|array', // Ensure multiple files are uploaded
-                'images.*' => 'mimes:png,jpg,jpeg,pdf|max:2048', // Validate file types and size
-            ]);
+        // if ($request->hasFile('images')) {
+        //     $request->validate([
+        //         'images' => 'required|array', // Ensure multiple files are uploaded
+        //         'images.*' => 'mimes:png,jpg,jpeg,pdf|max:2048', // Validate file types and size
+        //     ]);
             
-            // Get existing file paths from the database (if any)
-            $existingPaths = json_decode($monthlyCompliance->file_path, true) ?? [];
+        //     // Get existing file paths from the database (if any)
+        //     $existingPaths = json_decode($monthlyCompliance->file_path, true) ?? [];
     
-            // Initialize an array to store paths for newly uploaded images
-            $newPaths = [];
+        //     // Initialize an array to store paths for newly uploaded images
+        //     $newPaths = [];
     
-            // Process the uploaded images
-            foreach ($request->file('images') as $file) {
-                // Generate a unique file name and store the image
-                $newPaths[] = $file->store('monthly_compliance_images', 'public');
-            }
+        //     // Process the uploaded images
+        //     foreach ($request->file('images') as $file) {
+        //         // Generate a unique file name and store the image
+        //         $newPaths[] = $file->store('monthly_compliance_images', 'public');
+        //     }
     
-            // Combine existing paths with the newly uploaded image paths
-            $allPaths = array_merge($existingPaths, $newPaths);
+        //     // Combine existing paths with the newly uploaded image paths
+        //     $allPaths = array_merge($existingPaths, $newPaths);
     
-            // Update the file_path column in the database
-            $monthlyCompliance->update([
-                'file_path' => json_encode($allPaths),  // Save combined array as JSON
-            ]);
-        }
+        //     // Update the file_path column in the database
+        //     $monthlyCompliance->update([
+        //         'file_path' => json_encode($allPaths),  // Save combined array as JSON
+        //     ]);
+        // }
 
        
 
@@ -211,15 +213,31 @@ class ComplianceManagementController extends Controller
             'images.*.max' => 'Each file must not exceed 10MB.',
         ]);
 
+        // Get the department based on department_id
+        $department = Department::find($monthlyCompliance->department_id);
+        if (!$department) {
+            return response('Department not found.', 404);
+        }
+
+        // Create the folder structure
+        $departmentName = $department->department_name; // Get the department name
+        $complianceFolderName = $monthlyCompliance->compliance_id . ' - ' . $monthlyCompliance->compliance_name; // "ID - Compliance Name"
+        $computedDeadline = Carbon::parse($monthlyCompliance->computed_deadline)->format('Y-m-d'); // Format the computed deadline
+
+        // Define the base path for storage
+        $basePath = 'monthly_compliance_images/' . $departmentName . '/' . $complianceFolderName;
+
+        // Create the directory if it doesn't exist
+        if (!Storage::exists($basePath)) {
+            Storage::makeDirectory($basePath, 0755, true); // Create the directory with permissions
+        }
+
         if ($request->hasFile('images')) {
             $request->validate([
                 'images' => 'required|array', // Ensure multiple files are uploaded
                 'images.*' => 'mimes:png,jpg,jpeg,pdf|max:2048', // Validate file types and size
             ]);
             
-            // Find the compliance record
-            // $monthlyCompliance = MonthlyCompliance::findOrFail($id);
-    
             // Get existing file paths from the database (if any)
             $existingPaths = json_decode($monthlyCompliance->file_path, true) ?? [];
     
@@ -229,7 +247,17 @@ class ComplianceManagementController extends Controller
             // Process the uploaded images
             foreach ($request->file('images') as $file) {
                 // Generate a unique file name and store the image
-                $newPaths[] = $file->store('monthly_compliance_images', 'public');
+                $newPaths[] = $file->store($basePath, 'public');
+
+                if ($file instanceof \Illuminate\Http\UploadedFile) {
+                    // Use the original name of the file
+                    // $fileName = $file->getClientOriginalName();
+
+                    $fileName = Carbon::parse($monthlyCompliance->computed_deadline)->format('Y-m-d') . ' - ' . $file->getClientOriginalName();
+    
+                    // Upload the file to Google Drive (or wherever you want)
+                    // Gdrive::put($departmentName . $complianceFolderName . '/' . $fileName , $file);
+                }
             }
     
             // Combine existing paths with the newly uploaded image paths
@@ -326,7 +354,72 @@ class ComplianceManagementController extends Controller
         $compliance->status = 'completed';
         $compliance->save();
 
-        // Return a JSON response indicating success
-        return response()->json(['success' => true]);
+        // Get the department name based on department_id
+        $department = Department::find($compliance->department_id);
+        if (!$department) {
+            return response('Department not found.', 404);
+        }
+
+        // Create the folder name based on department name and compliance details
+        $departmentName = $department->department_name; // Assuming the department table has a 'name' column
+        $complianceFolderName = $compliance->compliance_id . ' - ' . $compliance->compliance_name; // "ID - Compliance Name"
+        $imageFolderName = Carbon::parse($compliance->computed_deadline)->format('Y-m-d') . ' - ' . $compliance->compliance_name; // "YYYY-MM-DD - Compliance Name"
+
+        // Get the file paths from the database
+        $filePaths = json_decode($compliance->file_path, true) ?? [];
+        
+        // Initialize an array to store the results of the uploads
+        $uploadResults = [];
+
+        // Loop through each file path and upload to Google Drive
+        foreach ($filePaths as $index => $filePath) {
+            // Get the local file path
+            $localFilePath = storage_path('app/public/' . $filePath); // Adjust the path as necessary
+
+            // Check if the file exists
+            if (file_exists($localFilePath)) {
+                // Construct the file name
+                $fileName = $imageFolderName; // Base name
+                if (count($filePaths) > 1) {
+                    $fileName .= ' (' . ($index + 1) . ')'; // Append (1), (2), etc. for multiple files
+                }
+                $fileName .= '.' . pathinfo($filePath, PATHINFO_EXTENSION); // Add the file extension
+
+                // Upload the file to Google Drive
+                try {
+                    // Specify the destination path in Google Drive
+                    $drivePath = $departmentName . ' / ' . $complianceFolderName . '/' . $fileName;
+                    $file = new \Illuminate\Http\File($localFilePath);
+
+                    Gdrive::put($drivePath, $file);
+
+                    // Store the result of the upload
+                    $uploadResults[] = [
+                        'file' => $filePath,
+                        'status' => 'uploaded',
+                        'drivePath' => $drivePath,
+                    ];
+                } catch (\Exception $e) {
+                    // Handle any errors during the upload
+                    $uploadResults[] = [
+                        'file' => $filePath,
+                        'status' => 'failed',
+                        'error' => $e->getMessage(),
+                    ];
+                }
+            } else {
+                // File does not exist
+                $uploadResults[] = [
+                    'file' => $filePath,
+                    'status' => 'not found',
+                ];
+            }
+        }
+
+        // Return a JSON response indicating success and upload results
+        return response()->json([
+            'success' => true,
+            'uploadResults' => $uploadResults,
+        ]);
     }
 }
