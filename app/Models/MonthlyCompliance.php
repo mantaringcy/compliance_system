@@ -61,4 +61,5 @@ class MonthlyCompliance extends Model
 
         return $daysLeft;
     }
+    
 }

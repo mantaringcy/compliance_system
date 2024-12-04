@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Yajra\DataTables\DataTables;
 use Carbon\Carbon;
+use DateTime;
 use Hamcrest\Core\HasToString;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -55,6 +56,10 @@ class ComplianceController extends Controller
 
             return DataTables::of($compliancesByDepartment)
                 ->addColumn('action', function($row){
+
+                    $viewAnchor = '<a href="#" class="view-evidences view-evidences-btn" 
+                            data-compliance-id="'.$row->id.'"
+                            ><i class="fa-regular fa-eye"></i></a>';
              
 
                     $editAnchor = '<a href="#" class="edit-btn edit-compliance" 
@@ -76,7 +81,7 @@ class ComplianceController extends Controller
                             data-compliance-name="'.$row->compliance_name.'"
                             ><i class="fa-regular fa-trash-can"></i></a>';
 
-                    return $editAnchor. '' .$deleteAnchor;
+                    return $viewAnchor. '' . $editAnchor. '' .$deleteAnchor;
                 })
                 ->addColumn('view', function ($row) {
                     return '<a href="#" class="view-btn view-compliance" 
@@ -553,4 +558,23 @@ class ComplianceController extends Controller
         ]);
     }
 
+    public function showGallery($complianceId) {
+        $compliance = Compliance::with('monthlyCompliances')->findOrFail($complianceId);
+    
+        // Decode file_path if it's a JSON string
+        foreach ($compliance->monthlyCompliances as $monthlyCompliance) {
+            if (is_string($monthlyCompliance->file_path)) {
+                $monthlyCompliance->file_path = json_decode($monthlyCompliance->file_path, true);
+            }
+        }
+    
+        // Group by deadline
+        $groupedByDeadline = [];
+        foreach ($compliance->monthlyCompliances as $monthlyCompliance) {
+            $formattedDeadline = (new DateTime($monthlyCompliance->computed_deadline))->format('F d, Y');
+            $groupedByDeadline[$formattedDeadline][] = $monthlyCompliance;
+        }
+    
+        return view('module.gallery', compact('compliance', 'groupedByDeadline'));
+    }
 }

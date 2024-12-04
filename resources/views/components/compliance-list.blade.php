@@ -68,6 +68,21 @@
 </x-main>
 
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.body.addEventListener('click', function(event) {
+            // Check if the clicked element is the icon or its parent anchor
+            const complianceLink = event.target.closest('.view-evidences');
+            if (complianceLink) {
+                const complianceId = complianceLink.getAttribute('data-compliance-id');
+                const url = `/compliance/${complianceId}/gallery`; // Construct the URL
+                window.location.href = url; // Redirect to the URL
+                event.preventDefault(); // Prevent the default anchor behavior
+            }
+        });
+    });
+</script>
+
+<script>
     // Format Date
     function formatDate(myDate) {
         const date = new Date(myDate); // Create a new Date object

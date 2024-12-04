@@ -383,6 +383,11 @@ body.dark card-lg a {
     color: red !important;
 }
 
+.card-lg .view-evidences-btn:hover {
+    background: #dee2e6 !important;
+    color: #4f545c !important;
+}
+
 .card-lg .view-btn:hover {
     background: #dee2e6 !important;
     color: #4f545c !important;

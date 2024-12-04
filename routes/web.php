@@ -107,6 +107,9 @@ Route::middleware('auth')->group(function() {
     Route::post('/email/verification-notification', [AuthenticationController::class, 'verifyHandler'])->middleware('throttle:6,1')->name('verification.send');
 
     Route::view('/test-email', 'emails.superadmin_compliance_created');
+
+    Route::get('/compliance/{id}/gallery', [ComplianceController::class, 'showGallery']);
+
 });
 
 // Fallback route

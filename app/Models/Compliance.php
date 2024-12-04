@@ -41,4 +41,8 @@ class Compliance extends Model
     {
         return $this->hasMany(ComplianceRequest::class);
     }
+
+    public function monthlyCompliances() {
+        return $this->hasMany(MonthlyCompliance::class);
+    }
 }
