@@ -169,12 +169,12 @@
                                 </div>
                             </a>
                         </li>
-                        <li class="sidebar-item2 mb-1">
+                        {{-- <li class="sidebar-item2 mb-1">
                             <a href="{{ route('compliance-management.index') }}">
                                 <i class="fa-solid fa-folder-open"></i>
                                 <span>Compliance Management</span>
                             </a>
-                        </li>
+                        </li> --}}
                         <li class="sidebar-item2 mb-1">
                             <a href="{{ route('logs.data') }}">
                                 <i class="fa-solid fa-book"></i>

@@ -1,180 +1,63 @@
 @section('title', 'Logs')
 
 <x-main>
-    {{-- <h2 class="fw-semibold mb-4">Logs</h2> --}}
+    <h2 class="fw-bold mb-5" style="font-size: 30px !important;">Logs and Compliance</h2>
 
-    {{-- <table>
-        <thead>
-            <tr>
-                <th>At</th>
-                <th>User</th>
-                <th>Type</th>
-                <th>Compliance</th>
-                <th>Changes</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" id="compliance-tab" data-bs-toggle="tab" href="#compliance" role="tab" aria-controls="compliance" aria-selected="true">Compliance Records</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" id="logs-tab" data-bs-toggle="tab" href="#logs" role="tab" aria-controls="logs" aria-selected="false">Logs</a>
+        </li>
+    </ul>
 
-    
-
-            @foreach($logs as $log)
-                    @php
-                        $approvalJSON = json_decode($log->changes, true);
-
-                        $changesData = json_decode($log->changes, true);
-                        $oldData = $changesData['old'] ?? [];  // Provide default empty array if 'old' is not present
-                        $newData = $changesData['new'] ?? [];  // Provide default empty array if 'new' is not present
-
-                        $frequencyMapping = config('static_data.frequency');
-                        $startWorkingOnMapping = config('static_data.start_working_on');
-                        $submitOnMapping = config('static_data.submit_on');
-
-                        unset($oldData['id'], $newData['id']);
-                        unset($newData['_token']);
-                        unset($newData['complianceId']);
-                        unset($newData['_method']);
-
-                        $keyMapping = [
-                            'compliance_name' => 'Compliance Name',
-                            'department_id' => 'Department',
-                            'reference_date' => 'Reference Date',
-                            'frequency' => 'Frequency',
-                            'start_working_on' => 'Start Working On',
-                            'submit_on' => 'Submit On'
-                        ];
-
-                        $orderedKeys = [
-                            'compliance_name', 
-                            'department_id', 
-                            'frequency', 
-                            'reference_date', 
-                            'start_working_on',
-                            'submit_on'
-                        ];
-
-
-                        // Find the changes between old and new data
-                        $changes = array_diff_assoc($newData, $oldData);
-                    @endphp
-                <tr>
-                    <td>{{ \Carbon\Carbon::parse($log->created_at)->format('d M Y h:i A') }}</td>
-                    <td>{{ $log->user->username }}</td>
-                    <td>
-                        <span class="badge rounded-pill text-bg-primary">
-                            {{ $log->action }}
-                        </span>
-                    </td>
-                    <td class="fst-italic">
-                        @if ($log->action == 'add/approval')
-                            {{ $approvalJSON['compliance_name'] }}
-                        @else
-                            {{ $log->compliance ? $log->compliance->compliance_name : $log->compliance_name }}
-                        @endif
-                    </td>
-                    @if ($log->action == 'add')
-                        <td>Addition of Compliance <strong>{{ $log->compliance_name }}</strong></td>
-                    @elseif ($log->action == 'edit')
-                        <td class="border border-1">
-                            @if(empty($changes))
-                                <span>No changes were made.</span>
-                            @else
-                                    @foreach($orderedKeys as $key)
-                                        @if (array_key_exists($key, $changes))
-                                            <strong>{{ $keyMapping[$key] ?? ucfirst(str_replace('_', ' ', $key)) }}:</strong> 
-                                            <span>Old: 
-                                                @if ($key === 'department_id')
-                                                    {{ $departments[$oldData[$key] - 1]['department_name'] }}
-                                                @elseif ($key === 'reference_date')
-                                                    {{ \Carbon\Carbon::parse($oldData[$key])->format('F j, Y') }}
-                                                @elseif ($key === 'frequency')
-                                                    {{ $frequencyMapping[$oldData[$key]] ?? 'N/A' }}
-                                                @elseif ($key === 'start_working_on')
-                                                    {{ $startWorkingOnMapping[$oldData[$key]] ?? 'N/A' }}
-                                                @elseif ($key === 'submit_on')
-                                                    {{ $submitOnMapping[$oldData[$key]] ?? 'N/A' }}
-                                                @else
-                                                    {{ $oldData[$key] }}
-                                                @endif
-                                            </span> 
-                                            <span>New: 
-                                                @if ($key === 'department_id')
-                                                    {{ $departments[$changes[$key] - 1]['department_name'] }}
-                                                @elseif ($key === 'reference_date')
-                                                    {{ \Carbon\Carbon::parse($changes[$key])->format('F j, Y') }}
-                                                @elseif ($key === 'frequency')
-                                                    {{ $frequencyMapping[$changes[$key]] ?? 'N/A' }}
-                                                @elseif ($key === 'start_working_on')
-                                                    {{ $startWorkingOnMapping[$changes[$key]] ?? 'N/A' }}
-                                                @elseif ($key === 'submit_on')
-                                                    {{ $submitOnMapping[$changes[$key]] ?? 'N/A' }}
-                                                @else
-                                                    {{ $changes[$key] }}
-                                                @endif
-                                            </span><br>
-                                        @endif
-                                    @endforeach
-                            @endif
-                        </td>
-                    @elseif ($log->action == 'delete')
-                        <td>Deletion of Compliance <strong>{{ $log->compliance_name }}</strong></td>
-                    @elseif ($log->action == 'add/approval')
-                        <td>Request for Addition of Compliance <strong>{{ $approvalJSON['compliance_name'] }}</strong></td>
-                    @elseif ($log->action == 'edit/approval')
-                        <td>Request for Change of Compliance
-                            @foreach($orderedKeys as $key)
-                                @if ($key === 'compliance_name') 
-                                    <strong>{{$oldData[$key]}}</strong>
-                                @else
-                                @endif
-                            @endforeach
-                        </td>
-                    @elseif ($log->action == 'delete/approval')
-                        <td>Request for Deletion of Compliance <strong>{{ $log->compliance_name }}</strong></td>
-                    @elseif ($log->action == 'add/approved')
-                    @elseif ($log->action == 'edit/approved')
-                    <td>Approved for Change of Compliance
-                        @foreach($orderedKeys as $key)
-                            @if ($key === 'compliance_name') 
-                                <strong>{{$oldData[$key]}}</strong>
-                            @else
-                            @endif
-                        @endforeach
-                    </td>
-                    @elseif ($log->action == 'delete/approved')
-                        <td>Approved for Deletion of Compliance <strong>{{ $log->compliance_name }}</strong></td>
-                    @endif
-                    
-
-                    <td>ACTION</td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table> --}}
-    <h2 class="fw-bold mb-5" style="font-size: 30px !important;">Logs</h2>
-
-    <div>
-        <div class="card-lg custom-table-card-sm">
-
-            {{-- <div class="card-top">
-                <h5 class="fw-semibold m-0 p-0" style="font-size: 16px !important;">Logs</h5>
-            </div> --}}
-            
-            <table class="table custom-table custom-table-sm w-100" id="logsTable">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>AT</th>
-                        <th>USER</th>
-                        <th>TYPE</th>
-                        <th>COMPLIANCE NAME</th>
-                        <th>CHANGES</th>
-                        <th>ACTION</th>
-                    </tr>
-                </thead>
-          
-            </table>
+    <!-- Tab content -->
+    <div class="tab-content" id="myTabContent">
+        
+        <!-- Compliance Tab -->
+        <div class="tab-pane fade show active" id="compliance" role="tabpanel" aria-labelledby="compliance-tab">
+            <div class="card-lg custom-table-card-sm">
+                <table class="table custom-table custom-table-sm w-100" id="complianceManagementTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>COMPLIANCE NAME</th>
+                            <th>DEPARTMENT NAME</th>
+                            <th>DEADLINE</th>
+                            <th>STATUS</th>
+                            <th>ACTION</th>
+                        </tr>
+                    </thead>
+              
+                </table>
+            </div>
         </div>
+
+        <!-- Logs Tab -->
+        <div class="tab-pane fade" id="logs" role="tabpanel" aria-labelledby="logs-tab">
+            <div class="card-lg custom-table-card-sm">
+                <table class="table custom-table custom-table-sm w-100" id="logsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>AT</th>
+                            <th>USER</th>
+                            <th>TYPE</th>
+                            <th>COMPLIANCE NAME</th>
+                            <th>CHANGES</th>
+                            {{-- <th>ACTION</th> --}}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Populate logs data here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+      
     </div>
 </x-main>
 
@@ -385,4 +268,39 @@
         placement: 'top', // Set position: 'top', 'bottom', 'left', 'right'
     });
 
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('#complianceManagementTable').DataTable({
+            language: {
+                emptyTable: "No compliance due available", // When no data is in the table
+                zeroRecords: "No matching compliance due found", // When search results in no data
+                infoEmpty: "No compliance due to display", // When there are no records available
+                lengthMenu: "_MENU_ entries per page", // Change "Show entries" text
+                search: 'Search:', // Set search label to an empty string
+                searchPlaceholder: '' // Set the placeholder text
+            },
+            pageLength: 20, // Default entries to display
+            lengthMenu: [20, 30, 40, 50, 100], // Options available in the dropdown
+            processing: true,
+            serverSide: true,
+            ajax: '{{ route('compliance-management.index') }}',
+            order: [], // Disable default sorting
+            columns: [
+                { data: 'compliance_id', name: 'compliance_id' },
+                { data: 'compliance_name', name: 'compliance_name' },
+                { data: 'department_id', name: 'department_id' },
+                { data: 'deadline', name: 'deadline' },
+                { data: 'status', name: 'status' },
+                { data: 'action', name: 'action' },
+            ],
+            createdRow: function (row, data) {
+                // Check if the status is completed
+                if (data.status.includes('COMPLETED')) {
+                    $(row).addClass('completed'); // Use Bootstrap's gray class
+                }
+            }
+        });
+    });
 </script>

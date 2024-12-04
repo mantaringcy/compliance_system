@@ -45,16 +45,19 @@ class ComplianceManagementController extends Controller
 
     public function index(Request $request)
     {
-        $monthlyCompliances = MonthlyCompliance::all();
+        // $monthlyCompliances = MonthlyCompliance::all();
+        // $monthlyCompliances = MonthlyCompliance::where('status', 'completed')->get();
+
+        // dd($monthlyCompliances);
 
         // Retrieve departments from the database
         $departments = Department::all()->toArray(); 
 
         // Fetch monthly compliances and map department name and days difference
-        $monthlyCompliances = MonthlyCompliance::all()->map(function ($compliance) use ($departments) {
+        $monthlyCompliances = MonthlyCompliance::where('status', 'completed')->get()->map(function ($compliance) use ($departments) {
             // Calculate days difference
             $compliance->days_difference = now()->startOfDay()->diffInDays(\Carbon\Carbon::parse($compliance->computed_deadline)->startOfDay(), false);
-        
+            
             // Get department name using the method
             $compliance->department_name = $this->getDepartmentName($compliance->department_id, $departments);
             
@@ -112,7 +115,7 @@ class ComplianceManagementController extends Controller
                 ->make(true);
         }
 
-        return view('module.compliance-management', compact('monthlyCompliances'));
+        return view('components.logs', compact('monthlyCompliances'));
     }
 
     public function edit($id)
