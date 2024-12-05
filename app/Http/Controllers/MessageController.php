@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NewChatMessage;
 use App\Models\Message;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,6 +20,8 @@ class MessageController extends Controller
             'user_id' => Auth::id(),
             'message' => $validated['message'],
         ]);
+
+        broadcast(new NewChatMessage($message)); // Broadcast the message event
     
         return response()->json(['success' => true, 'message' => $message]);
     }

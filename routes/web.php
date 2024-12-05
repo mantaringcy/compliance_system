@@ -8,6 +8,7 @@ use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ComplianceController;
 use App\Http\Controllers\ComplianceManagementController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LogController;
 use App\Http\Controllers\MailController;
 use App\Http\Controllers\MessageController;
@@ -42,7 +43,10 @@ Route::middleware('guest')->group(function() {
 
 
 Route::middleware('auth')->group(function() {
-    Route::view('/dashboard', 'components.dashboard')->middleware('verified')->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('verified')->name('dashboard');
+
+    // Route::get('/compliance', [ComplianceController::class, 'index'])->name('compliance.index');
+
 
     // Overview - Compliance for the Month
     Route::get('/overview', [ComplianceController::class, 'monthlyCompliances'])->name('overview');

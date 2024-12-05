@@ -7,6 +7,7 @@ use App\Models\MonthlyCompliance;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -54,7 +55,23 @@ class ComplianceManagementController extends Controller
         $departments = Department::all()->toArray(); 
 
         // Fetch monthly compliances and map department name and days difference
-        $monthlyCompliances = MonthlyCompliance::where('status', 'completed')->get()->map(function ($compliance) use ($departments) {
+        // Assuming you have access to the current user
+        $user = Auth::user(); // Get the currently authenticated user
+
+        // Fetch monthly compliance records based on user credentials
+        $monthlyCompliances = MonthlyCompliance::where('status', 'completed');
+
+        // Check if the user meets the criteria for accessing all records
+        if (in_array($user->department_id, [1, 2]) && in_array($user->role_id, [1, 2, 3])) {
+            // User has access to all completed compliance records
+            $monthlyCompliances = $monthlyCompliances->get();
+        } else {
+            // User can only see their respective department's completed compliance records
+            $monthlyCompliances = $monthlyCompliances->where('department_id', $user->department_id)->get();
+        }
+
+        // Map through the compliance records to add additional information
+        $monthlyCompliances = $monthlyCompliances->map(function ($compliance) use ($departments) {
             // Calculate days difference
             $compliance->days_difference = now()->startOfDay()->diffInDays(\Carbon\Carbon::parse($compliance->computed_deadline)->startOfDay(), false);
             

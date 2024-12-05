@@ -200,110 +200,8 @@
     
             <span class="line-message"></span>
     
-            <div class="card-body">
+            <div class="card-body" id="message-container">
     
-                {{-- <div class="message-secondary">
-                    <div class="message-profile">
-                        <img src="{{ URL('images/avatar-2.jpg') }}" alt="logo">
-                    </div>
-    
-                    <div class="message-body">
-                        <div class="message-name">
-                            <p class="m-0">
-                                Cymon
-                                <small style="font-size: 11px !important; color: #585C5E !important;">
-                                    12:00
-                                </small>
-                            </p>
-                        </div>
-    
-                        <div class="message-content">
-                            <div class="message-user">
-                                <p class="m-0">Hello</p>
-                            </div>
-        
-                            <div class="message-user">
-                                <p class="m-0">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.</p>
-                            </div>
-                        </div>
-        
-                    </div>
-    
-    
-                </div>
-    
-                <div class="message-primary">
-                    <div class="message-body">
-                        <div class="message-name text-end">
-                            <small style="font-size: 11px !important; color: #585C5E !important;">
-                                9h ago
-                            </small>
-                        </div>
-    
-                        <div class="message-content">
-                            <div class="message-user">
-                                <p class="m-0">Hello</p>
-                            </div>
-        
-                            <div class="message-user">
-                                <p class="m-0">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.</p>
-                            </div>
-                        </div>
-        
-                    </div>
-                </div>
-    
-                <div class="message-secondary">
-                    <div class="message-profile">
-                        <img src="{{ URL('images/avatar-2.jpg') }}" alt="logo">
-                    </div>
-    
-                    <div class="message-body">
-                        <div class="message-name">
-                            <p class="m-0">
-                                Cymon
-                                <small style="font-size: 11px !important; color: #585C5E !important;">
-                                    12:00
-                                </small>
-                            </p>
-                        </div>
-    
-                        <div class="message-content">
-                            <div class="message-user">
-                                <p class="m-0">Hello</p>
-                            </div>
-        
-                            <div class="message-user">
-                                <p class="m-0">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.</p>
-                            </div>
-                        </div>
-        
-                    </div>
-    
-    
-                </div>
-    
-                <div class="message-primary">
-                    <div class="message-body">
-                        <div class="message-name text-end">
-                            <small style="font-size: 11px !important; color: #585C5E !important;">
-                                9h ago
-                            </small>
-                        </div>
-    
-                        <div class="message-content">
-                            <div class="message-user">
-                                <p class="m-0">Hello</p>
-                            </div>
-        
-                            <div class="message-user">
-                                <p class="m-0">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.</p>
-                            </div>
-                        </div>
-        
-                    </div>
-                </div> --}}
-
                 @php
                     $lastUserId = null; // Tracks the user of the last message
                 @endphp
@@ -511,6 +409,34 @@
     </div> --}}
     
 </x-main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Function to scroll to the bottom of the message container
+        function scrollToBottom() {
+            const messageContainer = document.getElementById('message-container');
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+        }
+
+        // Call the function on page load
+        scrollToBottom();
+
+        // Optional: If you're using AJAX to send messages, call this function after a new message is added
+        const chatForm = document.getElementById('chat-form');
+        chatForm.addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            // Here you would typically send the message via AJAX
+            // For example:
+            // const message = document.getElementById('chat-message').value;
+            // Send the message via AJAX...
+
+            // After sending the message, clear the input and scroll to the bottom
+            document.getElementById('chat-message').value = ''; // Clear the input
+            scrollToBottom(); // Scroll to the bottom
+        });
+    });
+</script>
 
 {{-- Approve Button --}}
 <script>
