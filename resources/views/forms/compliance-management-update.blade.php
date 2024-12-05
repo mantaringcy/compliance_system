@@ -8,20 +8,23 @@
             <h2 class="fw-bold" style="font-size: 30px !important;">{{ $monthlyCompliance->compliance_name }}</h2>
         </div>
 
-        @if (Auth::user()->role->id == 3)
+        @if ((Auth::user()->department_id == 1 || Auth::user()->department_id == 2) && 
+            (Auth::user()->role->id == 1 || Auth::user()->role->id == 2 || Auth::user()->role->id == 3))
             <div class="d-flex">
                 <!-- Status -->
                 <div class="me-2">
-                    {{-- <label for="status" class="mb-2">Status</label> --}}
                     <select name="status" id="status" class="form-select" onchange="updateStatus()">
                         @foreach($enumValues as $value)
-                            <option value="{{ $value }}" {{ $monthlyCompliance->status === $value ? 'selected' : '' }}>
-                                {{ ucwords(str_replace('_', ' ', $value)) }}
-                            </option>
+                            @if ($monthlyCompliance->status === 'completed' || 
+                                ($value === 'pending' || $value === 'in_progress')) <!-- Show all if completed -->
+                                <option value="{{ $value }}" {{ $monthlyCompliance->status === $value ? 'selected' : '' }}>
+                                    {{ ucwords(str_replace('_', ' ', $value)) }}
+                                </option>
+                            @endif
                         @endforeach
                     </select>
                 </div>
-        
+
                 <!-- Approve Button -->
                 <button class="btn btn-success" id="approveButton" onclick="approveCompliance()" 
                     {{ $monthlyCompliance->status === 'completed' ? 'disabled' : '' }}>

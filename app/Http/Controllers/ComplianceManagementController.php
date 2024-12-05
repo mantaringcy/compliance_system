@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\UploadFileToDrive;
+use App\Mail\ComplianceMail;
 use App\Models\Department;
 use App\Models\MonthlyCompliance;
+use App\Models\User;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -11,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\DataTables;
 use Yaza\LaravelGoogleDriveStorage\Gdrive;
@@ -295,6 +299,20 @@ class ComplianceManagementController extends Controller
             'status' => 'in_progress',
         ]);
 
+        // Fetch users in the same department
+        $departmentUsers = User::where('department_id', $monthlyCompliance->department_id)->get();
+
+        // Fetch superadmins with role_id 1, 2, or 3
+        $superAdmins = User::whereIn('role_id', [1, 2, 3])->get();
+
+        // Merge department users and superadmins
+        $recipients = $departmentUsers->merge($superAdmins);
+
+        // Send email to each user in the department
+        foreach ($superAdmins as $recipient) {
+            Mail::to($recipient->email)->queue(new ComplianceMail($monthlyCompliance, 'upload-image'));
+        }
+
        return response()->json([
             'success' => true,
             'filePaths' => $uploadedPaths,
@@ -372,7 +390,22 @@ class ComplianceManagementController extends Controller
         // Update the status to "approved" (1)
         $compliance->approve = $request->status;
         $compliance->status = 'completed';
+        $compliance->approved_at = Carbon::now();
         $compliance->save();
+
+        // Fetch users in the same department
+        $departmentUsers = User::where('department_id', $compliance->department_id)->get();
+
+        // Fetch superadmins with role_id 1, 2, or 3
+        $superAdmins = User::whereIn('role_id', [1, 2, 3])->get();
+
+        // Merge department users and superadmins
+        $recipients = $departmentUsers->merge($superAdmins);
+
+        // Send email to each user in the department
+        foreach ($recipients as $recipient) {
+            Mail::to($recipient->email)->queue(new ComplianceMail($compliance, 'approve-compliance'));
+        }
 
         // Get the department name based on department_id
         $department = Department::find($compliance->department_id);
@@ -411,7 +444,9 @@ class ComplianceManagementController extends Controller
                     $drivePath = $departmentName . ' / ' . $complianceFolderName . '/' . $fileName;
                     $file = new \Illuminate\Http\File($localFilePath);
 
-                    Gdrive::put($drivePath, $file);
+                    // Gdrive::put($drivePath, $file);
+                    UploadFileToDrive::dispatch($filePath, $drivePath);
+
 
                     // Store the result of the upload
                     $uploadResults[] = [

@@ -10,7 +10,7 @@
 <x-main>
     <h2 class="fw-bold mb-5">Dashboard</h2>
    
-    <div class="container">
+    <div class="container-kpi">
         
         <!-- Dropdown for selecting month -->
         <div class="mb-3">

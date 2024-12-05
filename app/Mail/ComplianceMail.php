@@ -79,6 +79,14 @@ class ComplianceMail extends Mailable implements ShouldQueue
                 $view = 'emails.superadmin-compliance-disapproval';
                 break;
 
+            case 'approve-compliance':
+                $view = 'emails.compliance-approval-notification';
+                break;
+
+            case 'upload-image':
+                $view = 'emails.compliance-image-upload-notification';
+                break;
+
             default:
                 $view = 'emails.default_compliance';
         }
