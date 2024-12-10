@@ -330,6 +330,7 @@
                 $('#eventComplianceModal').modal('show');
 
             }
+            
         });
 
         calendar.render();

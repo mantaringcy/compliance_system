@@ -100,7 +100,16 @@ class SendComplianceReminders extends Command
                     }
 
                     return $compliance;
-                });
+                })
+                ->sortBy(function ($compliance) {
+                    // Sort by computed_deadline first
+                    return $compliance->computed_deadline;
+                })
+                ->sortBy(function ($compliance) {
+                    // Then sort by status, putting 'completed' at the end
+                    return $compliance->status === 'completed' ? 1 : 0;
+                })
+                ->values();
 
             // Send email only if there are compliances
             if ($monthlyCompliances->isNotEmpty()) {
@@ -165,7 +174,16 @@ class SendComplianceReminders extends Command
                     }
 
                     return $compliance;
-                });
+                })
+                ->sortBy(function ($compliance) {
+                    // Sort by computed_deadline first
+                    return $compliance->computed_deadline;
+                })
+                ->sortBy(function ($compliance) {
+                    // Then sort by status, putting 'completed' at the end
+                    return $compliance->status === 'completed' ? 1 : 0;
+                })
+                ->values();
 
             // Send email only if there are compliances
             if ($monthlyCompliances->isNotEmpty()) {
@@ -222,7 +240,16 @@ class SendComplianceReminders extends Command
                     }
 
                     return $compliance;
-                });
+                })
+                ->sortBy(function ($compliance) {
+                    // Sort by computed_deadline first
+                    return $compliance->computed_deadline;
+                })
+                ->sortBy(function ($compliance) {
+                    // Then sort by status, putting 'completed' at the end
+                    return $compliance->status === 'completed' ? 1 : 0;
+                })
+                ->values();
 
             // Send email only if there are compliances
             if ($monthlyCompliances->isNotEmpty()) {

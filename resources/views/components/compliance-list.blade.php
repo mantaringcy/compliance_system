@@ -128,7 +128,7 @@
                 { data: 'view', name: 'view', orderable: false, searchable: false, className: 'hidden-column' },
             ],
             columnDefs: [
-                { orderable: false, targets: [0, 1, 2, 3, 4] }, 
+                // { orderable: false, targets: [0, 1, 2, 3, 4] }, 
                 { width: "15%", targets: -1},
             ],
         });

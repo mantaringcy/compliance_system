@@ -24,6 +24,9 @@
     <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.js"></script>
     {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> --}}
 
+    <!-- Tabler Icons CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" rel="stylesheet">
+
     <!-- FullCalendar CSS -->
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
 
@@ -45,6 +48,8 @@
         <div>
             <button id="theme-switch">
                 <i class="fa-solid fa-moon fs-5"></i>
+                {{-- {!! file_get_contents(public_path('images/svg-icon/moon.svg')) !!} --}}
+                {{-- {!! file_get_contents(public_path('images/svg-icon/sun.svg')) !!} --}}
                 <i class="fa-solid fa-sun fs-5"></i>
             </button>
         </div>
@@ -92,13 +97,15 @@
                             <ul>
                                 <li class="mb-3">
                                     <a href="{{ route('profile.update') }}">
-                                        <i class="fa-solid fa-user"></i>
+                                        {{-- <i class="fa-regular fa-user"></i> --}}
+                                        <i class="fs-5 ti ti-user"></i>
                                         My Account
                                     </a>
                                 </li>
                                 <li class="mb-3">
                                     <a href="account-settings">
-                                        <i class="fa-solid fa-gear"></i>
+                                        {{-- <i class="fa-solid fa-gear"></i> --}}
+                                        <i class="fs-5 ti ti-settings"></i>
                                         Settings
                                     </a>
                                 </li>
@@ -107,7 +114,8 @@
                                         @csrf
 
                                         <a onclick="document.getElementById('myForm').submit(); return false;">
-                                            <i class="fa-solid fa-right-from-bracket"></i>
+                                            {{-- <i class="fa-solid fa-power-off"></i> --}}
+                                            <i class="fs-5 ti ti-power"></i>
                                             Logout
                                         </a>
 
@@ -126,40 +134,49 @@
                         </li>
                         <li class="sidebar-item2 mb-1">
                             <a href="{{ route('dashboard') }}">
-                                <i class="fa-solid fa-house"></i>
-                                <span>Dashboard</span>
+                                {{-- <i class="fa-solid fa-house"></i> --}}
+                                {!! file_get_contents(public_path('images/svg-icon/dashboard.svg')) !!}
+                                <span class="sidebar-text">Dashboard</span>
                             </a>
                         </li>
+                                        
                         <li class="sidebar-item2 mb-1">
                             <a href="{{ route('overview') }}">
-                                <i class="fa-solid fa-square-poll-vertical"></i>
-                                <span>Compliance Due</span>
+                                {{-- <i class="fa-solid fa-square-poll-vertical"></i> --}}
+                                {!! file_get_contents(public_path('images/svg-icon/compliance-due.svg')) !!}
+                                <span class="sidebar-text">Compliance Due</span>
                             </a>
                         </li>
+
                         <li class="sidebar-item2 mb-1">
                             <a href="{{ route('projections') }}">
-                                <i class="fa-solid fa-chart-line"></i>
-                                <span>Compliance Projection</span>
+                                {{-- <i class="fa-solid fa-chart-line"></i> --}}
+                                {!! file_get_contents(public_path('images/svg-icon/projection.svg')) !!}
+                                <span class="sidebar-text">Compliance Projection</span>
                             </a>
                         </li>
+
                         <li class="sidebar-item2 mb-1">
                             <a href="{{ route('calendar') }}">
-                                <i class="fa-solid fa-calendar-days"></i>
-                                <span>Calendar</span>
+                                {{-- <i class="fa-solid fa-calendar-days"></i> --}}
+                                {!! file_get_contents(public_path('images/svg-icon/calendar.svg')) !!}
+                                <span class="sidebar-text">Calendar</span>
                             </a>
                         </li>
                         <li class="sidebar-item2 mb-1">
                             <a href="{{ route('compliances.index') }}">
-                                <i class="fa-solid fa-file-circle-plus"></i>
-                                <span>Compliance Reference</span>
+                                {{-- <i class="fa-solid fa-file-circle-plus"></i> --}}
+                                {!! file_get_contents(public_path('images/svg-icon/reference.svg')) !!}
+                                <span class="sidebar-text">Compliance Reference</span>
                             </a>
                         </li>
-                        <li class="sidebar-item2">
+                        <li class="sidebar-item2 mb-1">
                             <a href="{{ route('complianceRequests') }}">
                                 <div class="d-flex justify-content-between">
                                     <div>
-                                        <i class="fa-solid fa-file-import"></i>
-                                        <span>Compliance Request</span>
+                                        {{-- <i class="fa-solid fa-file-import"></i> --}}
+                                        {!! file_get_contents(public_path('images/svg-icon/request.svg')) !!}
+                                        <span class="sidebar-text">Compliance Request</span>
                                     </div>
                                     <div>
                                         @if (!empty($totalRequestsCount))
@@ -177,8 +194,9 @@
                         </li> --}}
                         <li class="sidebar-item2 mb-1">
                             <a href="{{ route('logs.data') }}">
-                                <i class="fa-solid fa-book"></i>
-                                <span>Logs</span>
+                                {{-- <i class="fa-solid fa-book"></i> --}}
+                                {!! file_get_contents(public_path('images/svg-icon/logs.svg')) !!}
+                                <span class="sidebar-text">Logs</span>
                             </a>
                         </li>
                         {{-- <li class="sidebar-item2 mb-1">
@@ -326,3 +344,53 @@
 
 </body>
 </html>
+
+<style>
+    svg {
+        margin-right: 15px !important;;
+    }
+
+    svg path:nth-of-type(1) {
+        fill: #BAC0C6; /* First path color */
+    }
+
+    svg path:not(:nth-of-type(1)) {
+        fill: #5B6B79; /* Style for paths other than the first one */
+    }
+
+    body.dark svg path:nth-of-type(1) {
+        fill: #42474C; /* First path color */
+    }
+
+    body.dark svg path:not(:nth-of-type(1)) {
+        fill: #A0A3A6; /* Style for paths other than the first one */
+    }
+
+    svg.svg-active path:nth-of-type(1) {
+        fill: #A7C2FD; /* First path color */
+    }
+
+    svg.svg-active path:not(:nth-of-type(1)) {
+        fill: #4480FF; /* Style for paths other than the first one */
+    }
+
+    body.dark svg.svg-active path:nth-of-type(1) {
+        fill: #2B4A87; /* First path color */
+    }
+
+    body.dark svg.svg-active path:not(:nth-of-type(1)) {
+        fill: #4480FF; /* Style for paths other than the first one */
+    }
+
+    .siderbar-text {
+        margin-bottom: 10px !important;
+    }
+
+    .sidebar-text.active {
+        color: #4982FF !important;
+    }
+
+    body.dark .sidebar-text.active {
+        color: #4076EA !important;
+    }
+</style>

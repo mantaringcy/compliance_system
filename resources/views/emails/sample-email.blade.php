@@ -15,8 +15,8 @@
                 <table role="presentation" style="background-color: #ffffff; padding: 20px; border-radius: 8px; border: 1px solid #E7EAEE;">
                     <tr>
                         <td>
-                            <h2 style="color: #131920; font-size: 24px; text-align: center;">Compliance Details Updated</h2>
-                            <p style="color: #666666; font-size: 16px; text-align: center;">Important: Compliance details have been updated. Please review the changes to ensure compliance is met on time.</p>
+                            <h2 style="color: #131920; font-size: 24px; text-align: center;">New Compliance Created</h2>
+                            <p style="color: #666666; font-size: 16px; text-align: center;">A new compliance has been created. Please review and address this requirement as soon as possible.</p>
 
                             <!-- Table of Compliance Data -->
                             <table role="presentation" style="width: 100%; margin-top: 20px; border-collapse: collapse;">
@@ -47,19 +47,19 @@
                                             color: #131920;
                                             ">
                                         <td style="padding: 8px; border-bottom: 1px solid #E7EAEE;">
-                                            {{ $compliance->compliance_name }}
+                                            Compliance Name
                                         </td>
                                         <td style="padding: 8px; border-bottom: 1px solid #E7EAEE;">
-                                            {{ \Carbon\Carbon::parse($compliance->reference_date)->format('F j, Y') }}
+                                            January 01, 2001
                                         </td>
                                         <td style="padding: 8px; border-bottom: 1px solid #E7EAEE;">
-                                            {{ config('static_data.frequency.' . $compliance->frequency) }}
+                                            Monthly
                                         </td>
-                                        {{-- <td style="padding: 8px; border-bottom: 1px solid #E7EAEE;">
-                                            {{ config('static_data.start_working_on.' . $compliance->start_working_on) }}
+                                        {{-- <td style="padding: 8px; border-bottom: 1px solid #ddd; color: #333333;">
+                                            February 01, 2001
                                         </td>
-                                        <td style="padding: 8px; border-bottom: 1px solid #E7EAEE;">
-                                            {{ config('static_data.submit_on.' . $compliance->submit_on) }}
+                                        <td style="padding: 8px; border-bottom: 1px solid #ddd; color: #333333;">
+                                            March 01, 2001
                                         </td> --}}
                                     </tr>
                                 </tbody>

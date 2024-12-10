@@ -11,7 +11,6 @@
     <h2 class="fw-bold mb-5">Dashboard</h2>
    
     <div class="container-kpi">
-        
         <!-- Dropdown for selecting month -->
         <div class="mb-3">
             <form method="GET" action="{{ route('dashboard') }}">
@@ -29,7 +28,7 @@
             </form>
         </div>
     
-        {{-- Content --}}
+        <!-- KPI -->
         <div class="row">
             
             {{-- Completed --}}
@@ -117,47 +116,9 @@
                     </div>
                 </div>
             </div>
-    
-            {{-- <div class="col-md-6">
-                <div class="card text-white bg-warning mb-3">
-                    <div class="card-header">In Progress</div>
-                    <div class="card-body">
-                        <h5 class="card-title">{{ $data['in_progress'] }}</h5>
-                        <p class="card-text">Percentage: {{ $data['total'] > 0 ? round(($data['in_progress'] / $data['total']) * 100, 2) : 0 }}%</p>
-                    </div>
-                </div>
-            </div>
-    
-            <div class="col-md-4">
-                <div class="card text-white bg-danger mb-3">
-                    <div class="card-header">Pending</div>
-                    <div class="card-body">
-                        <h5 class="card-title">{{ $data['pending'] }}</h5>
-                        <p class="card-text">Percentage: {{ $data['total'] > 0 ? round(($data['pending'] / $data['total']) * 100, 2) : 0 }}%</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="card text-white bg-primary mb-3">
-                    <div class="card-header">Total</div>
-                    <div class="card-body">
-                        <h5 class="card-title">{{ $data['total'] }}</h5>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="card text-white bg-danger mb-3">
-                    <div class="card-header">Overdue</div>
-                    <div class="card-body">
-                        <h5 class="card-title">{{ $data['overdue'] }}</h5>
-                    </div>
-                </div>
-            </div> --}}
-            
         </div>
     
+        <!-- Pie Chart -->
         <div class="container mt-5">
             <h2 class="fw-bold mb-5">Compliance Status Chart</h2>
             <canvas id="complianceChart" width="200" height="200"></canvas>

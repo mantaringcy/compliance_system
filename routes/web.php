@@ -110,7 +110,7 @@ Route::middleware('auth')->group(function() {
     // Resending the Verification Email
     Route::post('/email/verification-notification', [AuthenticationController::class, 'verifyHandler'])->middleware('throttle:6,1')->name('verification.send');
 
-    Route::view('/test-email', 'emails.superadmin_compliance_created');
+    Route::view('/test-email', 'emails.compliance-image-upload-notification');
 
     Route::get('/compliance/{id}/gallery', [ComplianceController::class, 'showGallery']);
 

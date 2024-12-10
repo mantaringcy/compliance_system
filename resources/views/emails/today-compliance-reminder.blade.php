@@ -3,68 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compliance Reminder</title>
+    <title>Compliance Reminder | Today's Deadline</title>
 </head>
-<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
+<body style="font-family: Arial, sans-serif; background-color: #F8F9FA; margin: 0; padding: 0;">
 
     <!-- Main container -->
-    <table role="presentation" style="width: 100%; background-color: #f4f4f4; padding: 20px;">
+    <table role="presentation" style="width: 100%; background-color: #F8F9FA; padding: 20px;">
         <tr>
             <td align="center">
                 <!-- Inner content wrapper -->
-                <table role="presentation" style="background-color: #ffffff; padding: 20px; border-radius: 8px; border: 1px solid #ddd;">
+                <table role="presentation" style="background-color: #ffffff; padding: 20px; border-radius: 8px; border: 1px solid #E7EAEE;">
                     <tr>
                         <td>
-                            <h2 style="color: #333333; font-size: 24px; text-align: center;">Today's Compliance Deadlines</h2>
+                            <h2 style="color: #131920; font-size: 24px; text-align: center;">Today's Compliance Deadlines</h2>
                             <p style="color: #666666; font-size: 16px; text-align: center;">This is a reminder to address your compliance obligations that are due today.</p>
 
                             <!-- Table of Compliance Data -->
                             <table role="presentation" style="width: 100%; margin-top: 20px; border-collapse: collapse;">
-                                <thead>
+                                <thead
+                                    style="
+                                        background: #FCFCFC;
+                                        border-top: 1px solid #E7EAEE;
+                                        border-bottom: 1px solid #E7EAEE;
+                                        height: 37px;
+                                        font-size: 13px;
+                                        font-weight: bold;
+                                        color: #131920;
+                                        text-transform: uppercase;
+                                    ">
                                     <tr>
-                                        <th style="text-align: left; padding: 8px; background-color: #f2f2f2; color: #333333;">Compliance Name</th>
-                                        <th style="text-align: left; padding: 8px; background-color: #f2f2f2; color: #333333;">Start Working On</th>
-                                        <th style="text-align: left; padding: 8px; background-color: #f2f2f2; color: #333333;">Submit On</th>
-                                        <th style="text-align: left; padding: 8px; background-color: #f2f2f2; color: #333333;">Deadline</th>
-                                        <th style="text-align: left; padding: 8px; background-color: #f2f2f2; color: #333333;">Days Left</th>
-                                        <th style="text-align: left; padding: 8px; background-color: #f2f2f2; color: #333333;">Status</th>
+                                        <th style="text-align: left; padding: 10px;">Compliance Name</th>
+                                        <th style="text-align: left; padding: 10px;">Start Working On</th>
+                                        <th style="text-align: left; padding: 10px;">Submit On</th>
+                                        <th style="text-align: left; padding: 10px;">Deadline</th>
+                                        <th style="text-align: left; padding: 10px;">Days Left</th>
+                                        <th style="text-align: left; padding: 10px;">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {{-- @foreach ($monthlyCompliances as $compliance) --}}
                                     @foreach ($compliances as $compliance)
-                                        <tr>
-                                            <td style="padding: 8px; border-bottom: 1px solid #ddd; color: #333333;">{{ $compliance['compliance_name'] }}</td>
-                                            <td style="padding: 8px; border-bottom: 1px solid #ddd; color: #333333;">
+                                        <tr
+                                            style="
+                                                height: 39px;
+                                                border-top: 2px solid #E7EAEE;
+                                                color: #131920;
+                                                {{ $compliance['status'] == 'completed' ? 'background: #F0F0F0;' : '' }}
+                                            ">
+                                            <td style="padding: 8px; border-bottom: 1px solid #E7EAEE;">{{ $compliance['compliance_name'] }}</td>
+                                            <td style="padding: 8px; border-bottom: 1px solid #E7EAEE;">
                                                 {{ \Carbon\Carbon::parse($compliance['computed_start_date'])->format('F j, Y') }}
                                             </td>
-                                            <td style="padding: 8px; border-bottom: 1px solid #ddd; color: #333333;">
+                                            <td style="padding: 8px; border-bottom: 1px solid #E7EAEE;">
                                                 {{ \Carbon\Carbon::parse($compliance['computed_submit_date'])->format('F j, Y') }}
                                             </td>
-                                            <td style="padding: 8px; border-bottom: 1px solid #ddd; color: #333333;">
+                                            <td style="padding: 8px; border-bottom: 1px solid #E7EAEE;">
                                                 {{ \Carbon\Carbon::parse($compliance['computed_deadline'])->format('F j, Y') }}
                                             </td>
-                                            <td style="padding: 8px; border-bottom: 1px solid #ddd; color: #333333;">
-                                                @if($compliance['days_left'] < 0)
-                                                    <span style="color: #DC2625;">
-                                                        {{ abs($compliance['days_left']) }} days overdue
+                                            @if ($compliance['status'] == 'completed')
+                                                <td 
+                                                    colspan="2" 
+                                                    style="
+                                                        padding: 10px; 
+                                                        border-bottom: 1px solid #E7EAEE; 
+                                                        color: #131920; 
+                                                        text-align: center;"
+                                                    >
+                                                    <span 
+                                                        style="
+                                                            background-color: #2CA87F; 
+                                                            color: white; 
+                                                            padding: 0.25em 0.5em; 
+                                                            border-radius: 0.25rem; 
+                                                            font-size: 10.5px; 
+                                                            font-weight: 700;
+                                                            text-align: center;
+                                                            ">
+                                                        COMPLIED ✓
                                                     </span>
-                                                @else
-                                                    <span style="color: #2CA87F;">
-                                                        {{ abs($compliance['days_left']) }} days left
-                                                    </span>
-                                                @endif
-                                            </td>
-                                            <td style="padding: 8px; border-bottom: 1px solid #ddd; color: #333333;">
-                                                @if($compliance['status'] == 'completed')
-                                                    <span style="background-color: #2CA87F; color: white; padding: 0.25em 0.5em; border-radius: 0.25rem; font-size: 14px; font-weight: 600;">COMPLIED</span>
-                                                @elseif($compliance['status'] == 'in_progress')
-                                                    <span style="background-color: #E3ECFF; color: #4680FF; padding: 0.25em 0.5em; border-radius: 0.25rem; font-size: 14px; font-weight: 600;">IN PROGRESS</span>
-                                                @elseif($compliance['status'] == 'pending')
-                                                    <span style="background-color: #FBECDE; color: #E48A01; padding: 0.25em 0.5em; border-radius: 0.25rem; font-size: 14px; font-weight: 600;">PENDING</span>
-                                                @endif
-                                            </td>
-                                            <td style="padding: 8px; border-bottom: 1px solid #ddd; color: #333333;">
+                                                </td>
+                                            @else
+                                                <td style="padding: 10px; border-bottom: 1px solid #E7EAEE;">
+                                                    <span style="color: #E48A01;">Deadline is today</span>
+                                                </td>
+                                                <td style="padding: 10px; border-bottom: 1px solid #E7EAEE;">
+                                                    @if ($compliance['status'] == 'in_progress')
+                                                        <span 
+                                                            style="
+                                                                background-color: #4680FF; 
+                                                                color: white; 
+                                                                padding: 0.25em 0.5em; 
+                                                                border-radius: 0.25rem; 
+                                                                font-size: 10.5px; 
+                                                                font-weight: 700; 
+                                                            "
+                                                        >
+                                                            IN PROGRESS
+                                                        </span>
+                                                    @elseif ($compliance['status'] == 'pending')
+                                                        <span 
+                                                            style="
+                                                                background-color: #E48A01; 
+                                                                color: white; 
+                                                                padding: 0.25em 0.5em; 
+                                                                border-radius: 0.25rem; 
+                                                                font-size: 10.5px; 
+                                                                font-weight: 700;
+                                                                text-align: center;
+                                                            "
+                                                        >
+                                                            PENDING
+                                                        </span>
+                                                    @endif
+                                                </td>
+                                            @endif
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -74,6 +125,18 @@
                             <p style="color: #999999; font-size: 14px; text-align: center; margin-top: 20px;">
                                 This is an automated reminder. Please contact us if you have any questions.
                             </p>
+
+                            <!-- Clickable link to compliance module -->
+                            <p style="text-align: center; margin: 0; font-size: 14px; color: #4680FF;">
+                                <span>
+                                    <a href="http://compliance_system.test/compliance-management/{{ $compliance['id'] }}/edit" style="color: #4680FF;">
+                                        Click here
+                                    </a>
+                                    to view compliance
+                                </span>
+                            </p>
+
+
                         </td>
                     </tr>
                 </table>
